@@ -15,7 +15,18 @@ export const kakaoLogin = async (code: string | null) => {
       throw new Error(`Failed to authenticate: ${jwtResponse.status}`)
     }
 
-    const jwtResponseData = await jwtResponse.json()
+    const jwtResponseData: {
+      data: {
+        accessToken: string
+        userId: number
+        userName: string
+        userEmail: string,
+        userRole: 'FREE' | 'PRO' | 'ADMIN'
+      },
+      message: string
+      status: number
+      success: boolean
+    } = await jwtResponse.json()
 
     console.log('jwtResponseData', jwtResponseData)
 
@@ -23,16 +34,16 @@ export const kakaoLogin = async (code: string | null) => {
       throw new Error(jwtResponseData.message || 'Authentication failed')
     }
 
-    // const { role, accessToken, refreshToken, isReadingTaste, memberId } = jwtResponseData.data
-    //
-    // return {
-    //   success: true,
-    //   accessToken,
-    //   refreshToken,
-    //   role,
-    //   isReadingTaste,
-    //   memberId,
-    // }
+    const { userId, accessToken, userName, userEmail, userRole } = jwtResponseData.data
+
+    return {
+      success: true,
+      accessToken,
+      userId,
+      userName,
+      userEmail,
+      userRole,
+    }
   } catch (error) {
     console.error('Authentication error:', error)
     return {

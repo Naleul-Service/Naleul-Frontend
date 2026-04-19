@@ -20,31 +20,29 @@ function setAuthCookiesToResponse(
   response: NextResponse,
   result: {
     accessToken?: string
-    refreshToken?: string | null
-    role?: string | null
-    isReadingTaste?: boolean
-    memberId?: number
+    userId?: number
+    userName?: string
+    userEmail?: string
+    userRole?: 'FREE' | 'PRO' | 'ADMIN'
   }
 ) {
-  const { accessToken, refreshToken, role, isReadingTaste, memberId } = result
+  const { accessToken, userId, userName, userEmail, userRole } = result
 
   if (accessToken) response.cookies.set('accessToken', accessToken, HTTP_ONLY_COOKIE_OPTIONS)
-  if (refreshToken) response.cookies.set('refreshToken', refreshToken, HTTP_ONLY_COOKIE_OPTIONS)
-  if (role) response.cookies.set('role', role, BASE_COOKIE_OPTIONS)
-  if (isReadingTaste !== undefined) response.cookies.set('isReadingTaste', String(isReadingTaste), BASE_COOKIE_OPTIONS)
-  if (memberId !== undefined) response.cookies.set('memberId', String(memberId), BASE_COOKIE_OPTIONS)
+  if (userRole) response.cookies.set('role', userRole, BASE_COOKIE_OPTIONS)
+  if (userId !== undefined) response.cookies.set('memberId', String(userId), BASE_COOKIE_OPTIONS)
 }
 
-function getRedirectPathByRole(role: string | undefined | null): string {
+function getRedirectPathByRole(role: 'FREE' | 'PRO' | 'ADMIN' | undefined | null): string {
   switch (role) {
-    case 'ROLE_GUEST':
-      return '/onboarding?tab=terms'
-    case 'ROLE_USER':
-    case 'ROLE_ADMIN':
-      return '/home?tab=PUBLIC'
+    case 'FREE':
+      return '/'
+    case 'PRO':
+      return '/'
+    case 'ADMIN':
+      return '/'
     default:
-      console.warn('Unexpected role:', role)
-      return '/login?error=unexpected_role'
+      return '/'
   }
 }
 
@@ -62,14 +60,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await kakaoLogin(code)
-    console.log("카카오 로그인 결과", result)
+    console.log("카카오 로그인 결과", result.userId)
 
     // ✅ response 객체 먼저 생성 → 쿠키 담기 → 반환
     //    기존: setAuthCookies() → redirect() 순서로 타이밍 불일치 발생
     //    변경: 하나의 response에 쿠키 + redirect 함께 담아서 원자적으로 반환
-    // const response = redirect(getRedirectPathByRole(result.role))
-    // setAuthCookiesToResponse(response, result)
-    // return response
+    const response = redirect(getRedirectPathByRole(result.userRole))
+    setAuthCookiesToResponse(response, {accessToken: result.accessToken, userEmail: result.userEmail, userId: result.userId, userName: result.userName, userRole: result.userRole})
+    return response
   } catch (error) {
     console.error('GET callback error:', error)
     const message = error instanceof Error ? error.message : 'server_error'

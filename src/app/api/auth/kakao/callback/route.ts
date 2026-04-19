@@ -20,15 +20,17 @@ function setAuthCookiesToResponse(
   response: NextResponse,
   result: {
     accessToken?: string
+    refreshToken?: string
     userId?: number
     userName?: string
     userEmail?: string
     userRole?: 'FREE' | 'PRO' | 'ADMIN'
   }
 ) {
-  const { accessToken, userId, userName, userEmail, userRole } = result
+  const { accessToken, userId, userName, userEmail, userRole, refreshToken } = result
 
   if (accessToken) response.cookies.set('accessToken', accessToken, HTTP_ONLY_COOKIE_OPTIONS)
+  if (refreshToken) response.cookies.set('refreshToken', refreshToken, HTTP_ONLY_COOKIE_OPTIONS)
   if (userRole) response.cookies.set('role', userRole, BASE_COOKIE_OPTIONS)
   if (userId !== undefined) response.cookies.set('userId', String(userId), BASE_COOKIE_OPTIONS)
 }

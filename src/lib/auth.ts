@@ -1,4 +1,16 @@
 
+interface AuthCallResult {
+  success: boolean
+  status?: string
+  error?: string
+  name?: string
+  email?: string
+  userId?: string
+  accessToken?: string | undefined
+  refreshToken?: string | undefined
+  role?: 'EMPLOYER' | 'EMPLOYEE'
+}
+
 export const kakaoLogin = async (code: string | null) => {
   try {
     if (!code) throw new Error('Authorization code not provided')
@@ -17,6 +29,7 @@ export const kakaoLogin = async (code: string | null) => {
 
     const jwtResponseData: {
       data: {
+        refreshToken: string
         accessToken: string
         userId: number
         userName: string
@@ -34,11 +47,12 @@ export const kakaoLogin = async (code: string | null) => {
       throw new Error(jwtResponseData.message || 'Authentication failed')
     }
 
-    const { userId, accessToken, userName, userEmail, userRole } = jwtResponseData.data
+    const { userId, accessToken, userName, userEmail, userRole, refreshToken } = jwtResponseData.data
 
     return {
       success: true,
       accessToken,
+      refreshToken,
       userId,
       userName,
       userEmail,

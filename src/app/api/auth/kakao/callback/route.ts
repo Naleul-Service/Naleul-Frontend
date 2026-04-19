@@ -1,6 +1,6 @@
 // app/redirect/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { kakaoLogin } from '@/src/features/auth/api/authAPI'
+import { kakaoLogin } from '@/src/lib/auth'
 
 const BASE_COOKIE_OPTIONS = {
   maxAge: 7 * 24 * 60 * 60,
@@ -30,7 +30,7 @@ function setAuthCookiesToResponse(
 
   if (accessToken) response.cookies.set('accessToken', accessToken, HTTP_ONLY_COOKIE_OPTIONS)
   if (userRole) response.cookies.set('role', userRole, BASE_COOKIE_OPTIONS)
-  if (userId !== undefined) response.cookies.set('memberId', String(userId), BASE_COOKIE_OPTIONS)
+  if (userId !== undefined) response.cookies.set('userId', String(userId), BASE_COOKIE_OPTIONS)
 }
 
 function getRedirectPathByRole(role: 'FREE' | 'PRO' | 'ADMIN' | undefined | null): string {
@@ -62,9 +62,6 @@ export async function GET(request: NextRequest) {
     const result = await kakaoLogin(code)
     console.log("카카오 로그인 결과", result.userId)
 
-    // ✅ response 객체 먼저 생성 → 쿠키 담기 → 반환
-    //    기존: setAuthCookies() → redirect() 순서로 타이밍 불일치 발생
-    //    변경: 하나의 response에 쿠키 + redirect 함께 담아서 원자적으로 반환
     const response = redirect(getRedirectPathByRole(result.userRole))
     setAuthCookiesToResponse(response, {accessToken: result.accessToken, userEmail: result.userEmail, userId: result.userId, userName: result.userName, userRole: result.userRole})
     return response

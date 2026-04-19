@@ -62,10 +62,10 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await kakaoLogin(code)
-    console.log("카카오 로그인 결과", result.userId)
+    console.log("카카오 로그인 결과 전체:", JSON.stringify(result, null, 2))
 
     const response = redirect(getRedirectPathByRole(result.userRole))
-    setAuthCookiesToResponse(response, {accessToken: result.accessToken, refreshToken: result.refreshToken, userEmail: result.userEmail, userId: result.userId, userName: result.userName, userRole: result.userRole})
+    setAuthCookiesToResponse(response, result)
     return response
   } catch (error) {
     console.error('GET callback error:', error)

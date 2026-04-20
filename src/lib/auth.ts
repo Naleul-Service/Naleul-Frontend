@@ -15,11 +15,13 @@ export const kakaoLogin = async (code: string | null) => {
   try {
     if (!code) throw new Error('Authorization code not provided')
 
-    const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/kakao/callback?code=${code}&redirect_uri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}`, {
+    const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/kakao/callback?code=${code}&redirectUri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
     })
+
+    console.log('jwtResponse', jwtResponse)
 
     if (!jwtResponse.ok) {
       const errorData = await jwtResponse.text()

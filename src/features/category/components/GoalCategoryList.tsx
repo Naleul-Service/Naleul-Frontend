@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { GripVertical, Plus } from 'lucide-react'
+import { GripVertical, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react'
 import {
   closestCenter,
   DndContext,
@@ -20,7 +20,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useGoalCategories, useUpdateGeneralCategories } from '@/src/features/category/hooks/useGoalCategories'
 import { GeneralCategoryItemType, GoalCategory } from '@/src/features/category/api/goalCategory'
 import { GeneralCategoryModal } from './GeneralCategoryModal'
+import { GoalCategoryContextMenu } from './GoalCategoryContextMenu'
+import { GoalCategoryEditModal } from './GoalCategoryEditModal'
+import { GoalCategoryCompleteModal } from './GoalCategoryCompleteModal'
+import { useDeleteGoalCategory } from '@/src/features/category/hooks/useGoalCategoryMutations'
+import { useDeleteGeneralCategory } from '@/src/features/category/hooks/useGeneralCategoryMutations'
 import { cn } from '@/src/lib/utils'
+import { GeneralCategoryEditModal } from '@/src/features/category/components/GeneralCategoryEditModal'
+
+// ─── 상수 / 유틸 ────────────────────────────────────────────
 
 const STATUS_LABEL: Record<string, string> = {
   NOT_STARTED: '시작 전',
@@ -36,29 +44,51 @@ const parseGoalCategoryId = (id: string | number): number | null => {
   return null
 }
 
-// over.id에서 goalCategoryId 추출
 function resolveOverGoalCategoryId(cats: GoalCategory[], overId: string | number): number | null {
-  // droppable 영역
   const fromDroppable = parseGoalCategoryId(overId)
   if (fromDroppable !== null) return fromDroppable
-
-  // generalCategoryId로 소속 찾기
   const found = cats.find((cat) => cat.generalCategories.some((g) => g.generalCategoryId === Number(overId)))
   return found?.goalCategoryId ?? null
 }
 
+// ─── 모달 상태 타입 ──────────────────────────────────────────
+
+type GoalModalType = 'addGeneral' | 'editGoal' | 'complete' | null
+
+interface GoalModalState {
+  type: GoalModalType
+  category: GoalCategory | null
+}
+
+interface GeneralModalState {
+  item: GeneralCategoryItemType | null
+  goalCategory: GoalCategory | null
+}
+
+// ─── GoalCategoryList ────────────────────────────────────────
+
 export function GoalCategoryList() {
   const { data: categories = [], isLoading, isError } = useGoalCategories()
   const { mutate: updateGeneralCategories } = useUpdateGeneralCategories()
+  const { mutate: deleteGoalCategory } = useDeleteGoalCategory()
+  const { mutate: deleteGeneralCategory } = useDeleteGeneralCategory()
   const queryClient = useQueryClient()
 
-  const [selectedGoalCategory, setSelectedGoalCategory] = useState<GoalCategory | null>(null)
+  const [goalModal, setGoalModal] = useState<GoalModalState>({ type: null, category: null })
+  const [generalEditModal, setGeneralEditModal] = useState<GeneralModalState>({ item: null, goalCategory: null })
   const [activeItem, setActiveItem] = useState<GeneralCategoryItemType | null>(null)
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null) // goalCategoryId
+  const [openGeneralMenuId, setOpenGeneralMenuId] = useState<number | null>(null) // generalCategoryId
 
-  // 드래그 시작 시점 원본 컨테이너 id 보존
   const originGoalCategoryIdRef = useRef<number | null>(null)
-
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+
+  const openGoalModal = (type: GoalModalType, category: GoalCategory) => setGoalModal({ type, category })
+  const closeGoalModal = () => setGoalModal({ type: null, category: null })
+
+  const openGeneralEditModal = (item: GeneralCategoryItemType, goalCategory: GoalCategory) =>
+    setGeneralEditModal({ item, goalCategory })
+  const closeGeneralEditModal = () => setGeneralEditModal({ item: null, goalCategory: null })
 
   const getSnapshot = () => queryClient.getQueryData<GoalCategory[]>(['goal-categories']) ?? []
 
@@ -66,50 +96,42 @@ export function GoalCategoryList() {
   if (isError) return <p className="text-xs text-red-500">카테고리를 불러오지 못했어요</p>
   if (categories.length === 0) return null
 
+  // ── DnD 핸들러 ───────────────────────────────────────────
+
   const handleDragStart = (event: DragStartEvent) => {
+    setOpenMenuId(null)
+    setOpenGeneralMenuId(null)
+
     const activeId = Number(event.active.id)
     const container = categories.find((cat) => cat.generalCategories.some((g) => g.generalCategoryId === activeId))
     originGoalCategoryIdRef.current = container?.goalCategoryId ?? null
-    const item = container?.generalCategories.find((g) => g.generalCategoryId === activeId)
-    setActiveItem(item ?? null)
+    setActiveItem(container?.generalCategories.find((g) => g.generalCategoryId === activeId) ?? null)
   }
 
-  // 컨테이너 간 이동 시 UI 즉시 반영 (optimistic)
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event
     if (!over) return
 
     const activeId = Number(active.id)
     const snapshot = getSnapshot()
-
     const activeGoalCategoryId = originGoalCategoryIdRef.current
     if (!activeGoalCategoryId) return
 
     const overGoalCategoryId = resolveOverGoalCategoryId(snapshot, over.id)
-    if (!overGoalCategoryId) return
-    if (activeGoalCategoryId === overGoalCategoryId) return
+    if (!overGoalCategoryId || activeGoalCategoryId === overGoalCategoryId) return
 
     queryClient.setQueryData<GoalCategory[]>(['goal-categories'], (prev) => {
       if (!prev) return prev
-
       const activeContainer = prev.find((c) => c.goalCategoryId === activeGoalCategoryId)
-      if (!activeContainer) return prev
-
-      const movingItem = activeContainer.generalCategories.find((g) => g.generalCategoryId === activeId)
+      const movingItem = activeContainer?.generalCategories.find((g) => g.generalCategoryId === activeId)
       if (!movingItem) return prev
 
       return prev.map((cat) => {
         if (cat.goalCategoryId === activeGoalCategoryId) {
-          return {
-            ...cat,
-            generalCategories: cat.generalCategories.filter((g) => g.generalCategoryId !== activeId),
-          }
+          return { ...cat, generalCategories: cat.generalCategories.filter((g) => g.generalCategoryId !== activeId) }
         }
         if (cat.goalCategoryId === overGoalCategoryId) {
-          return {
-            ...cat,
-            generalCategories: [...cat.generalCategories, movingItem],
-          }
+          return { ...cat, generalCategories: [...cat.generalCategories, movingItem] }
         }
         return cat
       })
@@ -121,7 +143,6 @@ export function GoalCategoryList() {
     setActiveItem(null)
 
     if (!over) {
-      // 드롭 취소 — 원복
       queryClient.invalidateQueries({ queryKey: ['goal-categories'] })
       originGoalCategoryIdRef.current = null
       return
@@ -130,67 +151,53 @@ export function GoalCategoryList() {
     const activeId = Number(active.id)
     const originGoalCategoryId = originGoalCategoryIdRef.current
     originGoalCategoryIdRef.current = null
-
     if (!originGoalCategoryId) return
 
     const snapshot = getSnapshot()
-
-    const originContainer = snapshot.find((c) => c.goalCategoryId === originGoalCategoryId)
-    if (!originContainer) return
-
     const overGoalCategoryId = resolveOverGoalCategoryId(snapshot, over.id)
     if (!overGoalCategoryId) return
 
+    const originContainer = snapshot.find((c) => c.goalCategoryId === originGoalCategoryId)
     const overContainer = snapshot.find((c) => c.goalCategoryId === overGoalCategoryId)
-    if (!overContainer) return
+    if (!originContainer || !overContainer) return
 
     if (originGoalCategoryId === overGoalCategoryId) {
-      // 같은 컨테이너 내 순서 변경
       const oldIndex = overContainer.generalCategories.findIndex((g) => g.generalCategoryId === activeId)
       const newIndex = overContainer.generalCategories.findIndex((g) => g.generalCategoryId === Number(over.id))
-
       if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return
 
       const reordered = arrayMove(overContainer.generalCategories, oldIndex, newIndex)
-
-      // 캐시 업데이트
       queryClient.setQueryData<GoalCategory[]>(['goal-categories'], (prev) =>
         prev?.map((cat) => (cat.goalCategoryId === overGoalCategoryId ? { ...cat, generalCategories: reordered } : cat))
-      )
-
-      // PATCH 요청
-      console.log(
-        'PATCH 순서변경:',
-        overGoalCategoryId,
-        reordered.map((g) => g.generalCategoryId)
       )
       updateGeneralCategories({
         goalCategoryId: overGoalCategoryId,
         generalCategoryIds: reordered.map((g) => g.generalCategoryId),
       })
     } else {
-      // 다른 컨테이너로 이동 — handleDragOver에서 캐시는 이미 반영됨
-      // origin 컨테이너: 이동한 아이템 제외한 ids
       const originIds = originContainer.generalCategories
         .filter((g) => g.generalCategoryId !== activeId)
         .map((g) => g.generalCategoryId)
-
-      // over 컨테이너: 현재 캐시 기준 ids (이미 movingItem 포함)
       const overIds = overContainer.generalCategories.map((g) => g.generalCategoryId)
 
-      console.log('PATCH 컨테이너이동 origin:', originGoalCategoryId, originIds)
-      console.log('PATCH 컨테이너이동 over:', overGoalCategoryId, overIds)
-
-      updateGeneralCategories({
-        goalCategoryId: originGoalCategoryId,
-        generalCategoryIds: originIds,
-      })
-      updateGeneralCategories({
-        goalCategoryId: overGoalCategoryId,
-        generalCategoryIds: overIds,
-      })
+      updateGeneralCategories({ goalCategoryId: originGoalCategoryId, generalCategoryIds: originIds })
+      updateGeneralCategories({ goalCategoryId: overGoalCategoryId, generalCategoryIds: overIds })
     }
   }
+
+  // ── 삭제 핸들러 ──────────────────────────────────────────
+
+  const handleDeleteGoalCategory = (category: GoalCategory) => {
+    if (!confirm(`"${category.goalCategoryName}" 목표를 삭제할까요?\n하위 일반 카테고리도 함께 삭제돼요.`)) return
+    deleteGoalCategory(category.goalCategoryId)
+  }
+
+  const handleDeleteGeneralCategory = (item: GeneralCategoryItemType) => {
+    if (!confirm(`"${item.generalCategoryName}" 카테고리를 삭제할까요?`)) return
+    deleteGeneralCategory(item.generalCategoryId)
+  }
+
+  // ── 렌더 ─────────────────────────────────────────────────
 
   return (
     <>
@@ -206,7 +213,20 @@ export function GoalCategoryList() {
             <GoalCategoryItem
               key={category.goalCategoryId}
               category={category}
-              onAddGeneral={() => setSelectedGoalCategory(category)}
+              isMenuOpen={openMenuId === category.goalCategoryId}
+              onMenuToggle={() =>
+                setOpenMenuId((prev) => (prev === category.goalCategoryId ? null : category.goalCategoryId))
+              }
+              onMenuClose={() => setOpenMenuId(null)}
+              onAddGeneral={() => openGoalModal('addGeneral', category)}
+              onEdit={() => openGoalModal('editGoal', category)}
+              onComplete={() => openGoalModal('complete', category)}
+              onDelete={() => handleDeleteGoalCategory(category)}
+              openGeneralMenuId={openGeneralMenuId}
+              onGeneralMenuToggle={(id) => setOpenGeneralMenuId((prev) => (prev === id ? null : id))}
+              onGeneralMenuClose={() => setOpenGeneralMenuId(null)}
+              onEditGeneral={(item) => openGeneralEditModal(item, category)}
+              onDeleteGeneral={handleDeleteGeneralCategory}
             />
           ))}
         </div>
@@ -214,19 +234,69 @@ export function GoalCategoryList() {
         <DragOverlay>{activeItem && <GeneralCategoryItemOverlay item={activeItem} />}</DragOverlay>
       </DndContext>
 
-      {selectedGoalCategory && (
-        <GeneralCategoryModal
-          isOpen={!!selectedGoalCategory}
-          onClose={() => setSelectedGoalCategory(null)}
-          goalCategory={selectedGoalCategory}
+      {/* 일반 카테고리 추가 */}
+      {goalModal.type === 'addGeneral' && goalModal.category && (
+        <GeneralCategoryModal isOpen onClose={closeGoalModal} goalCategory={goalModal.category} />
+      )}
+
+      {/* 목표 카테고리 수정 */}
+      {goalModal.type === 'editGoal' && goalModal.category && (
+        <GoalCategoryEditModal isOpen onClose={closeGoalModal} category={goalModal.category} />
+      )}
+
+      {/* 목표 완료 처리 */}
+      {goalModal.type === 'complete' && goalModal.category && (
+        <GoalCategoryCompleteModal isOpen onClose={closeGoalModal} category={goalModal.category} />
+      )}
+
+      {/* 일반 카테고리 수정 */}
+      {generalEditModal.item && generalEditModal.goalCategory && (
+        <GeneralCategoryEditModal
+          isOpen
+          onClose={closeGeneralEditModal}
+          item={generalEditModal.item}
+          goalCategory={generalEditModal.goalCategory}
         />
       )}
     </>
   )
 }
 
-function GoalCategoryItem({ category, onAddGeneral }: { category: GoalCategory; onAddGeneral: () => void }) {
+// ─── GoalCategoryItem ────────────────────────────────────────
+
+interface GoalCategoryItemProps {
+  category: GoalCategory
+  isMenuOpen: boolean
+  onMenuToggle: () => void
+  onMenuClose: () => void
+  onAddGeneral: () => void
+  onEdit: () => void
+  onComplete: () => void
+  onDelete: () => void
+  openGeneralMenuId: number | null
+  onGeneralMenuToggle: (id: number) => void
+  onGeneralMenuClose: () => void
+  onEditGeneral: (item: GeneralCategoryItemType) => void
+  onDeleteGeneral: (item: GeneralCategoryItemType) => void
+}
+
+function GoalCategoryItem({
+  category,
+  isMenuOpen,
+  onMenuToggle,
+  onMenuClose,
+  onAddGeneral,
+  onEdit,
+  onComplete,
+  onDelete,
+  openGeneralMenuId,
+  onGeneralMenuToggle,
+  onGeneralMenuClose,
+  onEditGeneral,
+  onDeleteGeneral,
+}: GoalCategoryItemProps) {
   const generalIds = category.generalCategories.map((g) => g.generalCategoryId)
+  const isCompleted = category.goalCategoryStatus === 'COMPLETED'
 
   return (
     <div className="border-border bg-background rounded-lg border">
@@ -238,13 +308,26 @@ function GoalCategoryItem({ category, onAddGeneral }: { category: GoalCategory; 
             {category.goalCategoryStartDate} · {STATUS_LABEL[category.goalCategoryStatus]}
           </p>
         </div>
-        <button
-          onClick={onAddGeneral}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-xs transition-colors"
-        >
-          <Plus size={12} />
-          일반 카테고리
-        </button>
+
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            onClick={onAddGeneral}
+            className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs transition-colors"
+          >
+            <Plus size={12} />
+            일반 카테고리
+          </button>
+
+          <GoalCategoryContextMenu
+            isOpen={isMenuOpen}
+            onToggle={onMenuToggle}
+            onClose={onMenuClose}
+            onEdit={onEdit}
+            onComplete={onComplete}
+            onDelete={onDelete}
+            isCompleted={isCompleted}
+          />
+        </div>
       </div>
 
       <SortableContext
@@ -254,13 +337,23 @@ function GoalCategoryItem({ category, onAddGeneral }: { category: GoalCategory; 
       >
         <DroppableContainer goalCategoryId={category.goalCategoryId} isEmpty={generalIds.length === 0}>
           {category.generalCategories.map((general) => (
-            <SortableGeneralCategoryItem key={general.generalCategoryId} item={general} />
+            <SortableGeneralCategoryItem
+              key={general.generalCategoryId}
+              item={general}
+              isMenuOpen={openGeneralMenuId === general.generalCategoryId}
+              onMenuToggle={() => onGeneralMenuToggle(general.generalCategoryId)}
+              onMenuClose={onGeneralMenuClose}
+              onEdit={() => onEditGeneral(general)}
+              onDelete={() => onDeleteGeneral(general)}
+            />
           ))}
         </DroppableContainer>
       </SortableContext>
     </div>
   )
 }
+
+// ─── DroppableContainer ──────────────────────────────────────
 
 function DroppableContainer({
   goalCategoryId,
@@ -289,7 +382,25 @@ function DroppableContainer({
   )
 }
 
-function SortableGeneralCategoryItem({ item }: { item: GeneralCategoryItemType }) {
+// ─── SortableGeneralCategoryItem ─────────────────────────────
+
+interface SortableGeneralCategoryItemProps {
+  item: GeneralCategoryItemType
+  isMenuOpen: boolean
+  onMenuToggle: () => void
+  onMenuClose: () => void
+  onEdit: () => void
+  onDelete: () => void
+}
+
+function SortableGeneralCategoryItem({
+  item,
+  isMenuOpen,
+  onMenuToggle,
+  onMenuClose,
+  onEdit,
+  onDelete,
+}: SortableGeneralCategoryItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.generalCategoryId,
   })
@@ -306,6 +417,15 @@ function SortableGeneralCategoryItem({ item }: { item: GeneralCategoryItemType }
     >
       <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: item.colorCode }} />
       <p className="text-foreground flex-1 text-xs">{item.generalCategoryName}</p>
+
+      <GeneralItemContextMenu
+        isMenuOpen={isMenuOpen}
+        onMenuToggle={onMenuToggle}
+        onMenuClose={onMenuClose}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+
       <button
         {...attributes}
         {...listeners}
@@ -317,6 +437,83 @@ function SortableGeneralCategoryItem({ item }: { item: GeneralCategoryItemType }
     </div>
   )
 }
+
+// ─── GeneralItemContextMenu ──────────────────────────────────
+
+interface GeneralItemContextMenuProps {
+  isMenuOpen: boolean
+  onMenuToggle: () => void
+  onMenuClose: () => void
+  onEdit: () => void
+  onDelete: () => void
+}
+
+function GeneralItemContextMenu({
+  isMenuOpen,
+  onMenuToggle,
+  onMenuClose,
+  onEdit,
+  onDelete,
+}: GeneralItemContextMenuProps) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  // 외부 클릭 감지
+  useState(() => {
+    if (!isMenuOpen) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onMenuClose()
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  })
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onMenuToggle()
+        }}
+        className={cn(
+          'text-muted-foreground hover:text-foreground rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100',
+          isMenuOpen && 'opacity-100'
+        )}
+        aria-label="더 보기"
+      >
+        <MoreVertical size={12} />
+      </button>
+
+      {isMenuOpen && (
+        <div className="bg-background border-border animate-in fade-in-0 zoom-in-95 absolute top-full right-0 z-50 mt-1 min-w-[112px] rounded-lg border py-1 shadow-md duration-100">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit()
+              onMenuClose()
+            }}
+            className="text-foreground hover:bg-muted flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors"
+          >
+            <Pencil size={12} />
+            수정하기
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete()
+              onMenuClose()
+            }}
+            className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors"
+          >
+            <Trash2 size={12} />
+            삭제하기
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Overlay / Skeleton ──────────────────────────────────────
 
 function GeneralCategoryItemOverlay({ item }: { item: GeneralCategoryItemType }) {
   return (

@@ -19,6 +19,16 @@ async function postGoalCategory(body: CreateGoalCategoryRequest): Promise<GoalCa
   return json.data
 }
 
+async function patchGeneralCategories(params: { goalCategoryId: number; generalCategoryIds: number[] }) {
+  const res = await fetch(`/api/goal-categories/${params.goalCategoryId}/general-categories`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ generalCategoryIds: params.generalCategoryIds }),
+  })
+  const json = await res.json()
+  if (!json.success) throw new Error(json.error ?? '일반 카테고리 수정 실패')
+}
+
 export function useGoalCategories() {
   return useQuery({
     queryKey: ['goal-categories'],
@@ -35,16 +45,6 @@ export function useCreateGoalCategory() {
       queryClient.invalidateQueries({ queryKey: ['goal-categories'] })
     },
   })
-}
-
-async function patchGeneralCategories(params: { goalCategoryId: number; generalCategoryIds: number[] }) {
-  const res = await fetch(`/api/goal-categories/${params.goalCategoryId}/general-categories`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ generalCategoryIds: params.generalCategoryIds }),
-  })
-  const json = await res.json()
-  if (!json.success) throw new Error(json.error ?? '일반 카테고리 수정 실패')
 }
 
 export function useUpdateGeneralCategories() {

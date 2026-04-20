@@ -31,7 +31,9 @@ function setAuthCookiesToResponse(
 
   if (accessToken) response.cookies.set('accessToken', accessToken, HTTP_ONLY_COOKIE_OPTIONS)
   if (refreshToken) response.cookies.set('refreshToken', refreshToken, HTTP_ONLY_COOKIE_OPTIONS)
-  if (userRole) response.cookies.set('role', userRole, BASE_COOKIE_OPTIONS)
+  if (userRole) response.cookies.set('userRole', userRole, BASE_COOKIE_OPTIONS)
+  if (userName) response.cookies.set('userName', userName, BASE_COOKIE_OPTIONS)
+  if (userEmail) response.cookies.set('userEmail', userEmail, BASE_COOKIE_OPTIONS)
   if (userId !== undefined) response.cookies.set('userId', String(userId), BASE_COOKIE_OPTIONS)
 }
 

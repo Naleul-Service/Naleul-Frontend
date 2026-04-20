@@ -19,7 +19,7 @@ export function Sidebar() {
     >
       {/* 헤더 */}
       <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-3.5">
-        {!isCollapsed && <span className="text-foreground text-sm font-medium">워크스페이스</span>}
+        {!isCollapsed && <span className="text-foreground text-sm font-medium">나를 (Naleul)</span>}
         <div className={cn(isCollapsed && 'mx-auto')}>
           <SidebarToggle />
         </div>

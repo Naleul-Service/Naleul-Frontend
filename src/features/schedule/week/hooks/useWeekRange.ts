@@ -3,10 +3,11 @@ export function useWeekRange(date: Date) {
   const monday = new Date(date)
   monday.setDate(date.getDate() - ((day + 6) % 7))
 
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
-
-  const fmt = (d: Date) => d.toISOString().split('T')[0]
 
   return {
     startDate: fmt(monday),

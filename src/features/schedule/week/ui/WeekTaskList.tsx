@@ -7,6 +7,7 @@ import { useWeekRange } from '../hooks/useWeekRange'
 import { useWeekTaskFilter } from '../hooks/useWeekTaskFilter'
 import { TaskFilterBar } from '@/src/features/schedule/day/components/TaskFilterBar'
 import { TaskItem } from '@/src/features/schedule/day/components/TaskItem'
+import { WeekTimeTable } from '@/src/features/schedule/week/ui/WeekTimeTable'
 
 const DAY_LABELS: Record<string, string> = {
   MONDAY: '월',
@@ -76,35 +77,45 @@ export function WeekTaskList({ date }: WeekTaskListProps) {
       {isPending && <p className="text-muted-foreground text-sm">불러오는 중...</p>}
       {isError && <p className="text-sm text-red-500">할 일을 불러오지 못했어요</p>}
 
-      {data && (
-        <div className="flex flex-col gap-6">
-          {visibleDays.map((day) => {
-            const tasks = data.tasksByDay[day] ?? []
-            const dayOffset = DAY_ORDER.indexOf(day)
-            const dayDate = new Date(startDate)
-            dayDate.setDate(dayDate.getDate() + dayOffset)
-            const dateStr = dayDate.toISOString().split('T')[0]
+      <div className="flex gap-4">
+        {/* 태스크 리스트 */}
+        {data && (
+          <div className="flex w-64 shrink-0 flex-col gap-6">
+            {visibleDays.map((day) => {
+              const tasks = data.tasksByDay[day] ?? []
+              const dayOffset = DAY_ORDER.indexOf(day)
+              const dayDate = new Date(startDate)
+              dayDate.setDate(dayDate.getDate() + dayOffset)
+              const dateStr = dayDate.toISOString().split('T')[0]
 
-            return (
-              <div key={day}>
-                <p className="text-muted-foreground mb-2 text-xs font-medium">
-                  {DAY_LABELS[day]}요일
-                  {tasks.length > 0 && <span className="ml-1.5">({tasks.length})</span>}
-                </p>
-                {tasks.length === 0 ? (
-                  <p className="text-muted-foreground text-xs">할 일이 없어요</p>
-                ) : (
-                  <ul className="flex flex-col gap-2">
-                    {tasks.map((task) => (
-                      <TaskItem key={task.taskId} task={task} date={dateStr} />
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      )}
+              return (
+                <div key={day}>
+                  <p className="text-muted-foreground mb-2 text-xs font-medium">
+                    {DAY_LABELS[day]}요일
+                    {tasks.length > 0 && <span className="ml-1.5">({tasks.length})</span>}
+                  </p>
+                  {tasks.length === 0 ? (
+                    <p className="text-muted-foreground text-xs">할 일이 없어요</p>
+                  ) : (
+                    <ul className="flex flex-col gap-2">
+                      {tasks.map((task) => (
+                        <TaskItem key={task.taskId} task={task} date={dateStr} />
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* 주간 타임테이블 */}
+        {data && (
+          <div className="min-w-0 flex-1 overflow-x-auto">
+            <WeekTimeTable data={data} startDate={startDate} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }

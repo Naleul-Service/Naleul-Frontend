@@ -8,6 +8,7 @@ import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGeneralCategory } from '@/src/features/category/hooks/useGeneralCategories'
 import { GoalCategory } from '@/src/features/category/api/goalCategory'
 import { ColorPicker } from './ColorPicker'
+import { AddColorInput } from '@/src/features/category/components/AddColorInput'
 
 interface GeneralCategoryModalProps {
   isOpen: boolean
@@ -81,6 +82,7 @@ export function GeneralCategoryModal({ isOpen, onClose, goalCategory }: GeneralC
             selectedColorId={selectedColorId}
             onSelect={setSelectedColorId}
           />
+          <AddColorInput existingColors={colors} onAdded={(newColor) => setSelectedColorId(newColor.colorId)} />
         </div>
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>

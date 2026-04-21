@@ -91,7 +91,7 @@ export function TaskEditModal({ task, onClose }: Props) {
           <Button variant="outline" className="flex-1" onClick={onClose}>
             취소
           </Button>
-          <Button variant="solid" className="flex-1" onClick={handleSubmit} isLoading={isPending} disabled={!isValid}>
+          <Button variant="primary" className="flex-1" onClick={handleSubmit} isLoading={isPending} disabled={!isValid}>
             저장
           </Button>
         </div>

@@ -40,7 +40,12 @@ export function CalendarPopover() {
   return (
     <div className="flex items-center gap-1">
       {/* 이전 날짜 */}
-      <Button variant="ghost" size="icon" aria-label="이전 날짜" onClick={() => navigateTo(shiftDate(currentDate, -1))}>
+      <Button
+        variant="ghost"
+        size="iconSm"
+        aria-label="이전 날짜"
+        onClick={() => navigateTo(shiftDate(currentDate, -1))}
+      >
         <ChevronLeft size={16} />
       </Button>
 
@@ -65,7 +70,12 @@ export function CalendarPopover() {
       </div>
 
       {/* 다음 날짜 */}
-      <Button variant="ghost" size="icon" aria-label="다음 날짜" onClick={() => navigateTo(shiftDate(currentDate, 1))}>
+      <Button
+        variant="ghost"
+        size="iconSm"
+        aria-label="다음 날짜"
+        onClick={() => navigateTo(shiftDate(currentDate, 1))}
+      >
         <ChevronRight size={16} />
       </Button>
     </div>

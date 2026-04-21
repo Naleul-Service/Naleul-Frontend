@@ -1,7 +1,9 @@
 'use client'
 
 import { Color } from '@/src/features/category/api/colors'
+import { useDeleteColor } from '@/src/features/category/hooks/useDeleteColor'
 import { cn } from '@/src/lib/utils'
+import { X } from 'lucide-react'
 
 interface ColorPickerProps {
   colors: Color[]
@@ -11,6 +13,8 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ colors, isLoading = false, selectedColorId, onSelect }: ColorPickerProps) {
+  const { mutate: deleteColor, isPending: isDeleting } = useDeleteColor()
+
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-2">
@@ -21,25 +25,45 @@ export function ColorPicker({ colors, isLoading = false, selectedColorId, onSele
     )
   }
 
-  const selectedColor = colors.find((c) => c.colorId === selectedColorId)
+  const selectedColor = colors.find((c) => c.userColorId === selectedColorId)
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
         {colors.map((color) => (
-          <button
-            key={color.colorId}
-            type="button"
-            title={color.colorCode}
-            onClick={() => onSelect(color.colorId)}
-            className={cn(
-              'h-8 w-8 rounded-full transition-all hover:scale-110 focus:outline-none',
-              selectedColorId === color.colorId
-                ? 'ring-foreground scale-110 ring-2 ring-offset-2'
-                : 'ring-1 ring-transparent'
+          <div key={color.userColorId} className="group relative">
+            <button
+              type="button"
+              title={color.colorCode}
+              onClick={() => onSelect(color.userColorId)}
+              disabled={isDeleting}
+              className={cn(
+                'h-8 w-8 rounded-full transition-all hover:scale-110 focus:outline-none disabled:opacity-50',
+                selectedColorId === color.userColorId
+                  ? 'ring-foreground scale-110 ring-2 ring-offset-2'
+                  : 'ring-1 ring-transparent'
+              )}
+              style={{ backgroundColor: color.colorCode }}
+            />
+
+            {/* defaultColor가 false인 경우에만 삭제 버튼 노출 */}
+            {!color.default && (
+              <button
+                type="button"
+                title="색상 삭제"
+                disabled={isDeleting}
+                onClick={() => deleteColor(color.userColorId)}
+                className={cn(
+                  'bg-background border-border absolute -top-1 -right-1 hidden h-4 w-4',
+                  'items-center justify-center rounded-full border',
+                  'hover:bg-destructive hover:text-destructive-foreground',
+                  'group-hover:flex focus:outline-none disabled:cursor-not-allowed'
+                )}
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
             )}
-            style={{ backgroundColor: color.colorCode }}
-          />
+          </div>
         ))}
       </div>
 

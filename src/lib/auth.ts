@@ -1,4 +1,3 @@
-
 interface AuthCallResult {
   success: boolean
   status?: string
@@ -15,11 +14,14 @@ export const kakaoLogin = async (code: string | null) => {
   try {
     if (!code) throw new Error('Authorization code not provided')
 
-    const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/kakao/callback?code=${code}&redirectUri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    })
+    const jwtResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/v1/auth/kakao/callback?code=${code}&redirectUri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      }
+    )
 
     console.log('jwtResponse', jwtResponse)
 
@@ -35,9 +37,9 @@ export const kakaoLogin = async (code: string | null) => {
         accessToken: string
         userId: number
         userName: string
-        userEmail: string,
+        userEmail: string
         userRole: 'FREE' | 'PRO' | 'ADMIN'
-      },
+      }
       message: string
       status: number
       success: boolean

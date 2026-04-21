@@ -6,8 +6,10 @@ export interface Task {
   taskPriority: TaskPriority
   goalCategoryId: number | null
   goalCategoryName: string | null
+  goalCategoryColorCode: string | null
   generalCategoryId: number | null
   generalCategoryName: string | null
+  generalCategoryColorCode: string | null
   plannedStartAt: string
   plannedEndAt: string
   plannedDurationMinutes: number

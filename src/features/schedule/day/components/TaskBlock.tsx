@@ -1,5 +1,5 @@
 import { Task } from '@/src/features/schedule/day/types'
-import { getCategoryColor, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
+import { PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
 
 interface TaskBlockProps {
   positioned: PositionedTask<Task>
@@ -13,8 +13,6 @@ interface TaskBlockProps {
  */
 export function TaskBlock({ positioned }: TaskBlockProps) {
   const { task, leftPercent, widthPercent } = positioned
-  const color = getCategoryColor(task.generalCategoryId)
-  const goalColor = getCategoryColor(task.goalCategoryId)
 
   return (
     <div
@@ -24,7 +22,7 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
         width: `${widthPercent}%`,
         top: 2,
         bottom: 2,
-        backgroundColor: color.bg,
+        backgroundColor: task.generalCategoryColorCode ?? '#E0E7EA',
         borderRadius: 4,
         padding: '0 6px',
         overflow: 'hidden',
@@ -41,14 +39,13 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
           width: 7,
           height: 7,
           borderRadius: '50%',
-          backgroundColor: goalColor.dot,
+          backgroundColor: task.goalCategoryColorCode ?? '#94999B',
         }}
       />
       <span
         style={{
           fontSize: 11,
           fontWeight: 500,
-          color: color.text,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',

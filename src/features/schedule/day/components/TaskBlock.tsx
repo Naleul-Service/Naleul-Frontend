@@ -1,4 +1,4 @@
-import { PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
+import { calcAchievementRatio, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
 import { Task } from '@/src/features/schedule/day/types'
 
 interface TaskBlockProps {
@@ -12,6 +12,10 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
 
   const generalColor = task.generalCategoryColorCode ?? FALLBACK_COLOR
   const goalColor = task.goalCategoryColorCode ?? FALLBACK_COLOR
+
+  // 6칸 중 3칸 이상 겹치면 달성 = ratio >= 0.5
+  const achievementRatio = calcAchievementRatio(task)
+  const isAchieved = achievementRatio >= 0.5
 
   return (
     <div
@@ -46,6 +50,7 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
               flexShrink: 0,
             }}
           />
+
           {/* taskName */}
           <span
             style={{
@@ -55,10 +60,29 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              flex: 1,
             }}
           >
             {task.taskName}
           </span>
+
+          {/* 달성 뱃지 */}
+          {isAchieved && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: '#fff',
+                backgroundColor: generalColor,
+                borderRadius: 2,
+                padding: '1px 3px',
+                flexShrink: 0,
+                marginRight: 3,
+              }}
+            >
+              ✓
+            </span>
+          )}
         </>
       )}
     </div>

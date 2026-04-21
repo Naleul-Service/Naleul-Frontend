@@ -21,3 +21,14 @@ export interface CreateTaskBody {
   dayOfWeekIds: number[]
   defaultSettingStatus: boolean
 }
+
+export interface UpdateTaskBody {
+  taskName: string
+  taskPriority: 'A' | 'B' | 'C' | 'D' | 'E'
+  goalCategoryId?: number
+  generalCategoryId?: number
+  plannedStartAt: string
+  plannedEndAt: string
+  dayOfWeekIds?: number[]
+  defaultSettingStatus?: boolean
+}

@@ -16,6 +16,7 @@ export async function getDailyTasks(params: DailyTasksParams): Promise<ApiCallRe
 }
 
 export interface UpdateActualTaskBody {
+  actualDate: string // 추가 "2026-04-21"
   actualStartAt: string
   actualEndAt: string
 }

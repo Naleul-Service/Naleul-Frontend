@@ -33,11 +33,17 @@ export interface Task {
   plannedStartAt: string
   plannedEndAt: string
   plannedDurationMinutes: number
-  actualStartAt: string | null
-  actualEndAt: string | null
-  actualDurationMinutes: number | null
+  actuals: TaskActual[] // 추가
   defaultSettingStatus: boolean
   dayNames: string[]
+}
+
+export interface TaskActual {
+  taskActualId: number
+  actualDate: string // "2026-04-21"
+  actualStartAt: string
+  actualEndAt: string
+  actualDurationMinutes: number
 }
 
 export interface DailyTasksResponse {

@@ -17,11 +17,22 @@ export interface PositionedTask<T> {
   isDone: boolean
 }
 
+interface TaskActualSummary {
+  actualDate: string
+  actualStartAt: string
+  actualEndAt: string
+}
+
 interface TimeRange {
   plannedStartAt: string
   plannedEndAt: string
-  actualStartAt: string | null
-  actualEndAt: string | null
+  actuals: TaskActualSummary[]
+}
+
+const today = new Date().toISOString().slice(0, 10)
+
+function getTodayActual(task: TimeRange): TaskActualSummary | null {
+  return task.actuals.find((a) => a.actualDate === today) ?? null
 }
 
 function splitByHour<T extends TimeRange>(
@@ -56,16 +67,34 @@ export function groupTasksByHour<T extends TimeRange>(tasks: T[]): Map<number, P
   const map = new Map<number, PositionedTask<T>[]>()
 
   for (const task of tasks) {
-    const isDone = task.actualStartAt !== null && task.actualEndAt !== null
+    const todayActual = getTodayActual(task)
+    const isDone = todayActual !== null
 
     if (isDone) {
-      // 실제 시간으로 표시 (배경색 O)
-      splitByHour(task, task.actualStartAt!, task.actualEndAt!, true, map)
+      splitByHour(task, todayActual.actualStartAt, todayActual.actualEndAt, true, map)
     } else {
-      // 계획 시간으로 표시 (border only)
       splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, map)
     }
   }
 
   return map
+}
+
+export function calcAchievementRatio(task: TimeRange): number {
+  const todayActual = getTodayActual(task)
+  if (!todayActual) return 0
+
+  const plannedStart = new Date(task.plannedStartAt).getTime()
+  const plannedEnd = new Date(task.plannedEndAt).getTime()
+  const actualStart = new Date(todayActual.actualStartAt).getTime()
+  const actualEnd = new Date(todayActual.actualEndAt).getTime()
+
+  const plannedDuration = plannedEnd - plannedStart
+  if (plannedDuration <= 0) return 0
+
+  const overlapStart = Math.max(plannedStart, actualStart)
+  const overlapEnd = Math.min(plannedEnd, actualEnd)
+  const overlap = Math.max(0, overlapEnd - overlapStart)
+
+  return overlap / plannedDuration
 }

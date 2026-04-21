@@ -1,4 +1,6 @@
-import { TaskPriority } from '@/src/features/task/types'
+import { INITIAL_FILTER, TaskFilterState, TaskPriority } from '@/src/features/task/types'
+
+export type { TaskFilterState, INITIAL_FILTER }
 
 export interface DailyTasksParams {
   date: string
@@ -6,18 +8,6 @@ export interface DailyTasksParams {
   priority?: TaskPriority
   goalCategoryId?: number
   generalCategoryId?: number
-}
-
-export interface TaskFilterState {
-  priority: TaskPriority | null
-  goalCategoryId: number | null
-  generalCategoryId: number | null
-}
-
-export const INITIAL_FILTER: TaskFilterState = {
-  priority: null,
-  goalCategoryId: null,
-  generalCategoryId: null,
 }
 
 export interface Task {
@@ -33,14 +23,14 @@ export interface Task {
   plannedStartAt: string
   plannedEndAt: string
   plannedDurationMinutes: number
-  actuals: TaskActual[] // 추가
+  actuals: TaskActual[]
   defaultSettingStatus: boolean
   dayNames: string[]
 }
 
 export interface TaskActual {
   taskActualId: number
-  actualDate: string // "2026-04-21"
+  actualDate: string
   actualStartAt: string
   actualEndAt: string
   actualDurationMinutes: number

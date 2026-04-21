@@ -1,4 +1,4 @@
-// src/components/common/Button.tsx
+// src/ui/common/Button.tsx
 import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react'
 import { cn } from '@/src/lib/utils'
 

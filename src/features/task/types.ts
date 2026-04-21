@@ -32,3 +32,15 @@ export interface UpdateTaskBody {
   dayOfWeekIds?: number[]
   defaultSettingStatus?: boolean
 }
+
+export interface TaskFilterState {
+  priority: TaskPriority | null
+  goalCategoryId: number | null
+  generalCategoryId: number | null
+}
+
+export const INITIAL_FILTER: TaskFilterState = {
+  priority: null,
+  goalCategoryId: null,
+  generalCategoryId: null,
+}

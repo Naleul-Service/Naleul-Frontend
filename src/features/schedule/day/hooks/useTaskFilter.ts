@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react'
-import { INITIAL_FILTER, TaskFilterState } from '../types'
-import { TaskPriority } from '@/src/features/task/types'
+import { INITIAL_FILTER, TaskFilterState, TaskPriority } from '@/src/features/task/types'
 
 export function useTaskFilter() {
   const [filter, setFilter] = useState<TaskFilterState>(INITIAL_FILTER)

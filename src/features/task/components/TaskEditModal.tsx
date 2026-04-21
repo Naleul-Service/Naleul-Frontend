@@ -1,32 +1,35 @@
-// src/features/task/components/TaskEditModal.tsx
 'use client'
 
 import { useState } from 'react'
 import { useUpdateTask } from '../hooks/useUpdateTask'
+import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import { Modal } from '@/src/components/common/Modal'
 import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
 import { cn } from '@/src/lib/utils'
-import { UpdateTaskBody } from '@/src/features/task/types'
+import { DAY_OF_WEEK_OPTIONS, TASK_PRIORITIES, TaskPriority, UpdateTaskBody } from '@/src/features/task/types'
 import { Task } from '@/src/features/schedule/day/types'
 
-const PRIORITIES = ['A', 'B', 'C', 'D', 'E'] as const
-type Priority = (typeof PRIORITIES)[number]
+const DAY_NAME_TO_ID: Record<string, number> = {
+  MONDAY: 1,
+  TUESDAY: 2,
+  WEDNESDAY: 3,
+  THURSDAY: 4,
+  FRIDAY: 5,
+  SATURDAY: 6,
+  SUNDAY: 7,
+}
 
-const PRIORITY_STYLE: Record<Priority, string> = {
-  A: 'bg-red-500',
-  B: 'bg-orange-500',
-  C: 'bg-yellow-500',
-  D: 'bg-green-500',
-  E: 'bg-blue-500',
+function toDayOfWeekIds(dayNames: string[]): number[] {
+  return dayNames.map((name) => DAY_NAME_TO_ID[name]).filter(Boolean)
 }
 
 function toDatetimeLocal(iso: string): string {
-  return new Date(iso).toISOString().slice(0, 16)
+  return iso.slice(0, 16)
 }
 
 function toISOString(local: string): string {
-  return `${local}:00.000` // "2026-04-20T17:38:00.000"
+  return `${local}:00.000`
 }
 
 interface Props {
@@ -36,26 +39,28 @@ interface Props {
 
 export function TaskEditModal({ task, onClose }: Props) {
   const { mutate, isPending } = useUpdateTask()
+  const { data: goalCategories = [], isLoading: isLoadingCategories } = useGoalCategories()
 
   const [taskName, setTaskName] = useState(task.taskName)
-  const [priority, setPriority] = useState<Priority>(task.taskPriority as Priority)
+  const [priority, setPriority] = useState<TaskPriority>(task.taskPriority as TaskPriority)
   const [plannedStartAt, setPlannedStartAt] = useState(toDatetimeLocal(task.plannedStartAt))
   const [plannedEndAt, setPlannedEndAt] = useState(toDatetimeLocal(task.plannedEndAt))
+  const [goalCategoryId, setGoalCategoryId] = useState<number | null>(task.goalCategoryId ?? null)
+  const [generalCategoryId, setGeneralCategoryId] = useState<number | null>(task.generalCategoryId ?? null)
+  const [dayOfWeekIds, setDayOfWeekIds] = useState<number[]>(toDayOfWeekIds(task.dayNames))
 
-  const isValid = taskName.trim().length > 0 && plannedStartAt < plannedEndAt
+  const generalCategories = goalCategories.find((g) => g.goalCategoryId === goalCategoryId)?.generalCategories ?? []
 
-  const DAY_NAME_TO_ID: Record<string, number> = {
-    MONDAY: 1,
-    TUESDAY: 2,
-    WEDNESDAY: 3,
-    THURSDAY: 4,
-    FRIDAY: 5,
-    SATURDAY: 6,
-    SUNDAY: 7,
+  const isValid =
+    taskName.trim().length > 0 && plannedStartAt < plannedEndAt && goalCategoryId !== null && generalCategoryId !== null
+
+  function handleGoalChange(id: number | null) {
+    setGoalCategoryId(id)
+    setGeneralCategoryId(null)
   }
 
-  function toDayOfWeekIds(dayNames: string[]): number[] {
-    return dayNames.map((name) => DAY_NAME_TO_ID[name]).filter(Boolean)
+  function toggleDayOfWeek(id: number) {
+    setDayOfWeekIds((prev) => (prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]))
   }
 
   function handleSubmit() {
@@ -66,11 +71,10 @@ export function TaskEditModal({ task, onClose }: Props) {
       taskPriority: priority,
       plannedStartAt: toISOString(plannedStartAt),
       plannedEndAt: toISOString(plannedEndAt),
-      // task에서 기존 값 유지
-      goalCategoryId: task.goalCategoryId ?? undefined,
-      generalCategoryId: task.generalCategoryId ?? undefined,
-      dayOfWeekIds: toDayOfWeekIds(task.dayNames),
-      defaultSettingStatus: task.defaultSettingStatus ?? false,
+      goalCategoryId: goalCategoryId!,
+      generalCategoryId: generalCategoryId!,
+      dayOfWeekIds,
+      defaultSettingStatus: dayOfWeekIds.length > 0,
     }
 
     mutate({ taskId: task.taskId, body }, { onSuccess: onClose })
@@ -93,7 +97,7 @@ export function TaskEditModal({ task, onClose }: Props) {
         </div>
       }
     >
-      <div className="space-y-5">
+      <div className="space-y-4">
         {/* 할 일 이름 */}
         <Input
           label="할 일"
@@ -106,23 +110,75 @@ export function TaskEditModal({ task, onClose }: Props) {
           required
         />
 
+        {/* 목표 카테고리 */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-foreground text-xs font-medium">
+            목표 <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={goalCategoryId ?? ''}
+            onChange={(e) => handleGoalChange(e.target.value ? Number(e.target.value) : null)}
+            disabled={isLoadingCategories}
+            className={cn(
+              'bg-background text-foreground border-border h-9 w-full rounded-md border px-3 text-sm',
+              'focus:border-foreground focus:ring-foreground transition-colors outline-none focus:ring-1',
+              'disabled:cursor-not-allowed disabled:opacity-50'
+            )}
+          >
+            <option value="">목표를 선택해주세요</option>
+            {goalCategories.map((goal) => (
+              <option key={goal.goalCategoryId} value={goal.goalCategoryId}>
+                {goal.goalCategoryName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 일반 카테고리 */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-foreground text-xs font-medium">
+            일반 카테고리 <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={generalCategoryId ?? ''}
+            onChange={(e) => setGeneralCategoryId(e.target.value ? Number(e.target.value) : null)}
+            disabled={!goalCategoryId || generalCategories.length === 0}
+            className={cn(
+              'bg-background text-foreground border-border h-9 w-full rounded-md border px-3 text-sm',
+              'focus:border-foreground focus:ring-foreground transition-colors outline-none focus:ring-1',
+              'disabled:cursor-not-allowed disabled:opacity-50'
+            )}
+          >
+            <option value="">
+              {!goalCategoryId
+                ? '목표를 먼저 선택해주세요'
+                : generalCategories.length === 0
+                  ? '등록된 카테고리가 없어요'
+                  : '일반 카테고리를 선택해주세요'}
+            </option>
+            {generalCategories.map((general) => (
+              <option key={general.generalCategoryId} value={general.generalCategoryId}>
+                {general.generalCategoryName}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* 우선순위 */}
         <div className="flex flex-col gap-1.5">
           <span className="text-foreground text-xs font-medium">우선순위</span>
           <div className="flex gap-2">
-            {PRIORITIES.map((p) => (
+            {TASK_PRIORITIES.map((p) => (
               <button
                 key={p}
                 type="button"
                 onClick={() => setPriority(p)}
                 className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white transition-all',
-                  PRIORITY_STYLE[p],
+                  'h-8 w-10 rounded-md text-xs font-semibold transition-colors',
                   priority === p
-                    ? 'ring-foreground scale-110 opacity-100 ring-2 ring-offset-2'
-                    : 'opacity-40 hover:opacity-70'
+                    ? 'bg-foreground text-background'
+                    : 'border-border text-muted-foreground hover:bg-muted border'
                 )}
-                aria-label={`우선순위 ${p}`}
                 aria-pressed={priority === p}
               >
                 {p}
@@ -146,6 +202,31 @@ export function TaskEditModal({ task, onClose }: Props) {
             onChange={(e) => setPlannedEndAt(e.target.value)}
             error={plannedStartAt >= plannedEndAt ? '종료 시간을 확인해주세요' : undefined}
           />
+        </div>
+
+        {/* 반복 요일 */}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-foreground text-xs font-medium">
+            반복 요일
+            <span className="text-muted-foreground ml-1 font-normal">(선택)</span>
+          </span>
+          <div className="flex gap-1.5">
+            {DAY_OF_WEEK_OPTIONS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => toggleDayOfWeek(id)}
+                className={cn(
+                  'h-8 flex-1 rounded-md text-xs font-medium transition-colors',
+                  dayOfWeekIds.includes(id)
+                    ? 'bg-foreground text-background'
+                    : 'border-border text-muted-foreground hover:bg-muted border'
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </Modal>

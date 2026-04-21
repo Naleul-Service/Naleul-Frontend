@@ -34,7 +34,7 @@ export function GeneralCategoryEditModal({ isOpen, onClose, item, goalCategory }
     const matchedColor = colors.find((c) => c.colorCode === item.colorCode)
     setForm({
       generalCategoryName: item.generalCategoryName,
-      colorId: matchedColor?.colorId ?? null,
+      colorId: matchedColor?.userColorId ?? null,
     })
     setNameError('')
   }, [isOpen, item, colors])
@@ -109,7 +109,7 @@ export function GeneralCategoryEditModal({ isOpen, onClose, item, goalCategory }
           />
           <AddColorInput
             existingColors={colors}
-            onAdded={(newColor) => setForm((prev) => ({ ...prev, colorId: newColor.colorId }))}
+            onAdded={(newColor) => setForm((prev) => ({ ...prev, colorId: newColor.userColorId }))}
           />
         </div>
       </div>

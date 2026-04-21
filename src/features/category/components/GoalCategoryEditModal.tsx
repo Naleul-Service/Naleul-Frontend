@@ -54,7 +54,7 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
       goalCategoryName: category.goalCategoryName,
       goalCategoryStatus: category.goalCategoryStatus,
       goalCategoryStartDate: category.goalCategoryStartDate,
-      colorId: matchedColor?.colorId ?? null,
+      colorId: matchedColor?.userColorId ?? null,
     })
     setNameError('')
   }, [isOpen, category, colors])
@@ -164,7 +164,7 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
           />
           <AddColorInput
             existingColors={colors}
-            onAdded={(newColor) => setForm((prev) => ({ ...prev, colorId: newColor.colorId }))}
+            onAdded={(newColor) => setForm((prev) => ({ ...prev, colorId: newColor.userColorId }))}
           />
         </div>
       </div>

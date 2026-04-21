@@ -84,7 +84,7 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
             selectedColorId={selectedColorId}
             onSelect={setSelectedColorId}
           />
-          <AddColorInput existingColors={colors} onAdded={(newColor) => setSelectedColorId(newColor.colorId)} />
+          <AddColorInput existingColors={colors} onAdded={(newColor) => setSelectedColorId(newColor.userColorId)} />
         </div>
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>

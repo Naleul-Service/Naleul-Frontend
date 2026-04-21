@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import { deleteColor } from '@/src/features/category/api/colors'
 
-export async function DELETE(_request: Request, { params }: { params: { colorId: string } }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ colorId: string }> }) {
   try {
-    const colorId = Number(params.colorId)
-    if (isNaN(colorId)) {
+    const { colorId } = await params
+    const colorIdNum = Number(colorId)
+
+    if (isNaN(colorIdNum)) {
       return NextResponse.json({ success: false, error: '유효하지 않은 colorId' }, { status: 400 })
     }
 
-    await deleteColor(colorId)
+    await deleteColor(colorIdNum)
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json(

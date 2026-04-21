@@ -35,8 +35,8 @@ const INITIAL_FORM: FormState = {
   generalCategoryId: null,
 }
 
-function toISO(localDatetime: string) {
-  return new Date(localDatetime).toISOString()
+function toISO(localDatetime: string): string {
+  return localDatetime.length === 16 ? `${localDatetime}:00` : localDatetime
 }
 
 function validate(form: FormState): Partial<Record<keyof FormState, string>> {
@@ -103,6 +103,7 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
       generalCategoryId: form.generalCategoryId!,
       plannedStartAt: toISO(form.plannedStartAt),
       plannedEndAt: toISO(form.plannedEndAt),
+      dayOfWeekIds: form.dayOfWeekIds, // 빈 배열이어도 항상 포함
       defaultSettingStatus: form.dayOfWeekIds.length > 0,
       ...(form.dayOfWeekIds.length > 0 && { dayOfWeekIds: form.dayOfWeekIds }),
     }

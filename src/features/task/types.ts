@@ -18,6 +18,6 @@ export interface CreateTaskBody {
   generalCategoryId?: number
   plannedStartAt: string
   plannedEndAt: string
-  dayOfWeekIds?: number[]
+  dayOfWeekIds: number[]
   defaultSettingStatus: boolean
 }

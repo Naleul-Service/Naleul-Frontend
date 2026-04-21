@@ -2,8 +2,8 @@
 import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react'
 import { cn } from '@/src/lib/utils'
 
-type Variant = 'solid' | 'outline' | 'ghost'
-type Size = 'sm' | 'md' | 'lg' | 'icon'
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+type Size = 'sm' | 'md' | 'lg' | 'iconSm' | 'iconMd' | 'iconLg'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
@@ -14,21 +14,36 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<Variant, string> = {
-  solid: 'bg-foreground text-background hover:opacity-80',
-  outline: 'border border-border text-foreground hover:bg-muted',
-  ghost: 'text-foreground hover:bg-muted',
+  primary: 'bg-primary-600 text-white hover:bg-primary-800 disabled:bg-gray-100 disabled:text-gray-300',
+  secondary: 'bg-primary-50 text-primary-400 hover:bg-primary-100 disabled:bg-gray-100 disabled:text-gray-300',
+  outline:
+    'border border-primary-400 text-primary-400 bg-white hover:bg-primary-50 disabled:bg-white disabled:text-gray-300',
+  ghost: 'text-primary-500 bg-white hover:bg-primary-100 disabled:bg-white disabled:text-gray-300',
+  danger: 'text-error-default bg-white hover:bg-error-dark disabled:bg-gray-100 disabled:text-gray-300',
 }
 
 const sizeStyles: Record<Size, string> = {
-  sm: 'h-8 px-3 text-xs rounded-md gap-1.5',
-  md: 'h-9 px-4 text-sm rounded-md gap-2',
-  lg: 'h-11 px-5 text-sm rounded-lg gap-2',
-  icon: 'h-9 w-9 rounded-md',
+  sm: 'h-[32px] label-sm rounded-[6px] gap-x-2 px-[12px]',
+  md: 'h-[40px] label-md rounded-[8px] gap-x-[6px] px-[16px]',
+  lg: 'h-[48px] label-lg rounded-[10px] gap-x-1 px-[20px]',
+  iconSm: 'h-[32px] w-[32px] rounded-[6px]',
+  iconMd: 'h-[40px] w-[40px] rounded-[8px]',
+  iconLg: 'h-[48px] w-[48px] rounded-[10px]',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { variant = 'solid', size = 'md', isLoading = false, leftIcon, rightIcon, disabled, className, children, ...props },
+    {
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      leftIcon,
+      rightIcon,
+      disabled,
+      className,
+      children,
+      ...props
+    },
     ref
   ) => {
     const isDisabled = disabled || isLoading

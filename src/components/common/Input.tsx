@@ -72,14 +72,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             onChange={onChange}
             disabled={disabled}
             className={cn(
-              'bg-background text-foreground h-9 w-full text-sm',
-              'border-border rounded-md border px-3',
-              'placeholder:text-muted-foreground',
-              'transition-colors outline-none',
-              'hover:border-border-secondary',
-              'focus:border-foreground focus:ring-foreground focus:ring-1',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              error && 'border-red-400 focus:border-red-500 focus:ring-red-500',
+              // base
+              'input-default h-[48px] w-full rounded-[10px] border px-3 transition-colors outline-none',
+              // default
+              'border-gray-200 bg-white text-gray-950',
+              'placeholder:text-gray-300',
+              // hover
+              'hover:border-gray-300',
+              // focus
+              'focus:border-primary-400 focus:text-gray-950 focus:ring-0',
+              // filled (value 있을 때)
+              !!value && !error && 'border-gray-200',
+              // error
+              error && 'border-error-default bg-error-bg text-gray-950 placeholder:text-gray-300',
+              error && 'focus:border-error-default',
+              // disabled
+              'disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-gray-300 disabled:placeholder:text-gray-300',
+              // icon padding
               hasLeftIcon && 'pl-9',
               hasRightIcon && 'pr-9',
               className

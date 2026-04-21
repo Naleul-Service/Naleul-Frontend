@@ -14,3 +14,16 @@ export async function getDailyTasks(params: DailyTasksParams): Promise<ApiCallRe
 
   return apiCallServer(`/v1/tasks/daily?${searchParams}`)
 }
+
+export interface UpdateActualTaskBody {
+  actualStartAt: string
+  actualEndAt: string
+}
+
+export async function patchActualTask(taskId: number, body: UpdateActualTaskBody): Promise<ApiCallResult<void>> {
+  return apiCallServer(`/v1/tasks/${taskId}/actual`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}

@@ -18,7 +18,7 @@ export function DailyTimeTable({ params }: DailyTimeTableProps) {
   if (isLoading) return <TimeTableSkeleton />
   if (isError || !data) return <TimeTableError />
 
-  const tasksByHour = groupTasksByHour(data.tasks)
+  const tasksByHour = groupTasksByHour(data.tasks, params.date)
 
   return (
     <div
@@ -32,7 +32,7 @@ export function DailyTimeTable({ params }: DailyTimeTableProps) {
       }}
     >
       {HOUR_LABELS.map((hour) => (
-        <HourSlot key={hour} hour={hour} tasks={tasksByHour.get(hour) ?? []} />
+        <HourSlot key={hour} hour={hour} date={params.date} tasks={tasksByHour.get(hour) ?? []} />
       ))}
     </div>
   )

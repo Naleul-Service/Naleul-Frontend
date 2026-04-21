@@ -12,6 +12,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   try {
     const result = await deleteTask(id)
 
+    console.log('[DELETE /api/tasks] result:', JSON.stringify(result))
+
     if (!result.success) {
       return NextResponse.json({ success: false, error: result.error ?? '삭제 실패' }, { status: 400 })
     }
@@ -36,8 +38,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ task
   try {
     const body = await request.json()
     const result = await updateTask(id, body)
-
-    console.log('[PUT /api/tasks] result:', JSON.stringify(result))
 
     if (!result.success) {
       return NextResponse.json({ success: false, error: result.error ?? '수정 실패' }, { status: 400 })

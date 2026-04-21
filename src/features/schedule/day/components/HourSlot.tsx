@@ -4,6 +4,7 @@ import { formatHourLabel, PositionedTask } from '@/src/features/schedule/day/uti
 
 interface HourSlotProps {
   hour: number
+  date: string
   tasks: PositionedTask<Task>[]
 }
 
@@ -16,7 +17,7 @@ const TEN_MIN_CELLS = Array.from({ length: 6 })
  * - tasks를 절대 위치로 가로 오버레이
  * 책임: 1시간짜리 시각 구조 + 태스크 오버레이
  */
-export function HourSlot({ hour, tasks }: HourSlotProps) {
+export function HourSlot({ hour, date, tasks }: HourSlotProps) {
   return (
     <div style={{ display: 'flex', minHeight: 36 }}>
       {/* 시간 레이블 */}
@@ -59,7 +60,7 @@ export function HourSlot({ hour, tasks }: HourSlotProps) {
 
         {/* 태스크 절대 오버레이 */}
         {tasks.map((positioned, i) => (
-          <TaskBlock key={positioned.task.taskId ?? i} positioned={positioned} />
+          <TaskBlock date={date} key={positioned.task.taskId ?? i} positioned={positioned} />
         ))}
       </div>
     </div>

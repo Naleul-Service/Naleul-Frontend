@@ -6,9 +6,11 @@ import { ApiCallResult } from '@/src/types/common'
  *
  * 클라이언트 & 서버 양쪽에서 사용 가능
  */
-export const parseJsonResponse = async <T = never>(
-  response: Response,
-): Promise<ApiCallResult<T>> => {
+export const parseJsonResponse = async <T = never>(response: Response): Promise<ApiCallResult<T>> => {
+  if (response.status === 204) {
+    return { success: true }
+  }
+
   try {
     const rawData = await response.json()
 

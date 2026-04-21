@@ -29,10 +29,8 @@ interface TimeRange {
   actuals: TaskActualSummary[]
 }
 
-const today = new Date().toISOString().slice(0, 10)
-
-function getTodayActual(task: TimeRange): TaskActualSummary | null {
-  return task.actuals.find((a) => a.actualDate === today) ?? null
+function getActualByDate(task: TimeRange, date: string): TaskActualSummary | null {
+  return task.actuals.find((a) => a.actualDate === date) ?? null
 }
 
 function splitByHour<T extends TimeRange>(
@@ -63,15 +61,18 @@ function splitByHour<T extends TimeRange>(
   }
 }
 
-export function groupTasksByHour<T extends TimeRange>(tasks: T[]): Map<number, PositionedTask<T>[]> {
+export function groupTasksByHour<T extends TimeRange>(
+  tasks: T[],
+  date: string // 추가
+): Map<number, PositionedTask<T>[]> {
   const map = new Map<number, PositionedTask<T>[]>()
 
   for (const task of tasks) {
-    const todayActual = getTodayActual(task)
-    const isDone = todayActual !== null
+    const actual = getActualByDate(task, date)
+    const isDone = actual !== null
 
     if (isDone) {
-      splitByHour(task, todayActual.actualStartAt, todayActual.actualEndAt, true, map)
+      splitByHour(task, actual.actualStartAt, actual.actualEndAt, true, map)
     } else {
       splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, map)
     }
@@ -80,14 +81,19 @@ export function groupTasksByHour<T extends TimeRange>(tasks: T[]): Map<number, P
   return map
 }
 
-export function calcAchievementRatio(task: TimeRange): number {
-  const todayActual = getTodayActual(task)
-  if (!todayActual) return 0
+function toMinutesOfDay(iso: string): number {
+  const d = new Date(iso)
+  return d.getHours() * 60 + d.getMinutes()
+}
 
-  const plannedStart = new Date(task.plannedStartAt).getTime()
-  const plannedEnd = new Date(task.plannedEndAt).getTime()
-  const actualStart = new Date(todayActual.actualStartAt).getTime()
-  const actualEnd = new Date(todayActual.actualEndAt).getTime()
+export function calcAchievementRatio(task: TimeRange, date: string): number {
+  const actual = getActualByDate(task, date)
+  if (!actual) return 0
+
+  const plannedStart = toMinutesOfDay(task.plannedStartAt)
+  const plannedEnd = toMinutesOfDay(task.plannedEndAt)
+  const actualStart = toMinutesOfDay(actual.actualStartAt)
+  const actualEnd = toMinutesOfDay(actual.actualEndAt)
 
   const plannedDuration = plannedEnd - plannedStart
   if (plannedDuration <= 0) return 0

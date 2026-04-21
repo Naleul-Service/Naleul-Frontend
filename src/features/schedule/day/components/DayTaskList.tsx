@@ -50,7 +50,7 @@ export function DayTaskList({ date }: DayTaskListProps) {
       {data?.tasks && (
         <ul className="flex flex-col gap-2">
           {data.tasks.map((task) => (
-            <TaskItem key={task.taskId} task={task} />
+            <TaskItem key={task.taskId} task={task} date={params.date} />
           ))}
         </ul>
       )}

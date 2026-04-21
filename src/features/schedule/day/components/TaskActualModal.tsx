@@ -9,6 +9,7 @@ import { Button } from '@/src/components/common/Button'
 
 interface TaskActualModalProps {
   task: Task
+  date: string
   onClose: () => void
 }
 
@@ -32,17 +33,14 @@ function formatMinutes(minutes: number): string {
   return `${h}시간 ${m}분`
 }
 
-const today = new Date().toISOString().slice(0, 10)
-
-export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
-  // 오늘 날짜 actual이 있으면 기존 값으로, 없으면 계획 시간으로 초기화
-  const todayActual = task.actuals.find((a) => a.actualDate === today)
+export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
+  const dateActual = task.actuals.find((a) => a.actualDate === date)
 
   const [actualStartAt, setActualStartAt] = useState(
-    todayActual ? toDatetimeLocal(todayActual.actualStartAt) : toDatetimeLocal(task.plannedStartAt)
+    dateActual ? toDatetimeLocal(dateActual.actualStartAt) : toDatetimeLocal(task.plannedStartAt)
   )
   const [actualEndAt, setActualEndAt] = useState(
-    todayActual ? toDatetimeLocal(todayActual.actualEndAt) : toDatetimeLocal(task.plannedEndAt)
+    dateActual ? toDatetimeLocal(dateActual.actualEndAt) : toDatetimeLocal(task.plannedEndAt)
   )
 
   const { mutate, isPending, error } = useUpdateActualTask()
@@ -52,7 +50,7 @@ export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
       {
         taskId: task.taskId,
         body: {
-          actualDate: today,
+          actualDate: date,
           actualStartAt: toISOString(actualStartAt),
           actualEndAt: toISOString(actualEndAt),
         },

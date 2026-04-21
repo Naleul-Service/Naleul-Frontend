@@ -3,18 +3,19 @@ import { Task } from '@/src/features/schedule/day/types'
 
 interface TaskBlockProps {
   positioned: PositionedTask<Task>
+  date: string
 }
 
 const FALLBACK_COLOR = '#9CA3AF'
 
-export function TaskBlock({ positioned }: TaskBlockProps) {
+export function TaskBlock({ positioned, date }: TaskBlockProps) {
   const { task, leftPercent, widthPercent, isDone } = positioned
 
   const generalColor = task.generalCategoryColorCode ?? FALLBACK_COLOR
   const goalColor = task.goalCategoryColorCode ?? FALLBACK_COLOR
 
   // 6칸 중 3칸 이상 겹치면 달성 = ratio >= 0.5
-  const achievementRatio = calcAchievementRatio(task)
+  const achievementRatio = calcAchievementRatio(task, date)
   const isAchieved = achievementRatio >= 0.5
 
   return (
@@ -67,7 +68,8 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
           </span>
 
           {/* 달성 뱃지 */}
-          {isAchieved && (
+          {/* 달성 뱃지 — 별도 조건으로 분리 */}
+          {isAchieved && widthPercent > 25 && (
             <span
               style={{
                 fontSize: 9,
@@ -75,9 +77,11 @@ export function TaskBlock({ positioned }: TaskBlockProps) {
                 color: '#fff',
                 backgroundColor: generalColor,
                 borderRadius: 2,
-                padding: '1px 3px',
+                padding: '1px 5px',
                 flexShrink: 0,
                 marginRight: 3,
+                lineHeight: '14px', // 높이 고정
+                whiteSpace: 'nowrap',
               }}
             >
               ✓

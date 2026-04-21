@@ -1,16 +1,9 @@
-/**
- * 시간 테이블 관련 순수 함수 모음
- * 컴포넌트 의존성 없음 — 테스트 가능
- */
+export const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => i)
 
-export const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => i) // 0~23
-
-/** "09:00" 형태 레이블 */
 export function formatHourLabel(hour: number): string {
   return `${String(hour).padStart(2, '0')}:00`
 }
 
-/** ISO string → 로컬 기준 분(0~1439) */
 export function isoToMinutes(iso: string): number {
   const d = new Date(iso)
   return d.getHours() * 60 + d.getMinutes()
@@ -18,53 +11,61 @@ export function isoToMinutes(iso: string): number {
 
 export interface PositionedTask<T> {
   task: T
-  leftPercent: number // 시간 슬롯(1h) 내 좌측 오프셋 %
-  widthPercent: number // 시간 슬롯(1h) 내 너비 %
-  hour: number // 속하는 시(0~23)
+  leftPercent: number
+  widthPercent: number
+  hour: number
+  isDone: boolean
 }
 
 interface TimeRange {
   plannedStartAt: string
   plannedEndAt: string
+  actualStartAt: string | null
+  actualEndAt: string | null
 }
 
-/**
- * 태스크를 시간대별로 그룹핑하고 가로 위치 계산
- * - 하나의 태스크가 두 hour에 걸칠 경우 시작 hour에서 자름 (단순화)
- */
+function splitByHour<T extends TimeRange>(
+  task: T,
+  startIso: string,
+  endIso: string,
+  isDone: boolean,
+  map: Map<number, PositionedTask<T>[]>
+) {
+  const startMin = isoToMinutes(startIso)
+  const endMin = isoToMinutes(endIso)
+
+  const startHour = Math.floor(startMin / 60)
+  const endHour = endMin % 60 === 0 ? endMin / 60 - 1 : Math.floor(endMin / 60)
+
+  for (let hour = startHour; hour <= endHour; hour++) {
+    const slotStart = hour * 60
+    const slotEnd = slotStart + 60
+
+    const segStart = Math.max(startMin, slotStart)
+    const segEnd = Math.min(endMin, slotEnd)
+
+    const leftPercent = ((segStart - slotStart) / 60) * 100
+    const widthPercent = Math.max(((segEnd - segStart) / 60) * 100, 4)
+
+    if (!map.has(hour)) map.set(hour, [])
+    map.get(hour)!.push({ task, leftPercent, widthPercent, hour, isDone })
+  }
+}
+
 export function groupTasksByHour<T extends TimeRange>(tasks: T[]): Map<number, PositionedTask<T>[]> {
   const map = new Map<number, PositionedTask<T>[]>()
 
   for (const task of tasks) {
-    const startMin = isoToMinutes(task.plannedStartAt)
-    const endMin = isoToMinutes(task.plannedEndAt)
-    const hour = Math.floor(startMin / 60)
-    const slotStart = hour * 60
+    const isDone = task.actualStartAt !== null && task.actualEndAt !== null
 
-    const leftPercent = ((startMin - slotStart) / 60) * 100
-    const clampedEnd = Math.min(endMin, slotStart + 60)
-    const widthPercent = Math.max(((clampedEnd - startMin) / 60) * 100, 4) // 최소 4%
-
-    if (!map.has(hour)) map.set(hour, [])
-    map.get(hour)!.push({ task, leftPercent, widthPercent, hour })
+    if (isDone) {
+      // 실제 시간으로 표시 (배경색 O)
+      splitByHour(task, task.actualStartAt!, task.actualEndAt!, true, map)
+    } else {
+      // 계획 시간으로 표시 (border only)
+      splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, map)
+    }
   }
 
   return map
-}
-
-/** generalCategoryId → 고정 색상 (백엔드 color 필드 추가되면 이 함수만 교체) */
-const PALETTE = [
-  { bg: '#E3F0FF', dot: '#3B82F6', text: '#1E3A5F' }, // blue
-  { bg: '#E8F5E9', dot: '#22C55E', text: '#14532D' }, // green
-  { bg: '#FFF3E0', dot: '#F59E0B', text: '#78350F' }, // amber
-  { bg: '#FCE4EC', dot: '#EC4899', text: '#831843' }, // pink
-  { bg: '#F3E8FF', dot: '#A855F7', text: '#4A1D96' }, // purple
-  { bg: '#E0F7FA', dot: '#06B6D4', text: '#164E63' }, // cyan
-  { bg: '#FFF9C4', dot: '#EAB308', text: '#713F12' }, // yellow
-  { bg: '#FFE4E1', dot: '#EF4444', text: '#7F1D1D' }, // red
-]
-
-export function getCategoryColor(id: number | null) {
-  const idx = id == null ? 0 : Math.abs(id) % PALETTE.length
-  return PALETTE[idx]
 }

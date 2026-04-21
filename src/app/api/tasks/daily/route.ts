@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getDailyTasks } from '@/src/features/schedule/day/api/day'
+import { TASK_PRIORITIES, TaskPriority } from '@/src/features/task/types'
 
-// GET /api/tasks/daily?date=2026-04-20&dayOfWeek=SUNDAY
+function parsePriority(value: string | null): TaskPriority | undefined {
+  if (!value) return undefined
+  return (TASK_PRIORITIES as readonly string[]).includes(value) ? (value as TaskPriority) : undefined
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -12,7 +17,17 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: 'date, dayOfWeek는 필수입니다' }, { status: 400 })
     }
 
-    const result = await getDailyTasks({ date, dayOfWeek })
+    const priority = parsePriority(searchParams.get('priority'))
+    const goalCategoryId = searchParams.get('goalCategoryId')
+    const generalCategoryId = searchParams.get('generalCategoryId')
+
+    const result = await getDailyTasks({
+      date,
+      dayOfWeek,
+      priority,
+      goalCategoryId: goalCategoryId ? Number(goalCategoryId) : undefined,
+      generalCategoryId: generalCategoryId ? Number(generalCategoryId) : undefined,
+    })
 
     if (!result.success) {
       return NextResponse.json({ success: false, error: result.error ?? '일간 할 일 조회 실패' }, { status: 400 })

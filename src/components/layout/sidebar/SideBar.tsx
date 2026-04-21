@@ -5,6 +5,7 @@ import { SidebarNav } from './SidebarNav'
 import { SidebarFooter } from './SidebarFooter'
 import { useSidebarStore } from '@/src/components/store/useSidebarStore'
 import { cn } from '@/src/lib/utils'
+import { Logo } from '@/src/assets/svgComponents'
 
 export function Sidebar() {
   const isCollapsed = useSidebarStore((s) => s.isCollapsed)
@@ -19,7 +20,7 @@ export function Sidebar() {
     >
       {/* 헤더 */}
       <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-3.5">
-        {!isCollapsed && <span className="text-foreground text-sm font-medium">나를 (Naleul)</span>}
+        {!isCollapsed && <Logo width={88} height={24} />}
         <div className={cn(isCollapsed && 'mx-auto')}>
           <SidebarToggle />
         </div>

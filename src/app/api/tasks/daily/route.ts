@@ -11,10 +11,9 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const date = searchParams.get('date')
-    const dayOfWeek = searchParams.get('dayOfWeek')
 
-    if (!date || !dayOfWeek) {
-      return NextResponse.json({ success: false, error: 'date, dayOfWeek는 필수입니다' }, { status: 400 })
+    if (!date) {
+      return NextResponse.json({ success: false, error: 'date 필수입니다' }, { status: 400 })
     }
 
     const priority = parsePriority(searchParams.get('priority'))

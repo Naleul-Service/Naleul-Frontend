@@ -8,6 +8,9 @@ async function postColor(body: ColorRequest): Promise<Color> {
     body: JSON.stringify(body),
   })
   const json = await res.json()
+
+  console.log('postColor response:', json)
+
   if (!json.success) throw new Error(json.error ?? '색상 생성 실패')
   return json.data
 }
@@ -17,8 +20,9 @@ export function useAddColor() {
 
   return useMutation({
     mutationFn: (colorCode: string) => postColor({ colorCode }),
-    onSuccess: () => {
+    onSuccess: (newColor) => {
       queryClient.invalidateQueries({ queryKey: ['colors'] })
+      return newColor
     },
   })
 }

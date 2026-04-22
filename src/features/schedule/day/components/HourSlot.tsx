@@ -60,7 +60,7 @@ export function HourSlot({ hour, date, tasks }: HourSlotProps) {
 
         {/* 태스크 절대 오버레이 */}
         {tasks.map((positioned, i) => (
-          <TaskBlock date={date} key={positioned.task.taskId ?? i} positioned={positioned} />
+          <TaskBlock key={positioned.task.taskId ?? i} positioned={positioned} />
         ))}
       </div>
     </div>

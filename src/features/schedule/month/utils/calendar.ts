@@ -50,12 +50,12 @@ export function getMonthDays(year: number, month: number): Date[] {
 
 // 해당 날짜에 completed(actuals 있음)인 task가 하나라도 있는지
 export function isDayCompleted(tasks: Task[]): boolean {
-  return tasks.some((task) => task.actuals.length > 0)
+  return tasks.some((task) => task.actual !== null)
 }
 
 // completed된 task 중 첫 번째 색상 반환 (없으면 null)
 export function getDayColor(tasks: Task[]): string | null {
-  const completedTask = tasks.find((task) => task.actuals.length > 0)
+  const completedTask = tasks.find((task) => task.actual !== null)
   return completedTask?.goalCategoryColorCode ?? null
 }
 
@@ -74,13 +74,10 @@ export function buildCalendarGrid(year: number, month: number): (Date | null)[][
   return weeks // weeks[주차][요일]
 }
 
-export function getDayStatus(tasks: Task[], dateKey: string): { completed: boolean; color: string | null } {
-  const completedTasks = tasks.filter((t) => {
-    const actual = t.actuals
-      .filter((a) => a.actualDate === dateKey) // 해당 날짜 actual만
-      .reduce((sum, a) => sum + a.actualDurationMinutes, 0)
-    return actual >= t.plannedDurationMinutes
-  })
+export function getDayStatus(tasks: Task[]): { completed: boolean; color: string | null } {
+  const completedTasks = tasks.filter(
+    (t) => t.actual !== null && t.actual.actualDurationMinutes >= t.plannedDurationMinutes
+  )
 
   return {
     completed: tasks.length > 0 && completedTasks.length === tasks.length,

@@ -7,7 +7,7 @@ export const TASK_QUERY_KEYS = {
 }
 
 async function fetchDailyTasks(params: DailyTasksParams): Promise<DailyTasksResponse> {
-  const searchParams = new URLSearchParams({ date: params.date, dayOfWeek: params.dayOfWeek })
+  const searchParams = new URLSearchParams({ date: params.date })
 
   if (params.priority) searchParams.set('priority', params.priority)
   if (params.goalCategoryId != null) searchParams.set('goalCategoryId', String(params.goalCategoryId))

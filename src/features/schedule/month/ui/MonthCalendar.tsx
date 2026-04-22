@@ -13,8 +13,6 @@ export function MonthCalendar() {
   const { data, isLoading } = useMonthlyTasks({ year, month })
   const tasksByDate = data ?? {} // .tasksByDate 제거
 
-  console.log('isLoading:', isLoading, 'tasksByDate:', tasksByDate)
-
   const handlePrev = () => {
     if (month === 1) {
       setYear((y) => y - 1)

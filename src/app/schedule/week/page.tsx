@@ -1,4 +1,6 @@
-import { WeekTaskList } from '@/src/features/schedule/week/ui/WeekTaskList'
+// WeekPage.tsx (서버 컴포넌트 유지)
+
+import { WeekPageClient } from '@/src/features/schedule/week/ui/WeekPageClient'
 
 interface WeekPageProps {
   searchParams: Promise<{ date?: string }>
@@ -10,9 +12,5 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
   const dateStr = date ?? today
   const dateObj = new Date(dateStr)
 
-  return (
-    <main>
-      <WeekTaskList date={dateObj} />
-    </main>
-  )
+  return <WeekPageClient date={dateObj} />
 }

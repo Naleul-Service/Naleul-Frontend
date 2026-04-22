@@ -4,6 +4,7 @@ import { Task } from '@/src/features/schedule/day/types'
 import { WeeklyTasksResponse } from '../types'
 import { groupTasksByHour, HOUR_LABELS, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
 import { formatLocalDate } from '@/src/lib/datetime'
+import { useRouter } from 'next/navigation'
 
 // ─────────────────────────────────────────────
 // 상수
@@ -149,9 +150,14 @@ interface DayColumnProps {
 
 function DayColumn({ label, date, tasks }: DayColumnProps) {
   const tasksByHour = groupTasksByHour(tasks, date)
-
+  const router = useRouter()
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div
+      onClick={() => {
+        router.push(`/schedule?date=${date}`)
+      }}
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
       {/* 헤더 */}
       <div
         style={{

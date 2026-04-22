@@ -25,7 +25,7 @@ export function MonthHeatmap({ year, month, tasksByDate }: Props) {
 
             const key = toDateKey(date)
             const tasks = tasksByDate[key] ?? []
-            const status = getDayStatus(tasks, key)
+            const status = getDayStatus(tasks)
 
             return (
               <div

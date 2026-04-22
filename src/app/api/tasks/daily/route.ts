@@ -23,7 +23,6 @@ export async function GET(request: Request) {
 
     const result = await getDailyTasks({
       date,
-      dayOfWeek,
       priority,
       goalCategoryId: goalCategoryId ? Number(goalCategoryId) : undefined,
       generalCategoryId: generalCategoryId ? Number(generalCategoryId) : undefined,

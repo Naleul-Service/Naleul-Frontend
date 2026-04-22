@@ -1,9 +1,5 @@
-import { MonthCalendar } from '@/src/features/schedule/month/ui/MonthCalendar'
+import { MonthPageClient } from '@/src/features/schedule/month/ui/MonthPageClient'
 
 export default function MonthPage() {
-  return (
-    <div className="p-4">
-      <MonthCalendar />
-    </div>
-  )
+  return <MonthPageClient />
 }

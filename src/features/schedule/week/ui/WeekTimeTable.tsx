@@ -3,6 +3,7 @@
 import { Task } from '@/src/features/schedule/day/types'
 import { WeeklyTasksResponse } from '../types'
 import { groupTasksByHour, HOUR_LABELS, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
+import { formatLocalDate } from '@/src/lib/datetime'
 
 // ─────────────────────────────────────────────
 // 상수
@@ -29,7 +30,7 @@ const TEN_MIN_CELLS = Array.from({ length: 6 })
 function getDayDate(startDate: string, dayIndex: number): string {
   const d = new Date(startDate)
   d.setDate(d.getDate() + dayIndex)
-  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-')
+  return formatLocalDate(d)
 }
 
 // ─────────────────────────────────────────────

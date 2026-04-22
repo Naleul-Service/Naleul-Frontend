@@ -8,6 +8,7 @@ import { useCreateTask } from '../hooks/useCreateTask'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import { cn } from '@/src/lib/utils'
 import { CreateTaskBody, DAY_OF_WEEK_OPTIONS, TASK_PRIORITIES, TaskPriority } from '@/src/features/task/types'
+import { localInputToUtc } from '@/src/lib/datetime'
 
 interface AddTaskModalProps {
   isOpen: boolean
@@ -33,10 +34,6 @@ const INITIAL_FORM: FormState = {
   dayOfWeekIds: [],
   goalCategoryId: null,
   generalCategoryId: null,
-}
-
-function toISO(localDatetime: string): string {
-  return localDatetime.length === 16 ? `${localDatetime}:00` : localDatetime
 }
 
 function validate(form: FormState): Partial<Record<keyof FormState, string>> {
@@ -101,8 +98,8 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
       taskPriority: form.taskPriority,
       goalCategoryId: form.goalCategoryId!,
       generalCategoryId: form.generalCategoryId!,
-      plannedStartAt: toISO(form.plannedStartAt),
-      plannedEndAt: toISO(form.plannedEndAt),
+      plannedStartAt: localInputToUtc(form.plannedStartAt),
+      plannedEndAt: localInputToUtc(form.plannedEndAt),
       dayOfWeekIds: form.dayOfWeekIds, // 빈 배열이어도 항상 포함
       defaultSettingStatus: form.dayOfWeekIds.length > 0,
       ...(form.dayOfWeekIds.length > 0 && { dayOfWeekIds: form.dayOfWeekIds }),

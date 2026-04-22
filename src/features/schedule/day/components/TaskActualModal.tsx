@@ -6,23 +6,12 @@ import { useUpdateActualTask } from '../hooks/useUpdateActualTask'
 import { Modal } from '@/src/components/common/Modal'
 import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
+import { localInputToUtc, utcIsoToKstTimeLabel, utcToLocalInput } from '@/src/lib/datetime'
 
 interface TaskActualModalProps {
   task: Task
   date: string
   onClose: () => void
-}
-
-function toDatetimeLocal(iso: string): string {
-  return iso.slice(0, 16)
-}
-
-function toISOString(local: string): string {
-  return `${local}:00.000`
-}
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
 }
 
 function formatMinutes(minutes: number): string {
@@ -37,10 +26,10 @@ export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
   const dateActual = task.actuals.find((a) => a.actualDate === date)
 
   const [actualStartAt, setActualStartAt] = useState(
-    dateActual ? toDatetimeLocal(dateActual.actualStartAt) : toDatetimeLocal(task.plannedStartAt)
+    dateActual ? utcToLocalInput(dateActual.actualStartAt) : utcToLocalInput(task.plannedStartAt)
   )
   const [actualEndAt, setActualEndAt] = useState(
-    dateActual ? toDatetimeLocal(dateActual.actualEndAt) : toDatetimeLocal(task.plannedEndAt)
+    dateActual ? utcToLocalInput(dateActual.actualEndAt) : utcToLocalInput(task.plannedEndAt)
   )
 
   const { mutate, isPending, error } = useUpdateActualTask()
@@ -51,8 +40,8 @@ export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
         taskId: task.taskId,
         body: {
           actualDate: date,
-          actualStartAt: toISOString(actualStartAt),
-          actualEndAt: toISOString(actualEndAt),
+          actualStartAt: localInputToUtc(actualStartAt),
+          actualEndAt: localInputToUtc(actualEndAt),
         },
       },
       { onSuccess: onClose }
@@ -82,7 +71,7 @@ export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
         <div className="bg-muted rounded-lg px-4 py-3">
           <p className="text-muted-foreground mb-1 text-xs font-medium">계획</p>
           <p className="text-foreground text-sm">
-            {formatTime(task.plannedStartAt)} ~ {formatTime(task.plannedEndAt)}
+            {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
             <span className="text-muted-foreground ml-2 text-xs">({formatMinutes(task.plannedDurationMinutes)})</span>
           </p>
         </div>

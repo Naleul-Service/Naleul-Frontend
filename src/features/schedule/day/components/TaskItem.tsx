@@ -5,6 +5,7 @@ import { Task } from '../types'
 import { TaskActualModal } from './TaskActualModal'
 import { useDeleteTask } from '@/src/features/task/hooks/useDeleteTask'
 import { TaskEditModal } from '@/src/features/task/components/TaskEditModal'
+import { utcIsoToKstTimeLabel } from '@/src/lib/datetime'
 
 const PRIORITY_STYLE: Record<string, string> = {
   A: 'bg-red-500',
@@ -12,10 +13,6 @@ const PRIORITY_STYLE: Record<string, string> = {
   C: 'bg-yellow-500',
   D: 'bg-green-500',
   E: 'bg-blue-500',
-}
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
 }
 
 export function TaskItem({ task, date }: { task: Task; date: string }) {
@@ -78,7 +75,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
 
         {/* 시간 */}
         <span className="text-muted-foreground shrink-0 text-xs">
-          {formatTime(task.plannedStartAt)} ~ {formatTime(task.plannedEndAt)}
+          {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
         </span>
 
         {/* 수정/삭제 액션 — hover 시 노출 */}

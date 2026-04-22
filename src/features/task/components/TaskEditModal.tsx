@@ -9,6 +9,7 @@ import { Button } from '@/src/components/common/Button'
 import { cn } from '@/src/lib/utils'
 import { DAY_OF_WEEK_OPTIONS, TASK_PRIORITIES, TaskPriority, UpdateTaskBody } from '@/src/features/task/types'
 import { Task } from '@/src/features/schedule/day/types'
+import { localInputToUtc, utcToLocalInput } from '@/src/lib/datetime'
 
 const DAY_NAME_TO_ID: Record<string, number> = {
   MONDAY: 1,
@@ -24,14 +25,6 @@ function toDayOfWeekIds(dayNames: string[]): number[] {
   return dayNames.map((name) => DAY_NAME_TO_ID[name]).filter(Boolean)
 }
 
-function toDatetimeLocal(iso: string): string {
-  return iso.slice(0, 16)
-}
-
-function toISOString(local: string): string {
-  return `${local}:00.000`
-}
-
 interface Props {
   task: Task
   onClose: () => void
@@ -43,8 +36,8 @@ export function TaskEditModal({ task, onClose }: Props) {
 
   const [taskName, setTaskName] = useState(task.taskName)
   const [priority, setPriority] = useState<TaskPriority>(task.taskPriority as TaskPriority)
-  const [plannedStartAt, setPlannedStartAt] = useState(toDatetimeLocal(task.plannedStartAt))
-  const [plannedEndAt, setPlannedEndAt] = useState(toDatetimeLocal(task.plannedEndAt))
+  const [plannedStartAt, setPlannedStartAt] = useState(utcToLocalInput(task.plannedStartAt))
+  const [plannedEndAt, setPlannedEndAt] = useState(utcToLocalInput(task.plannedEndAt))
   const [goalCategoryId, setGoalCategoryId] = useState<number | null>(task.goalCategoryId ?? null)
   const [generalCategoryId, setGeneralCategoryId] = useState<number | null>(task.generalCategoryId ?? null)
   const [dayOfWeekIds, setDayOfWeekIds] = useState<number[]>(toDayOfWeekIds(task.dayNames))
@@ -69,8 +62,8 @@ export function TaskEditModal({ task, onClose }: Props) {
     const body: UpdateTaskBody = {
       taskName: taskName.trim(),
       taskPriority: priority,
-      plannedStartAt: toISOString(plannedStartAt),
-      plannedEndAt: toISOString(plannedEndAt),
+      plannedStartAt: localInputToUtc(plannedStartAt),
+      plannedEndAt: localInputToUtc(plannedEndAt),
       goalCategoryId: goalCategoryId!,
       generalCategoryId: generalCategoryId!,
       dayOfWeekIds,

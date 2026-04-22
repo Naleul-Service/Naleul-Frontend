@@ -1,12 +1,9 @@
+import { utcIsoToKstMinutes } from '@/src/lib/datetime'
+
 export const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => i)
 
 export function formatHourLabel(hour: number): string {
   return `${String(hour).padStart(2, '0')}:00`
-}
-
-export function isoToMinutes(iso: string): number {
-  const d = new Date(iso)
-  return d.getHours() * 60 + d.getMinutes()
 }
 
 export interface PositionedTask<T> {
@@ -40,8 +37,8 @@ function splitByHour<T extends TimeRange>(
   isDone: boolean,
   map: Map<number, PositionedTask<T>[]>
 ) {
-  const startMin = isoToMinutes(startIso)
-  const endMin = isoToMinutes(endIso)
+  const startMin = utcIsoToKstMinutes(startIso)
+  const endMin = utcIsoToKstMinutes(endIso)
 
   const startHour = Math.floor(startMin / 60)
   const endHour = endMin % 60 === 0 ? endMin / 60 - 1 : Math.floor(endMin / 60)
@@ -81,19 +78,14 @@ export function groupTasksByHour<T extends TimeRange>(
   return map
 }
 
-function toMinutesOfDay(iso: string): number {
-  const d = new Date(iso)
-  return d.getHours() * 60 + d.getMinutes()
-}
-
 export function calcAchievementRatio(task: TimeRange, date: string): number {
   const actual = getActualByDate(task, date)
   if (!actual) return 0
 
-  const plannedStart = toMinutesOfDay(task.plannedStartAt)
-  const plannedEnd = toMinutesOfDay(task.plannedEndAt)
-  const actualStart = toMinutesOfDay(actual.actualStartAt)
-  const actualEnd = toMinutesOfDay(actual.actualEndAt)
+  const plannedStart = utcIsoToKstMinutes(task.plannedStartAt)
+  const plannedEnd = utcIsoToKstMinutes(task.plannedEndAt)
+  const actualStart = utcIsoToKstMinutes(actual.actualStartAt)
+  const actualEnd = utcIsoToKstMinutes(actual.actualEndAt)
 
   const plannedDuration = plannedEnd - plannedStart
   if (plannedDuration <= 0) return 0

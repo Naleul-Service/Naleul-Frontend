@@ -8,6 +8,7 @@ import { useWeekTaskFilter } from '../hooks/useWeekTaskFilter'
 import { TaskFilterBar } from '@/src/features/schedule/day/components/TaskFilterBar'
 import { TaskItem } from '@/src/features/schedule/day/components/TaskItem'
 import { WeekTimeTable } from '@/src/features/schedule/week/ui/WeekTimeTable'
+import { formatLocalDate } from '@/src/lib/datetime'
 
 const DAY_LABELS: Record<string, string> = {
   MONDAY: '월',
@@ -86,7 +87,7 @@ export function WeekTaskList({ date }: WeekTaskListProps) {
               const dayOffset = DAY_ORDER.indexOf(day)
               const dayDate = new Date(startDate)
               dayDate.setDate(dayDate.getDate() + dayOffset)
-              const dateStr = dayDate.toISOString().split('T')[0]
+              const dateStr = formatLocalDate(dayDate)
 
               return (
                 <div key={day}>

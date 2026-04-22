@@ -5,6 +5,7 @@ export const CHART_QUERY_KEYS = {
   goalCategories: () => [...CHART_QUERY_KEYS.all, 'goal-categories'] as const,
   goalCategoriesDetail: () => [...CHART_QUERY_KEYS.all, 'goal-categories-detail'] as const,
   generalCategories: () => [...CHART_QUERY_KEYS.all, 'general-categories'] as const,
+  achievement: () => [...CHART_QUERY_KEYS.all, 'achievement'] as const,
 }
 
 export const FALLBACK_COLOR = '#E5E7EB'

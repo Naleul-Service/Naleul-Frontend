@@ -6,11 +6,24 @@ import { useGeneralCategoryChart } from '../hooks/useGeneralCategoryChart'
 import { GoalCategoryBarChart } from './GoalCategoryBarChart'
 import { GoalCategoryDetailChart } from './GoalCategoryDetailChart'
 import { GeneralCategoryDonutChart } from './GeneralCategoryDonutChart'
+import { useAchievementChart } from '@/src/features/charts/hooks/useAchievementChart'
+import { AchievementDonutChart } from '@/src/features/charts/ui/AchievementDonutChart'
 
-function SectionWrapper({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionWrapper({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string
+  subtitle?: string
+  children: React.ReactNode
+}) {
   return (
     <section className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+      <div className="flex flex-col gap-0.5">
+        <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+        {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
+      </div>
       {children}
     </section>
   )
@@ -20,10 +33,19 @@ function ChartSkeleton() {
   return <div className="h-[160px] animate-pulse rounded-xl bg-gray-100" />
 }
 
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex h-[120px] items-center justify-center rounded-xl bg-gray-50">
+      <p className="text-sm text-gray-300">{message}</p>
+    </div>
+  )
+}
+
 export function ChartSection() {
   const goalCategory = useGoalCategoryChart()
   const goalDetail = useGoalCategoryDetailChart()
   const generalCategory = useGeneralCategoryChart()
+  const achievement = useAchievementChart()
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -66,6 +88,16 @@ export function ChartSection() {
             slices={generalCategory.data.slices}
             totalMinutes={generalCategory.data.totalMinutes}
           />
+        )}
+      </SectionWrapper>
+
+      <SectionWrapper title="계획 달성률" subtitle="계획 시간과 실제 시간이 50% 이상 일치한 Task 기준">
+        {achievement.isPending ? (
+          <ChartSkeleton />
+        ) : achievement.isError || !achievement.data ? (
+          <EmptyState message="데이터가 없습니다" />
+        ) : (
+          <AchievementDonutChart data={achievement.data} />
         )}
       </SectionWrapper>
     </div>

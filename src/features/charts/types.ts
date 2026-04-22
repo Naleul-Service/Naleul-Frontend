@@ -18,3 +18,10 @@ export interface GoalCategoryChart {
   totalMinutes: number
   generalCategories: ChartSlice[]
 }
+
+export interface AchievementChart {
+  totalCount: number
+  achievedCount: number
+  unachievedCount: number
+  achievementRate: number
+}

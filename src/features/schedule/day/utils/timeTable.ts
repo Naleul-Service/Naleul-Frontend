@@ -15,7 +15,6 @@ export interface PositionedTask<T> {
 }
 
 interface TaskActualSummary {
-  actualDate: string
   actualStartAt: string
   actualEndAt: string
 }
@@ -23,11 +22,7 @@ interface TaskActualSummary {
 interface TimeRange {
   plannedStartAt: string
   plannedEndAt: string
-  actuals: TaskActualSummary[]
-}
-
-function getActualByDate(task: TimeRange, date: string): TaskActualSummary | null {
-  return task.actuals.find((a) => a.actualDate === date) ?? null
+  actual: TaskActualSummary | null // actuals 배열 → actual 단수
 }
 
 function splitByHour<T extends TimeRange>(
@@ -35,20 +30,35 @@ function splitByHour<T extends TimeRange>(
   startIso: string,
   endIso: string,
   isDone: boolean,
-  map: Map<number, PositionedTask<T>[]>
+  map: Map<number, PositionedTask<T>[]>,
+  viewDate: string
 ) {
   const startMin = utcIsoToKstMinutes(startIso)
-  const endMin = utcIsoToKstMinutes(endIso)
+  let endMin = utcIsoToKstMinutes(endIso)
 
-  const startHour = Math.floor(startMin / 60)
-  const endHour = endMin % 60 === 0 ? endMin / 60 - 1 : Math.floor(endMin / 60)
+  const taskStartDate = new Date(startIso + 'Z')
+  const kstStartDate = new Date(taskStartDate.getTime() + 9 * 60 * 60 * 1000)
+  const kstStartDateStr = [
+    kstStartDate.getUTCFullYear(),
+    String(kstStartDate.getUTCMonth() + 1).padStart(2, '0'),
+    String(kstStartDate.getUTCDate()).padStart(2, '0'),
+  ].join('-')
+
+  const isOvernight = kstStartDateStr !== viewDate
+  const adjustedStartMin = isOvernight ? 0 : startMin
+
+  if (endMin <= adjustedStartMin) endMin += 24 * 60
+
+  const clampedEnd = Math.min(endMin, 24 * 60)
+  const startHour = Math.floor(adjustedStartMin / 60)
+  const endHour = clampedEnd % 60 === 0 ? clampedEnd / 60 - 1 : Math.floor(clampedEnd / 60)
 
   for (let hour = startHour; hour <= endHour; hour++) {
     const slotStart = hour * 60
     const slotEnd = slotStart + 60
 
-    const segStart = Math.max(startMin, slotStart)
-    const segEnd = Math.min(endMin, slotEnd)
+    const segStart = Math.max(adjustedStartMin, slotStart)
+    const segEnd = Math.min(clampedEnd, slotEnd)
 
     const leftPercent = ((segStart - slotStart) / 60) * 100
     const widthPercent = Math.max(((segEnd - segStart) / 60) * 100, 4)
@@ -58,34 +68,29 @@ function splitByHour<T extends TimeRange>(
   }
 }
 
-export function groupTasksByHour<T extends TimeRange>(
-  tasks: T[],
-  date: string // 추가
-): Map<number, PositionedTask<T>[]> {
+export function groupTasksByHour<T extends TimeRange>(tasks: T[], date: string): Map<number, PositionedTask<T>[]> {
   const map = new Map<number, PositionedTask<T>[]>()
 
   for (const task of tasks) {
-    const actual = getActualByDate(task, date)
-    const isDone = actual !== null
+    const isDone = task.actual !== null
 
-    if (isDone) {
-      splitByHour(task, actual.actualStartAt, actual.actualEndAt, true, map)
+    if (isDone && task.actual) {
+      splitByHour(task, task.actual.actualStartAt, task.actual.actualEndAt, true, map, date)
     } else {
-      splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, map)
+      splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, map, date)
     }
   }
 
   return map
 }
 
-export function calcAchievementRatio(task: TimeRange, date: string): number {
-  const actual = getActualByDate(task, date)
-  if (!actual) return 0
+export function calcAchievementRatio(task: TimeRange): number {
+  if (!task.actual) return 0
 
   const plannedStart = utcIsoToKstMinutes(task.plannedStartAt)
   const plannedEnd = utcIsoToKstMinutes(task.plannedEndAt)
-  const actualStart = utcIsoToKstMinutes(actual.actualStartAt)
-  const actualEnd = utcIsoToKstMinutes(actual.actualEndAt)
+  const actualStart = utcIsoToKstMinutes(task.actual.actualStartAt)
+  const actualEnd = utcIsoToKstMinutes(task.actual.actualEndAt)
 
   const plannedDuration = plannedEnd - plannedStart
   if (plannedDuration <= 0) return 0

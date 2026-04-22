@@ -7,7 +7,7 @@ import { Button } from '@/src/components/common/Button'
 import { useCreateTask } from '../hooks/useCreateTask'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import { cn } from '@/src/lib/utils'
-import { CreateTaskBody, DAY_OF_WEEK_OPTIONS, TASK_PRIORITIES, TaskPriority } from '@/src/features/task/types'
+import { CreateTaskBody, TASK_PRIORITIES, TaskPriority } from '@/src/features/task/types'
 import { localInputToUtc } from '@/src/lib/datetime'
 
 interface AddTaskModalProps {
@@ -21,7 +21,6 @@ interface FormState {
   taskPriority: TaskPriority
   plannedStartAt: string
   plannedEndAt: string
-  dayOfWeekIds: number[]
   goalCategoryId: number | null
   generalCategoryId: number | null
 }
@@ -31,7 +30,6 @@ const INITIAL_FORM: FormState = {
   taskPriority: 'A',
   plannedStartAt: '',
   plannedEndAt: '',
-  dayOfWeekIds: [],
   goalCategoryId: null,
   generalCategoryId: null,
 }
@@ -60,7 +58,6 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
   const { mutate: createTask, isPending } = useCreateTask()
   const { data: goalCategories = [], isLoading: isLoadingCategories } = useGoalCategories()
 
-  // 선택된 goal의 generalCategories 추출
   const generalCategories =
     goalCategories.find((g) => g.goalCategoryId === form.goalCategoryId)?.generalCategories ?? []
 
@@ -69,15 +66,9 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
-  // goal 변경 시 general 초기화
   function handleGoalChange(goalCategoryId: number | null) {
     setForm((prev) => ({ ...prev, goalCategoryId, generalCategoryId: null }))
     setErrors((prev) => ({ ...prev, goalCategoryId: undefined, generalCategoryId: undefined }))
-  }
-
-  function toggleDayOfWeek(id: number) {
-    const next = form.dayOfWeekIds.includes(id) ? form.dayOfWeekIds.filter((d) => d !== id) : [...form.dayOfWeekIds, id]
-    handleChange('dayOfWeekIds', next)
   }
 
   function handleClose() {
@@ -100,9 +91,7 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
       generalCategoryId: form.generalCategoryId!,
       plannedStartAt: localInputToUtc(form.plannedStartAt),
       plannedEndAt: localInputToUtc(form.plannedEndAt),
-      dayOfWeekIds: form.dayOfWeekIds, // 빈 배열이어도 항상 포함
-      defaultSettingStatus: form.dayOfWeekIds.length > 0,
-      ...(form.dayOfWeekIds.length > 0 && { dayOfWeekIds: form.dayOfWeekIds }),
+      defaultSettingStatus: false,
     }
 
     createTask(body, { onSuccess: handleClose })
@@ -126,7 +115,6 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
       }
     >
       <div className="flex flex-col gap-4">
-        {/* 할 일 이름 */}
         <Input
           label="할 일"
           placeholder="할 일을 입력해주세요"
@@ -162,7 +150,7 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
           {errors.goalCategoryId && <p className="text-xs text-red-500">{errors.goalCategoryId}</p>}
         </div>
 
-        {/* 일반 카테고리 — goal 선택 후 활성화 */}
+        {/* 일반 카테고리 */}
         <div className="flex flex-col gap-1.5">
           <label className="text-foreground text-xs font-medium">
             일반 카테고리 <span className="text-red-500">*</span>
@@ -216,49 +204,24 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
           </div>
         </div>
 
-        {/* 시작 시간 */}
-        <Input
-          label="시작 시간"
-          type="datetime-local"
-          value={form.plannedStartAt}
-          onChange={(e) => handleChange('plannedStartAt', e.target.value)}
-          error={errors.plannedStartAt}
-          required
-        />
-
-        {/* 종료 시간 */}
-        <Input
-          label="종료 시간"
-          type="datetime-local"
-          value={form.plannedEndAt}
-          onChange={(e) => handleChange('plannedEndAt', e.target.value)}
-          error={errors.plannedEndAt}
-          required
-        />
-
-        {/* 반복 요일 */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-foreground text-xs font-medium">
-            반복 요일
-            <span className="text-muted-foreground ml-1 font-normal">(선택)</span>
-          </span>
-          <div className="flex gap-1.5">
-            {DAY_OF_WEEK_OPTIONS.map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => toggleDayOfWeek(id)}
-                className={cn(
-                  'h-8 flex-1 rounded-md text-xs font-medium transition-colors',
-                  form.dayOfWeekIds.includes(id)
-                    ? 'bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:bg-muted border'
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+        {/* 시간 */}
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            label="시작 시간"
+            type="datetime-local"
+            value={form.plannedStartAt}
+            onChange={(e) => handleChange('plannedStartAt', e.target.value)}
+            error={errors.plannedStartAt}
+            required
+          />
+          <Input
+            label="종료 시간"
+            type="datetime-local"
+            value={form.plannedEndAt}
+            onChange={(e) => handleChange('plannedEndAt', e.target.value)}
+            error={errors.plannedEndAt}
+            required
+          />
         </div>
       </div>
     </Modal>

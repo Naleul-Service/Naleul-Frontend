@@ -28,7 +28,7 @@ const TEN_MIN_CELLS = Array.from({ length: 6 })
 // 유틸
 // ─────────────────────────────────────────────
 function getDayDate(startDate: string, dayIndex: number): string {
-  const d = new Date(startDate)
+  const d = new Date(startDate + 'T00:00:00')
   d.setDate(d.getDate() + dayIndex)
   return formatLocalDate(d)
 }

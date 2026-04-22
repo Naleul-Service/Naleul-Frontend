@@ -3,19 +3,18 @@ import { Task } from '@/src/features/schedule/day/types'
 
 interface TaskBlockProps {
   positioned: PositionedTask<Task>
-  date: string
 }
 
 const FALLBACK_COLOR = '#9CA3AF'
 
-export function TaskBlock({ positioned, date }: TaskBlockProps) {
+export function TaskBlock({ positioned }: TaskBlockProps) {
   const { task, leftPercent, widthPercent, isDone } = positioned
 
   const generalColor = task.generalCategoryColorCode ?? FALLBACK_COLOR
   const goalColor = task.goalCategoryColorCode ?? FALLBACK_COLOR
 
   // 6칸 중 3칸 이상 겹치면 달성 = ratio >= 0.5
-  const achievementRatio = calcAchievementRatio(task, date)
+  const achievementRatio = calcAchievementRatio(task)
   const isAchieved = achievementRatio >= 0.5
 
   return (

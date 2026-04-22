@@ -5,7 +5,6 @@ import { apiCallServer } from '@/src/lib/api.server'
 export async function getDailyTasks(params: DailyTasksParams): Promise<ApiCallResult<DailyTasksResponse>> {
   const searchParams = new URLSearchParams({
     date: params.date,
-    dayOfWeek: params.dayOfWeek,
   })
 
   if (params.priority) searchParams.set('priority', params.priority)
@@ -16,7 +15,6 @@ export async function getDailyTasks(params: DailyTasksParams): Promise<ApiCallRe
 }
 
 export interface UpdateActualTaskBody {
-  actualDate: string // 추가 "2026-04-21"
   actualStartAt: string
   actualEndAt: string
 }

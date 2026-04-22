@@ -21,7 +21,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask()
 
   const today = new Date().toISOString().slice(0, 10) // "2026-04-21"
-  const isDone = task.actuals.some((a) => a.actualDate === date)
+  const isDone = task.actual !== null
 
   function handleDelete() {
     if (!confirm(`"${task.taskName}"을 삭제할까요?`)) return
@@ -128,7 +128,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
         </div>
       </li>
 
-      {isActualModalOpen && <TaskActualModal task={task} date={date} onClose={() => setIsActualModalOpen(false)} />}
+      {isActualModalOpen && <TaskActualModal task={task} onClose={() => setIsActualModalOpen(false)} />}
       {isEditModalOpen && <TaskEditModal task={task} onClose={() => setIsEditModalOpen(false)} />}
     </>
   )

@@ -8,8 +8,6 @@ import { TaskFilterBar } from './TaskFilterBar'
 import { TaskItem } from './TaskItem'
 import { formatLocalDate } from '@/src/lib/datetime'
 
-const DAY_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'] as const
-
 interface DayTaskListProps {
   date: Date
 }
@@ -18,11 +16,9 @@ export function DayTaskList({ date }: DayTaskListProps) {
   const { filter, setPriority, setGoalCategory, setGeneralCategory } = useTaskFilter()
   const { data: goalCategories = [] } = useGoalCategories()
 
-  // useMemo로 params 안정화 — date, filter 바뀔 때만 새 객체 생성
   const params = useMemo(
     () => ({
       date: formatLocalDate(date),
-      dayOfWeek: DAY_OF_WEEK[date.getDay()],
       ...(filter.priority && { priority: filter.priority }),
       ...(filter.goalCategoryId != null && { goalCategoryId: filter.goalCategoryId }),
       ...(filter.generalCategoryId != null && { generalCategoryId: filter.generalCategoryId }),

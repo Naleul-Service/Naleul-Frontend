@@ -3,6 +3,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { GoalCategory } from '@/src/features/category/api/goalCategory'
 import type {
   RetrospectiveCreateRequest,
   RetrospectiveResponse,
@@ -16,26 +17,17 @@ const REVIEW_TYPES: { value: ReviewType; label: string }[] = [
   { value: 'MONTHLY', label: '월간' },
 ]
 
-interface CategoryOption {
-  id: number
-  name: string
-}
-
 interface CreateMode {
   mode: 'create'
-  goalCategories: CategoryOption[]
-  generalCategories: CategoryOption[]
+  goalCategories: GoalCategory[]
   onSubmit: (data: RetrospectiveCreateRequest) => void
-  onGoalCategoryChange?: (id: number | null) => void
 }
 
 interface EditMode {
   mode: 'edit'
   initialData: RetrospectiveResponse
-  goalCategories: CategoryOption[]
-  generalCategories: CategoryOption[]
+  goalCategories: GoalCategory[]
   onSubmit: (data: RetrospectiveUpdateRequest) => void
-  onGoalCategoryChange?: (id: number | null) => void
 }
 
 type Props = (CreateMode | EditMode) & {
@@ -47,7 +39,7 @@ export function RetrospectiveForm(props: Props) {
   const isEdit = props.mode === 'edit'
 
   const [reviewType, setReviewType] = useState<ReviewType>(isEdit ? props.initialData.reviewType : 'DAILY')
-  const [reviewDate, setReviewDate] = useState(isEdit ? props.initialData.reviewDate : today())
+  const [reviewDate, setReviewDate] = useState(isEdit ? props.initialData.reviewDate : getDefaultDate('DAILY'))
   const [content, setContent] = useState(isEdit ? props.initialData.content : '')
   const [goalCategoryId, setGoalCategoryId] = useState<number | null>(
     isEdit ? (props.initialData.goalCategoryId ?? null) : null
@@ -56,31 +48,32 @@ export function RetrospectiveForm(props: Props) {
     isEdit ? (props.initialData.generalCategoryId ?? null) : null
   )
 
+  // goalCategoryId 기준으로 generalCategories 직접 계산
+  const selectedGoalCategory = props.goalCategories.find((g) => g.goalCategoryId === goalCategoryId)
+  const generalCategories = selectedGoalCategory?.generalCategories ?? []
+
   const handleGoalCategoryChange = (id: number | null) => {
     setGoalCategoryId(id)
-    setGeneralCategoryId(null) // goalCategory 바뀌면 generalCategory 초기화
-    props.onGoalCategoryChange?.(id)
+    setGeneralCategoryId(null) // goalCategory 바뀌면 초기화
+  }
+
+  const handleReviewTypeChange = (type: ReviewType) => {
+    setReviewType(type)
+    setReviewDate(getDefaultDate(type))
   }
 
   const handleSubmit = () => {
     if (!content.trim()) return
-
     if (isEdit) {
       ;(props as EditMode).onSubmit({ content, goalCategoryId, generalCategoryId })
     } else {
-      ;(props as CreateMode).onSubmit({
-        reviewType,
-        reviewDate,
-        content,
-        goalCategoryId,
-        generalCategoryId,
-      })
+      ;(props as CreateMode).onSubmit({ reviewType, reviewDate, content, goalCategoryId, generalCategoryId })
     }
   }
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 타입 선택 (수정 시 비활성) */}
+      {/* 타입 선택 (수정 시 숨김) */}
       {!isEdit && (
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">회고 유형</label>
@@ -89,10 +82,7 @@ export function RetrospectiveForm(props: Props) {
               <button
                 key={value}
                 type="button"
-                onClick={() => {
-                  setReviewType(value)
-                  setReviewDate(getDefaultDate(value))
-                }}
+                onClick={() => handleReviewTypeChange(value)}
                 className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${
                   reviewType === value
                     ? 'border-gray-900 bg-gray-900 text-white'
@@ -106,16 +96,46 @@ export function RetrospectiveForm(props: Props) {
         </div>
       )}
 
-      {/* 날짜 (수정 시 비활성) */}
+      {/* 날짜 — 타입별로 다른 input */}
       {!isEdit && (
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">날짜</label>
-          <input
-            type="date"
-            value={reviewDate}
-            onChange={(e) => setReviewDate(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
-          />
+
+          {/* 일간: date picker */}
+          {reviewType === 'DAILY' && (
+            <input
+              type="date"
+              value={reviewDate}
+              onChange={(e) => setReviewDate(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
+            />
+          )}
+
+          {/* 주간: 월-일 범위 표시 + week picker */}
+          {reviewType === 'WEEKLY' && (
+            <div className="flex flex-col gap-1.5">
+              <input
+                type="week"
+                value={dateToWeekValue(reviewDate)}
+                onChange={(e) => setReviewDate(weekValueToMonday(e.target.value))}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
+              />
+              <p className="text-xs text-gray-400">{getWeekRangeLabel(reviewDate)}</p>
+            </div>
+          )}
+
+          {/* 월간: month picker */}
+          {reviewType === 'MONTHLY' && (
+            <div className="flex flex-col gap-1.5">
+              <input
+                type="month"
+                value={reviewDate.slice(0, 7)} // "yyyy-MM"
+                onChange={(e) => setReviewDate(`${e.target.value}-01`)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
+              />
+              <p className="text-xs text-gray-400">{getMonthLabel(reviewDate)}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -130,9 +150,9 @@ export function RetrospectiveForm(props: Props) {
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
         >
           <option value="">선택 안 함</option>
-          {props.goalCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
+          {props.goalCategories.map((g) => (
+            <option key={g.goalCategoryId} value={g.goalCategoryId}>
+              {g.goalCategoryName}
             </option>
           ))}
         </select>
@@ -146,13 +166,13 @@ export function RetrospectiveForm(props: Props) {
         <select
           value={generalCategoryId ?? ''}
           onChange={(e) => setGeneralCategoryId(e.target.value ? Number(e.target.value) : null)}
-          disabled={!goalCategoryId}
+          disabled={!goalCategoryId || generalCategories.length === 0}
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <option value="">선택 안 함</option>
-          {props.generalCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
+          <option value="">{!goalCategoryId ? '목표 카테고리를 먼저 선택하세요' : '선택 안 함'}</option>
+          {generalCategories.map((g) => (
+            <option key={g.generalCategoryId} value={g.generalCategoryId}>
+              {g.generalCategoryName}
             </option>
           ))}
         </select>
@@ -192,22 +212,18 @@ export function RetrospectiveForm(props: Props) {
   )
 }
 
-// ── 헬퍼 ──────────────────────────────────────────────────
+// ── 날짜 헬퍼 ─────────────────────────────────────────────
 
 function today() {
   return new Date().toISOString().slice(0, 10)
 }
 
-function getMonday(date: Date) {
+function getMonday(date: Date): string {
   const d = new Date(date)
   const day = d.getDay()
   const diff = day === 0 ? -6 : 1 - day
   d.setDate(d.getDate() + diff)
   return d.toISOString().slice(0, 10)
-}
-
-function getFirstDayOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1).toISOString().slice(0, 10)
 }
 
 function getDefaultDate(type: ReviewType): string {
@@ -218,6 +234,51 @@ function getDefaultDate(type: ReviewType): string {
     case 'WEEKLY':
       return getMonday(now)
     case 'MONTHLY':
-      return getFirstDayOfMonth(now)
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
   }
+}
+
+// "yyyy-MM-dd" → input[type=week] value인 "yyyy-Www"
+function dateToWeekValue(dateStr: string): string {
+  const date = new Date(dateStr)
+  const year = date.getFullYear()
+
+  // ISO 주차 계산
+  const startOfYear = new Date(year, 0, 1)
+  const diff = date.getTime() - startOfYear.getTime()
+  const weekNum = Math.ceil((diff / 86400000 + startOfYear.getDay() + 1) / 7)
+
+  return `${year}-W${String(weekNum).padStart(2, '0')}`
+}
+
+// input[type=week] value인 "yyyy-Www" → 해당 주 월요일 "yyyy-MM-dd"
+function weekValueToMonday(weekValue: string): string {
+  const [yearStr, weekStr] = weekValue.split('-W')
+  const year = Number(yearStr)
+  const week = Number(weekStr)
+
+  // 해당 연도 1월 4일 (항상 1주차에 포함)
+  const jan4 = new Date(year, 0, 4)
+  const jan4Day = jan4.getDay() || 7 // 일=0을 7로
+  const monday = new Date(jan4)
+  monday.setDate(jan4.getDate() - (jan4Day - 1) + (week - 1) * 7)
+
+  return monday.toISOString().slice(0, 10)
+}
+
+// 주간 범위 레이블: "2025년 18주 (04/28 ~ 05/04)"
+function getWeekRangeLabel(mondayStr: string): string {
+  const monday = new Date(mondayStr)
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+
+  const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`
+
+  return `${fmt(monday)} ~ ${fmt(sunday)}`
+}
+
+// 월간 레이블: "2025년 5월"
+function getMonthLabel(dateStr: string): string {
+  const d = new Date(dateStr)
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`
 }

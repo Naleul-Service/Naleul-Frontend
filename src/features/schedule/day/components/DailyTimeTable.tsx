@@ -18,7 +18,7 @@ export function DailyTimeTable({ params }: DailyTimeTableProps) {
   if (isLoading) return <TimeTableSkeleton />
   if (isError || !data) return <TimeTableError />
 
-  const tasksByHour = groupTasksByHour(data.tasks, params.date)
+  const tasksByHour = groupTasksByHour(data, params.date)
 
   return (
     <div

@@ -3,6 +3,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
+import type { GoalCategory } from '@/src/features/category/api/goalCategory'
 import { useRetrospectiveList } from '../hooks/useRetrospectiveList'
 import {
   useCreateRetrospective,
@@ -13,7 +15,6 @@ import { RetrospectiveCard } from './RetrospectiveCard'
 import { RetrospectiveFilter } from './RetrospectiveFilter'
 import { RetrospectiveForm } from './RetrospectiveForm'
 import type { RetrospectiveResponse, ReviewType } from '../types'
-import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 
 type ModalState = { type: 'closed' } | { type: 'create' } | { type: 'edit'; data: RetrospectiveResponse }
 
@@ -25,14 +26,12 @@ export function RetrospectiveListPage() {
   const [page, setPage] = useState(0)
   const [modal, setModal] = useState<ModalState>({ type: 'closed' })
 
-  // 실제 카테고리 데이터
   const { data: goalCategories = [] } = useGoalCategories()
 
-  // 선택된 goalCategory의 generalCategories
+  // 필터용 generalCategories — 선택된 goalCategory 기준
   const selectedGoalCategory = goalCategories.find((g) => g.goalCategoryId === goalCategoryId)
   const generalCategories = selectedGoalCategory?.generalCategories ?? []
 
-  // 회고 목록
   const { data, isLoading, isError } = useRetrospectiveList({
     reviewType,
     baseDate: reviewType ? baseDate : undefined,
@@ -53,25 +52,15 @@ export function RetrospectiveListPage() {
 
   const handleFilterTypeChange = (type: ReviewType | undefined) => {
     setReviewType(type)
-    setGeneralCategoryId(undefined) // 타입 바뀌면 하위 필터 초기화
+    setGeneralCategoryId(undefined)
     setPage(0)
   }
 
   const handleGoalCategoryChange = (id: number | undefined) => {
     setGoalCategoryId(id)
-    setGeneralCategoryId(undefined) // goalCategory 바뀌면 generalCategory 초기화
+    setGeneralCategoryId(undefined)
     setPage(0)
   }
-
-  // goalCategories → Form용 CategoryOption으로 변환
-  const goalCategoryOptions = goalCategories.map((g) => ({
-    id: g.goalCategoryId,
-    name: g.goalCategoryName,
-  }))
-  const generalCategoryOptions = generalCategories.map((g) => ({
-    id: g.generalCategoryId,
-    name: g.generalCategoryName,
-  }))
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -99,7 +88,6 @@ export function RetrospectiveListPage() {
         />
 
         <div className="flex gap-2">
-          {/* 목표 카테고리 필터 */}
           <select
             value={goalCategoryId ?? ''}
             onChange={(e) => handleGoalCategoryChange(e.target.value ? Number(e.target.value) : undefined)}
@@ -113,7 +101,6 @@ export function RetrospectiveListPage() {
             ))}
           </select>
 
-          {/* 일반 카테고리 필터 — goalCategory 선택 시에만 활성화 */}
           <select
             value={generalCategoryId ?? ''}
             onChange={(e) => {
@@ -187,8 +174,7 @@ export function RetrospectiveListPage() {
           {modal.type === 'create' ? (
             <RetrospectiveForm
               mode="create"
-              goalCategories={goalCategoryOptions}
-              generalCategories={generalCategoryOptions}
+              goalCategories={goalCategories}
               isLoading={createMutation.isPending}
               onSubmit={(data) =>
                 createMutation.mutate(data, {
@@ -200,8 +186,7 @@ export function RetrospectiveListPage() {
           ) : (
             <EditModalContent
               data={modal.data}
-              goalCategories={goalCategoryOptions}
-              goalCategoriesRaw={goalCategories}
+              goalCategories={goalCategories}
               onClose={() => setModal({ type: 'closed' })}
             />
           )}
@@ -211,37 +196,24 @@ export function RetrospectiveListPage() {
   )
 }
 
-// 수정 모달: generalCategories를 선택된 goalCategory 기준으로 동적 계산
+// EditModalContent — goalCategoriesRaw, goalCategoryOptions 변환 전부 제거
 function EditModalContent({
   data,
   goalCategories,
-  goalCategoriesRaw,
   onClose,
 }: {
   data: RetrospectiveResponse
-  goalCategories: { id: number; name: string }[]
-  goalCategoriesRaw: ReturnType<typeof useGoalCategories>['data'] // GoalCategory[]
+  goalCategories: GoalCategory[]
   onClose: () => void
 }) {
   const updateMutation = useUpdateRetrospective(data.retrospectiveId)
-
-  // 수정 폼에서 goalCategory 변경 시 generalCategories도 연동
-  const [selectedGoalId, setSelectedGoalId] = useState<number | null>(data.goalCategoryId ?? null)
-
-  const selectedGoal = goalCategoriesRaw?.find((g) => g.goalCategoryId === selectedGoalId)
-  const generalCategoryOptions = (selectedGoal?.generalCategories ?? []).map((g) => ({
-    id: g.generalCategoryId,
-    name: g.generalCategoryName,
-  }))
 
   return (
     <RetrospectiveForm
       mode="edit"
       initialData={data}
       goalCategories={goalCategories}
-      generalCategories={generalCategoryOptions}
       isLoading={updateMutation.isPending}
-      onGoalCategoryChange={setSelectedGoalId} // Form에 콜백 추가 필요
       onSubmit={(body) => updateMutation.mutate(body, { onSuccess: onClose })}
       onCancel={onClose}
     />

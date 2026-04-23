@@ -1,8 +1,8 @@
-import { DailyTasksParams, DailyTasksResponse } from '@/src/features/schedule/day/types'
+import { DailyTasksParams, Task } from '@/src/features/schedule/day/types'
 import { ApiCallResult } from '@/src/types/common'
 import { apiCallServer } from '@/src/lib/api.server'
 
-export async function getDailyTasks(params: DailyTasksParams): Promise<ApiCallResult<DailyTasksResponse>> {
+export async function getDailyTasks(params: DailyTasksParams): Promise<ApiCallResult<Task[]>> {
   const searchParams = new URLSearchParams({
     date: params.date,
   })

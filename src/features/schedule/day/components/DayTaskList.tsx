@@ -40,13 +40,13 @@ export function DayTaskList({ date }: DayTaskListProps) {
 
       {isPending && <p className="text-muted-foreground text-sm">불러오는 중...</p>}
       {isError && <p className="text-sm text-red-500">할 일을 불러오지 못했어요</p>}
-      {!isPending && !isError && !data?.tasks.length && (
+      {!isPending && !isError && !data?.length && (
         <p className="text-muted-foreground text-sm">등록된 할 일이 없어요</p>
       )}
 
-      {data?.tasks && (
+      {data && (
         <ul className="flex flex-col gap-2">
-          {data.tasks.map((task) => (
+          {data.map((task) => (
             <TaskItem key={task.taskId} task={task} date={params.date} />
           ))}
         </ul>

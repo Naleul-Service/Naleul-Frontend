@@ -33,11 +33,3 @@ export interface TaskActual {
   actualEndAt: string
   actualDurationMinutes: number
 }
-
-export interface DailyTasksResponse {
-  tasks: Task[]
-  currentPage: number
-  totalPages: number
-  totalElements: number
-  hasNext: boolean
-}

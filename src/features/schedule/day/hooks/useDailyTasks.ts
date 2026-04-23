@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { DailyTasksParams, DailyTasksResponse } from '../types'
+import { DailyTasksParams, Task } from '../types'
 
 export const TASK_QUERY_KEYS = {
   all: ['tasks'] as const,
   daily: (params: DailyTasksParams) => ['tasks', 'daily', params] as const,
 }
 
-async function fetchDailyTasks(params: DailyTasksParams): Promise<DailyTasksResponse> {
+async function fetchDailyTasks(params: DailyTasksParams): Promise<Task[]> {
   const searchParams = new URLSearchParams({ date: params.date })
 
   if (params.priority) searchParams.set('priority', params.priority)

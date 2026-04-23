@@ -22,10 +22,10 @@ export function DayPageContent() {
   return (
     <main className="flex flex-col gap-4">
       <div className="flex w-full overflow-y-auto" style={{ maxHeight: 'calc(100svh - 120px)' }}>
-        <div className="w-1/2 shrink-0">
+        <div className="w-2/5 shrink-0">
           <DayTaskList date={selectedDate} />
         </div>
-        <div className="w-1/2 shrink-0">
+        <div className="w-3/5 shrink-0">
           <DailyTimeTable params={tableParams} />
         </div>
       </div>

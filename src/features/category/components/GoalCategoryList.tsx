@@ -27,14 +27,11 @@ import { useDeleteGoalCategory } from '@/src/features/category/hooks/useGoalCate
 import { useDeleteGeneralCategory } from '@/src/features/category/hooks/useGeneralCategoryMutations'
 import { cn } from '@/src/lib/utils'
 import { GeneralCategoryEditModal } from '@/src/features/category/components/GeneralCategoryEditModal'
+import { STATUS_LABEL } from '@/src/features/category/constants'
+import { Button } from '@/src/components/common/Button'
+import Badge from '@/src/components/common/Badge'
 
 // ─── 상수 / 유틸 ────────────────────────────────────────────
-
-const STATUS_LABEL: Record<string, string> = {
-  NOT_STARTED: '시작 전',
-  IN_PROGRESS: '진행 중',
-  COMPLETED: '완료',
-}
 
 const toDroppableId = (goalCategoryId: number) => `droppable-${goalCategoryId}`
 
@@ -299,24 +296,33 @@ function GoalCategoryItem({
   const isCompleted = category.goalCategoryStatus === 'COMPLETED'
 
   return (
-    <div className="border-border bg-background rounded-lg border">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: category.colorCode }} />
-        <div className="min-w-0 flex-1">
-          <p className="text-foreground truncate text-sm font-medium">{category.goalCategoryName}</p>
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            {category.goalCategoryStartDate} · {STATUS_LABEL[category.goalCategoryStatus]}
-          </p>
-        </div>
+    <div className="bg-background rounded-[12px] border border-gray-100">
+      <section className="flex items-center justify-between gap-3 px-4 py-3">
+        <section className="flex items-center gap-x-4">
+          <div
+            className="h-4 w-4 shrink-0 rounded-full"
+            style={{ backgroundColor: category.colorCode ? category.colorCode : '#637580' }}
+          />
+          <section className="flex flex-col gap-y-[2px]">
+            <p className="h4 text-gray-950">{category.goalCategoryName}</p>
+            <div className="flex items-center gap-x-1">
+              <Badge bgColor={'bg-gray-100'} textColor={'text-gray-500'}>
+                {STATUS_LABEL[category.goalCategoryStatus]}
+              </Badge>
+              <p className="body-md text-gray-500">{category.goalCategoryStartDate}</p>
+            </div>
+          </section>
+        </section>
 
-        <div className="flex shrink-0 items-center gap-1">
-          <button
+        <div className="flex shrink-0 items-center gap-[7px]">
+          <Button
             onClick={onAddGeneral}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs transition-colors"
+            variant={'secondary'}
+            size={'sm'}
+            leftIcon={<Plus size={12} className="text-primary-400" />}
           >
-            <Plus size={12} />
-            일반 카테고리
-          </button>
+            세부 목표 추가
+          </Button>
 
           <GoalCategoryContextMenu
             isOpen={isMenuOpen}
@@ -328,7 +334,7 @@ function GoalCategoryItem({
             isCompleted={isCompleted}
           />
         </div>
-      </div>
+      </section>
 
       <SortableContext
         id={toDroppableId(category.goalCategoryId)}
@@ -370,8 +376,8 @@ function DroppableContainer({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex flex-col gap-1 px-4 pb-2 transition-colors',
-        !isEmpty && 'border-border border-t pt-2',
+        'flex flex-col gap-1 px-2 pb-2 transition-colors',
+        !isEmpty && 'border-t border-gray-100 pt-2',
         isEmpty && 'min-h-[32px] items-center justify-center',
         isOver && isEmpty && 'bg-muted rounded-b-lg'
       )}
@@ -410,13 +416,29 @@ function SortableGeneralCategoryItem({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        'group flex items-center gap-2.5 rounded-md py-1.5 pr-1 pl-2',
+        'group flex items-center justify-between rounded-[12px] px-[10px] py-3',
         'hover:bg-muted transition-colors',
         isDragging && 'opacity-40'
       )}
     >
-      <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: item.colorCode }} />
-      <p className="text-foreground flex-1 text-xs">{item.generalCategoryName}</p>
+      <section className="flex gap-x-[10px]">
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-muted-foreground hover:text-foreground cursor-grab rounded p-0.5 transition-colors active:cursor-grabbing"
+          aria-label="드래그 핸들"
+        >
+          <GripVertical size={16} className="text-gray-300" />
+        </button>
+
+        <section className="flex items-center gap-x-[10px]">
+          <div
+            className="h-3 w-3 shrink-0 rounded-full"
+            style={{ backgroundColor: item.colorCode ? item.colorCode : '#BDC9CE' }}
+          />
+          <p className="body-md-medium flex-1 text-gray-950">{item.generalCategoryName}</p>
+        </section>
+      </section>
 
       <GeneralItemContextMenu
         isMenuOpen={isMenuOpen}
@@ -425,15 +447,6 @@ function SortableGeneralCategoryItem({
         onEdit={onEdit}
         onDelete={onDelete}
       />
-
-      <button
-        {...attributes}
-        {...listeners}
-        className="text-muted-foreground hover:text-foreground cursor-grab rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100 active:cursor-grabbing"
-        aria-label="드래그 핸들"
-      >
-        <GripVertical size={12} />
-      </button>
     </div>
   )
 }
@@ -475,12 +488,12 @@ function GeneralItemContextMenu({
           onMenuToggle()
         }}
         className={cn(
-          'text-muted-foreground hover:text-foreground rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100',
+          'text-muted-foreground hover:text-foreground rounded p-0.5 transition-opacity group-hover:opacity-100',
           isMenuOpen && 'opacity-100'
         )}
         aria-label="더 보기"
       >
-        <MoreVertical size={12} />
+        <MoreVertical size={16} className="text-gray-300" />
       </button>
 
       {isMenuOpen && (

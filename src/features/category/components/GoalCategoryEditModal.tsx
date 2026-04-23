@@ -7,16 +7,15 @@ import { Input } from '@/src/components/common/Input'
 import { ColorPicker } from './ColorPicker'
 import { useColors } from '../hooks/useColors'
 import { useUpdateGoalCategory } from '../hooks/useGoalCategoryMutations'
-import { GoalCategory } from '../api/goalCategory'
+import { GoalCategory, GoalCategoryStatus } from '../api/goalCategory'
 import { AddColorInput } from '@/src/features/category/components/AddColorInput'
 
 const STATUS_OPTIONS = [
   { value: 'NOT_STARTED', label: '시작 전' },
   { value: 'IN_PROGRESS', label: '진행 중' },
   { value: 'COMPLETED', label: '완료' },
+  { value: 'STOPPED', label: '완료' },
 ] as const
-
-type GoalCategoryStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
 
 interface GoalCategoryEditModalProps {
   isOpen: boolean

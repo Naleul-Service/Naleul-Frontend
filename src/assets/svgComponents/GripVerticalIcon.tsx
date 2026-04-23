@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgGripVerticalIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 32 32" {...props}><path fill="#8FA0A8" d="M13.5 17.458a1.458 1.458 0 1 0 0-2.916 1.458 1.458 0 0 0 0 2.916M13.5 11.625a1.458 1.458 0 1 0 0-2.917 1.458 1.458 0 0 0 0 2.917M13.5 23.292a1.458 1.458 0 1 0 0-2.917 1.458 1.458 0 0 0 0 2.917M18.5 17.458a1.458 1.458 0 1 0 0-2.916 1.458 1.458 0 0 0 0 2.916M18.5 11.625a1.458 1.458 0 1 0 0-2.917 1.458 1.458 0 0 0 0 2.917M18.5 23.292a1.458 1.458 0 1 0 0-2.917 1.458 1.458 0 0 0 0 2.917" /></svg>;
+export default SvgGripVerticalIcon;

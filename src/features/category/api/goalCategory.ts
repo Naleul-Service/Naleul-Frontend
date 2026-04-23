@@ -1,6 +1,6 @@
 import { apiCallServer } from '@/src/lib/api.server'
 
-export type GoalCategoryStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
+export type GoalCategoryStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'STOPPED'
 
 export interface GeneralCategoryItemType {
   generalCategoryId: number
@@ -29,7 +29,7 @@ export interface CreateGoalCategoryRequest {
 export interface UpdateGoalCategoryRequest {
   colorId: number
   goalCategoryName: string
-  goalCategoryStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
+  goalCategoryStatus: GoalCategoryStatus
   goalCategoryStartDate: string
 }
 

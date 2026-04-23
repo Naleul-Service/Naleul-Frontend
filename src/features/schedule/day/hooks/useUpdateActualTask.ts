@@ -3,7 +3,7 @@ import { TASK_QUERY_KEYS } from './useDailyTasks'
 import { UpdateActualTaskBody } from '../api/day'
 
 async function updateActualTask(taskId: number, body: UpdateActualTaskBody): Promise<void> {
-  const res = await fetch(`/api/tasks/${taskId}/actual`, {
+  const res = await fetch(`/api/task-actuals/${taskId}/actual`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

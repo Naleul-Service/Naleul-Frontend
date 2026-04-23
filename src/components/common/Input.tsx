@@ -3,9 +3,11 @@
 import { forwardRef, InputHTMLAttributes, ReactNode, useState } from 'react'
 import { Eye, EyeOff, Search, X } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
+import Label from '@/src/components/common/Label'
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string
+  isRequired?: boolean
   helperText?: string
   error?: string
   leftIcon?: ReactNode
@@ -18,6 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
       label,
+      isRequired,
       helperText,
       error,
       leftIcon,
@@ -48,12 +51,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex w-full flex-col gap-1.5">
         {/* 라벨 */}
-        {label && (
-          <label htmlFor={inputId} className={cn('text-foreground text-xs font-medium', disabled && 'opacity-50')}>
-            {label}
-            {props.required && <span className="ml-0.5 text-red-500">*</span>}
-          </label>
-        )}
+        {label && <Label isRequired={isRequired}>{label}</Label>}
 
         {/* 인풋 래퍼 */}
         <div className="relative flex items-center">

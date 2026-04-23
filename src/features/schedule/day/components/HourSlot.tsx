@@ -1,33 +1,62 @@
-import { Task } from '@/src/features/schedule/day/types'
 import { TaskBlock } from './TaskBlock'
 import { formatHourLabel, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
 
-interface HourSlotProps {
+// TaskBlock의 BlockItem과 동일한 제약
+interface BlockItem {
+  taskName: string
+  generalCategoryColorCode: string | null
+  goalCategoryColorCode: string | null
+  actual?: unknown
+  plannedStartAt?: string
+  plannedEndAt?: string
+}
+
+interface HourSlotProps<P extends BlockItem, A extends BlockItem> {
   hour: number
-  date: string
-  tasks: PositionedTask<Task>[]
+  plannedTasks: PositionedTask<P>[]
+  actualTasks: PositionedTask<A>[]
 }
 
 const TEN_MIN_CELLS = Array.from({ length: 6 })
 
-/**
- * 1시간 단위 슬롯
- * - 10분 단위 6칸 가로 grid
- * - 안쪽 border 연하게(#E5E7EB), 바깥 border 진하게(#D1D5DB)
- * - tasks를 절대 위치로 가로 오버레이
- * 책임: 1시간짜리 시각 구조 + 태스크 오버레이
- */
-export function HourSlot({ hour, date, tasks }: HourSlotProps) {
+function SlotGrid<T extends BlockItem>({ tasks }: { tasks: PositionedTask<T>[] }) {
   return (
-    <div style={{ display: 'flex', minHeight: 36 }}>
-      {/* 시간 레이블 */}
+    <div style={{ flex: 1, position: 'relative' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          height: '100%',
+          border: '1px solid #E0E7EA',
+          borderRadius: 8,
+        }}
+      >
+        {TEN_MIN_CELLS.map((_, i) => (
+          <div key={i} style={{ borderRight: i < 5 ? '1px solid #E5E7EB' : 'none' }} />
+        ))}
+      </div>
+      {tasks.map((positioned, i) => (
+        <TaskBlock key={i} positioned={positioned} />
+      ))}
+    </div>
+  )
+}
+
+export function HourSlot<P extends BlockItem, A extends BlockItem>({
+  hour,
+  plannedTasks,
+  actualTasks,
+}: HourSlotProps<P, A>) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'stretch', minHeight: 34 }}>
+      <SlotGrid tasks={plannedTasks} />
+
       <div
         style={{
           width: 44,
           flexShrink: 0,
-          paddingTop: 2,
-          paddingRight: 8,
-          textAlign: 'right',
+          paddingTop: 8,
+          textAlign: 'center',
           fontSize: 11,
           color: '#9CA3AF',
           userSelect: 'none',
@@ -36,33 +65,7 @@ export function HourSlot({ hour, date, tasks }: HourSlotProps) {
         {formatHourLabel(hour)}
       </div>
 
-      {/* 10분 그리드 + 태스크 오버레이 */}
-      <div style={{ flex: 1, position: 'relative' }}>
-        {/* 10분 칸 6개 — 가로 배치 */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
-            height: '100%',
-            border: '1px solid #D1D5DB', // 바깥 진하게
-            borderRadius: 2,
-          }}
-        >
-          {TEN_MIN_CELLS.map((_, i) => (
-            <div
-              key={i}
-              style={{
-                borderRight: i < 5 ? '1px solid #E5E7EB' : 'none', // 안쪽 연하게
-              }}
-            />
-          ))}
-        </div>
-
-        {/* 태스크 절대 오버레이 */}
-        {tasks.map((positioned, i) => (
-          <TaskBlock key={positioned.task.taskId ?? i} positioned={positioned} />
-        ))}
-      </div>
+      <SlotGrid tasks={actualTasks} />
     </div>
   )
 }

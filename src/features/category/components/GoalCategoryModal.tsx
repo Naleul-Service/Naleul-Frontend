@@ -8,6 +8,7 @@ import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGoalCategory } from '@/src/features/category/hooks/useGoalCategories'
 import { ColorPicker } from './ColorPicker'
 import { AddColorInput } from '@/src/features/category/components/AddColorInput'
+import Label from '@/src/components/common/Label'
 
 interface GoalCategoryModalProps {
   isOpen: boolean
@@ -56,10 +57,10 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
       size="md"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={handleClose} disabled={isPending}>
+          <Button className={'w-full'} variant={'secondary'} size={'lg'} onClick={handleClose} disabled={isPending}>
             취소
           </Button>
-          <Button onClick={handleSubmit} isLoading={isPending}>
+          <Button className={'w-full'} variant={'primary'} size={'lg'} onClick={handleSubmit} isLoading={isPending}>
             만들기
           </Button>
         </div>
@@ -67,17 +68,23 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
     >
       <div className="flex flex-col gap-5">
         <Input
-          label="카테고리 이름"
+          label="카테고리명"
+          isRequired={true}
           placeholder="예) 건강, 자기계발, 재테크"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <Input label="시작일" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+        <Input
+          label="시작일"
+          isRequired={true}
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          required
+        />
         <div className="flex flex-col gap-2">
-          <p className="text-foreground text-xs font-medium">
-            색상 <span className="text-red-500">*</span>
-          </p>
+          <Label isRequired={true}>색상</Label>
           <ColorPicker
             colors={colors}
             isLoading={isColorsLoading}

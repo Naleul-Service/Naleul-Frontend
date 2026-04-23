@@ -68,20 +68,26 @@ function splitByHour<T extends TimeRange>(
   }
 }
 
-export function groupTasksByHour<T extends TimeRange>(tasks: T[], date: string): Map<number, PositionedTask<T>[]> {
-  const map = new Map<number, PositionedTask<T>[]>()
+export interface GroupedTasks<T> {
+  planned: Map<number, PositionedTask<T>[]>
+  actual: Map<number, PositionedTask<T>[]>
+}
+
+export function groupTasksByHour<T extends TimeRange>(tasks: T[], date: string): GroupedTasks<T> {
+  const planned = new Map<number, PositionedTask<T>[]>()
+  const actual = new Map<number, PositionedTask<T>[]>()
 
   for (const task of tasks) {
-    const isDone = task.actual !== null
+    // planned는 항상 렌더 (actual 유무와 무관)
+    splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, planned, date)
 
-    if (isDone && task.actual) {
-      splitByHour(task, task.actual.actualStartAt, task.actual.actualEndAt, true, map, date)
-    } else {
-      splitByHour(task, task.plannedStartAt, task.plannedEndAt, false, map, date)
+    // actual은 존재할 때만
+    if (task.actual) {
+      splitByHour(task, task.actual.actualStartAt, task.actual.actualEndAt, true, actual, date)
     }
   }
 
-  return map
+  return { planned, actual }
 }
 
 export function calcAchievementRatio(task: TimeRange): number {

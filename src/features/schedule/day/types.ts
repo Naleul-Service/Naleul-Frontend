@@ -27,9 +27,41 @@ export interface Task {
   defaultSettingStatus: boolean
 }
 
+// 기존 TaskActual은 Task 안에 내장된 용도 — 유지
 export interface TaskActual {
   taskActualId: number
   actualStartAt: string
   actualEndAt: string
   actualDurationMinutes: number
+}
+
+// 독립 TaskActual 엔티티 (새 API 응답)
+export interface TaskActualItem {
+  taskActualId: number
+  taskId: number | null
+  taskName: string
+  goalCategoryId: number
+  goalCategoryName: string
+  goalCategoryColorCode: string | null
+  generalCategoryId: number
+  generalCategoryName: string
+  generalCategoryColorCode: string | null
+  actualStartAt: string
+  actualEndAt: string
+  actualDurationMinutes: number
+}
+
+export interface DailyActualsParams {
+  date: string
+  goalCategoryId?: number
+  generalCategoryId?: number
+}
+
+export interface CreateTaskActualBody {
+  taskId?: number | null
+  taskName: string
+  goalCategoryId: number
+  generalCategoryId: number
+  actualStartAt: string
+  actualEndAt: string
 }

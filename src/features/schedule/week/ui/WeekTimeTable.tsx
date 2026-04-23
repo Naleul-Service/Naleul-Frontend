@@ -149,7 +149,7 @@ interface DayColumnProps {
 }
 
 function DayColumn({ label, date, tasks }: DayColumnProps) {
-  const tasksByHour = groupTasksByHour(tasks, date)
+  const { planned, actual } = groupTasksByHour(tasks, date)
   const router = useRouter()
   return (
     <div
@@ -173,7 +173,7 @@ function DayColumn({ label, date, tasks }: DayColumnProps) {
 
       {/* 시간 슬롯 */}
       {HOUR_LABELS.map((hour) => (
-        <WeekHourSlot key={hour} hour={hour} tasks={tasksByHour.get(hour) ?? []} />
+        <WeekHourSlot key={hour} hour={hour} tasks={planned.get(hour) ?? []} />
       ))}
     </div>
   )

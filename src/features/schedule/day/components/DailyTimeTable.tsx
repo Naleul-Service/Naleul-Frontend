@@ -1,41 +1,82 @@
 import { useDailyTasks } from '@/src/features/schedule/day/hooks/useDailyTasks'
-import { DailyTasksParams } from '@/src/features/schedule/day/types'
+import { useDailyActuals } from '@/src/features/schedule/day/hooks/useDailyActuals'
+import { DailyTasksParams, TaskActualItem } from '@/src/features/schedule/day/types'
 import { HourSlot } from './HourSlot'
-import { groupTasksByHour, HOUR_LABELS } from '@/src/features/schedule/day/utils/timeTable'
+import { groupTasksByHour, HOUR_LABELS, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
+// utcIsoToKstMinutes import 추가 필요
+import { utcIsoToKstMinutes } from '@/src/lib/datetime'
 
 interface DailyTimeTableProps {
   params: DailyTasksParams
 }
 
-/**
- * 일간 시간표 진입점
- * 책임: 데이터 패칭 → 시간대별 그룹핑 → HourSlot 목록 렌더
- * UI 세부사항은 HourSlot / TaskBlock에 위임
- */
 export function DailyTimeTable({ params }: DailyTimeTableProps) {
-  const { data, isLoading, isError } = useDailyTasks(params)
+  const { data: tasks, isLoading: isLoadingTasks, isError: isErrorTasks } = useDailyTasks(params)
+  const { data: actuals, isLoading: isLoadingActuals } = useDailyActuals({ date: params.date })
+
+  const isLoading = isLoadingTasks || isLoadingActuals
+  const isError = isErrorTasks
 
   if (isLoading) return <TimeTableSkeleton />
-  if (isError || !data) return <TimeTableError />
+  if (isError || !tasks) return <TimeTableError />
 
-  const tasksByHour = groupTasksByHour(data, params.date)
+  // planned: 기존 Task 기반
+  const { planned } = groupTasksByHour(tasks, params.date)
+
+  // actual: 독립 TaskActualItem 기반
+  const actual = groupActualsByHour(actuals ?? [], params.date)
 
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 0,
         overflowY: 'auto',
+        gap: 2,
         maxHeight: 'calc(100svh - 120px)',
         paddingBottom: 16,
       }}
     >
+      <div className="flex h-[24px] bg-gray-50 py-1">
+        <div className="label-sm flex w-full items-center justify-center text-gray-500">계획</div>
+        <div className="label-sm flex w-[44px] items-center justify-center text-gray-500">시간</div>
+        <div className="label-sm flex w-full items-center justify-center text-gray-500">실제</div>
+      </div>
+
       {HOUR_LABELS.map((hour) => (
-        <HourSlot key={hour} hour={hour} date={params.date} tasks={tasksByHour.get(hour) ?? []} />
+        <HourSlot key={hour} hour={hour} plannedTasks={planned.get(hour) ?? []} actualTasks={actual.get(hour) ?? []} />
       ))}
     </div>
   )
+}
+
+// TaskActualItem은 Task와 구조가 달라서 별도 그룹핑 함수
+function groupActualsByHour(actuals: TaskActualItem[], date: string): Map<number, PositionedTask<TaskActualItem>[]> {
+  const map = new Map<number, PositionedTask<TaskActualItem>[]>()
+
+  for (const actual of actuals) {
+    const startMin = utcIsoToKstMinutes(actual.actualStartAt)
+    let endMin = utcIsoToKstMinutes(actual.actualEndAt)
+    if (endMin <= startMin) endMin += 24 * 60
+
+    const clampedEnd = Math.min(endMin, 24 * 60)
+    const startHour = Math.floor(startMin / 60)
+    const endHour = clampedEnd % 60 === 0 ? clampedEnd / 60 - 1 : Math.floor(clampedEnd / 60)
+
+    for (let hour = startHour; hour <= endHour; hour++) {
+      const slotStart = hour * 60
+      const slotEnd = slotStart + 60
+      const segStart = Math.max(startMin, slotStart)
+      const segEnd = Math.min(clampedEnd, slotEnd)
+      const leftPercent = ((segStart - slotStart) / 60) * 100
+      const widthPercent = Math.max(((segEnd - segStart) / 60) * 100, 4)
+
+      if (!map.has(hour)) map.set(hour, [])
+      map.get(hour)!.push({ task: actual, leftPercent, widthPercent, hour, isDone: true })
+    }
+  }
+
+  return map
 }
 
 function TimeTableSkeleton() {

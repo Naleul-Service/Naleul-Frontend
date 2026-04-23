@@ -108,13 +108,13 @@ export function Modal({
             {/* 헤더 */}
             {(title || !hideCloseButton) && (
               <div className="flex shrink-0 items-start justify-between border-b border-gray-100 pb-[16px]">
-                <div className="min-w-0 flex-1 pr-4">
+                <div className="min-w-0 flex-1 gap-y-1">
                   {title && (
-                    <h2 id="modal-title" className="h3">
+                    <h2 id="modal-title" className="h3 text-gray-950">
                       {title}
                     </h2>
                   )}
-                  {description && <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>}
+                  {description && <p className="caption-md text-gray-500">{description}</p>}
                 </div>
               </div>
             )}
@@ -123,7 +123,7 @@ export function Modal({
             <div className="flex-1 overflow-y-auto">{children}</div>
 
             {/* 푸터 */}
-            {footer && <div className="shrink-0 border-t border-gray-100 pt-[16px]">{footer}</div>}
+            {footer && <div className="shrink-0 pt-[16px]">{footer}</div>}
           </motion.div>
         </div>
       )}

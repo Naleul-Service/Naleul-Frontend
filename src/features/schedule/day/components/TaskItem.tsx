@@ -6,6 +6,7 @@ import { TaskActualModal } from './TaskActualModal'
 import { useDeleteTask } from '@/src/features/task/hooks/useDeleteTask'
 import { TaskEditModal } from '@/src/features/task/components/TaskEditModal'
 import { utcIsoToKstTimeLabel } from '@/src/lib/datetime'
+import Badge from '@/src/components/common/Badge'
 
 const PRIORITY_STYLE: Record<string, string> = {
   A: 'bg-red-500',
@@ -147,28 +148,26 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
         <div className="ml-8 flex flex-wrap items-center gap-x-3 gap-y-1">
           {/* 목표 카테고리 */}
           {task.goalCategoryName && (
-            <span className="flex items-center gap-1 text-xs text-gray-500">
-              {task.goalCategoryColorCode && (
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: task.goalCategoryColorCode }}
-                />
-              )}
+            <Badge
+              textColor={task.goalCategoryColorCode}
+              bgColor={task.goalCategoryColorCode}
+              type={'DOT'}
+              botColor={task.goalCategoryColorCode}
+            >
               {task.goalCategoryName}
-            </span>
+            </Badge>
           )}
 
           {/* 일반 카테고리 */}
           {task.generalCategoryName && (
-            <span className="flex items-center gap-1 text-xs text-gray-500">
-              {task.generalCategoryColorCode && (
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: task.generalCategoryColorCode }}
-                />
-              )}
+            <Badge
+              textColor={task.generalCategoryColorCode}
+              bgColor={task.generalCategoryColorCode}
+              type={'DOT'}
+              botColor={task.generalCategoryColorCode}
+            >
               {task.generalCategoryName}
-            </span>
+            </Badge>
           )}
 
           {/* 계획 시간 */}

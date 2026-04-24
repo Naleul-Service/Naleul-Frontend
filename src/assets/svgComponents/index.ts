@@ -1,6 +1,8 @@
+export { default as CheckIcon } from './CheckIcon'
 export { default as ChevronLeft } from './ChevronLeft'
 export { default as ChevronRight } from './ChevronRight'
 export { default as GripVerticalIcon } from './GripVerticalIcon'
 export { default as Logo } from './Logo'
 export { default as OptionIcon } from './OptionIcon'
 export { default as TimeIcon } from './TimeIcon'
+export { default as UncheckIcon } from './UncheckIcon'

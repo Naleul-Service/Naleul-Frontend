@@ -7,14 +7,8 @@ import { useDeleteTask } from '@/src/features/task/hooks/useDeleteTask'
 import { TaskEditModal } from '@/src/features/task/components/TaskEditModal'
 import { utcIsoToKstTimeLabel } from '@/src/lib/datetime'
 import Badge from '@/src/components/common/Badge'
-
-const PRIORITY_STYLE: Record<string, string> = {
-  A: 'bg-red-500',
-  B: 'bg-orange-500',
-  C: 'bg-yellow-500',
-  D: 'bg-green-500',
-  E: 'bg-blue-500',
-}
+import { CheckIcon, OptionIcon, TimeIcon, UncheckIcon } from '@/src/assets/svgComponents'
+import PriorityBadge from '@/src/components/common/PriorityBadge'
 
 export function TaskItem({ task, date }: { task: Task; date: string }) {
   const [isActualModalOpen, setIsActualModalOpen] = useState(false)
@@ -32,60 +26,43 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
 
   return (
     <>
-      <li className="border-border group flex flex-col gap-2 rounded-lg border px-4 py-3">
+      <li className="group flex flex-col gap-y-1 rounded-[10px] border border-gray-100 px-3 py-[10px]">
         {/* 상단 행: 체크 + 우선순위 + 이름 + ... */}
-        <div className="flex items-center gap-3">
-          {/* 완료 체크버튼 */}
-          <button
-            type="button"
-            onClick={() => setIsActualModalOpen(true)}
-            className={[
-              'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors',
-              isDone ? 'border-transparent bg-green-500 text-white' : 'border-border hover:border-green-400',
-            ].join(' ')}
-            aria-label={isDone ? '완료됨' : '완료 기록하기'}
-          >
-            {isDone && (
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path
-                  d="M2 5l2.5 2.5L8 3"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-x-[10px]">
+            {/* 완료 체크버튼 */}
+            {isDone ? (
+              <CheckIcon width={20} height={20} />
+            ) : (
+              <UncheckIcon
+                type="button"
+                onClick={() => setIsActualModalOpen(true)}
+                width={20}
+                height={20}
+                aria-label={isDone ? '완료됨' : '완료 기록하기'}
+              />
             )}
-          </button>
+            <div className="flex gap-x-[6px]">
+              {/* 우선순위 뱃지 */}
+              <PriorityBadge label={task.taskPriority} />
 
-          {/* 우선순위 뱃지 */}
-          <span
-            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${PRIORITY_STYLE[task.taskPriority] ?? 'bg-foreground'}`}
-          >
-            {task.taskPriority}
-          </span>
-
-          {/* 태스크 이름 */}
-          <p
-            className={`min-w-0 flex-1 truncate text-sm font-medium ${isDone ? 'text-muted-foreground line-through' : 'text-foreground'}`}
-          >
-            {task.taskName}
-          </p>
+              {/* 태스크 이름 */}
+              <p className={`body-md-medium min-w-0 flex-1 ${isDone ? 'text-gray-300 line-through' : 'text-gray-500'}`}>
+                {task.taskName}
+              </p>
+            </div>
+          </div>
 
           {/* ... 메뉴 버튼 */}
           <div className="relative shrink-0">
-            <button
+            <OptionIcon
+              iconColor={'#475660'}
               type="button"
-              onClick={() => setIsMenuOpen((v) => !v)}
-              className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
               aria-label="더보기"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="5" cy="12" r="2" />
-                <circle cx="12" cy="12" r="2" />
-                <circle cx="19" cy="12" r="2" />
-              </svg>
-            </button>
+              onClick={() => setIsMenuOpen((v) => !v)}
+              width={24}
+              height={24}
+            />
 
             {isMenuOpen && (
               <>
@@ -145,7 +122,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
         </div>
 
         {/* 하단 행: 상세 정보 */}
-        <div className="ml-8 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <div className="ml-8 flex flex-wrap items-center gap-x-[6px]">
           {/* 목표 카테고리 */}
           {task.goalCategoryName && (
             <Badge
@@ -171,22 +148,23 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
           )}
 
           {/* 계획 시간 */}
-          <span className="text-muted-foreground text-xs">
-            🕐 {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
+          <div className="caption-md flex items-center text-gray-400">
+            <TimeIcon width={24} height={24} />
+            {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
             {task.plannedDurationMinutes != null && (
               <span className="ml-1 text-gray-400">({task.plannedDurationMinutes}분)</span>
             )}
-          </span>
+          </div>
 
           {/* 실제 기록 */}
           {task.actual && (
-            <span className="text-xs text-green-600">
-              ✅ 실제 {utcIsoToKstTimeLabel(task.actual.actualStartAt)} ~{' '}
-              {utcIsoToKstTimeLabel(task.actual.actualEndAt)}
+            <div className="caption-md mt-1 flex items-center gap-x-[6px] text-[#34C759]">
+              <CheckIcon width={13} height={13} />
+              실제 {utcIsoToKstTimeLabel(task.actual.actualStartAt)} ~ {utcIsoToKstTimeLabel(task.actual.actualEndAt)}
               {task.actual.actualDurationMinutes != null && (
-                <span className="ml-1 text-green-400">({task.actual.actualDurationMinutes}분)</span>
+                <span className="ml-1">({task.actual.actualDurationMinutes}분)</span>
               )}
-            </span>
+            </div>
           )}
         </div>
       </li>

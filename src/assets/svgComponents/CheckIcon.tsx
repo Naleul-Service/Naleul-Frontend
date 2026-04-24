@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgCheckIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 20" {...props}><path fill="#34C759" d="M16.333 0c1.96 0 3.56 1.537 3.662 3.472l.005.195v12.666c0 1.96-1.537 3.56-3.472 3.662l-.195.005H3.667a3.667 3.667 0 0 1-3.662-3.472L0 16.333V3.667C0 1.707 1.537.107 3.472.005L3.667 0zm-2.626 7.293a1 1 0 0 0-1.414 0L9 10.585 7.707 9.293l-.094-.083a1 1 0 0 0-1.32 1.497l2 2 .094.083a1 1 0 0 0 1.32-.083l4-4 .083-.094a1 1 0 0 0-.083-1.32" /></svg>;
+export default SvgCheckIcon;

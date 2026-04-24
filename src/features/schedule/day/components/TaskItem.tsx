@@ -122,7 +122,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
         </div>
 
         {/* 하단 행: 상세 정보 */}
-        <div className="ml-8 flex flex-wrap items-center gap-x-[6px]">
+        <div className="ml-8 flex flex-wrap items-center gap-[6px]">
           {/* 목표 카테고리 */}
           {task.goalCategoryName && (
             <Badge

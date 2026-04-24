@@ -10,6 +10,7 @@ import { localInputToUtc, utcIsoToKstTimeLabel, utcToLocalInput } from '@/src/li
 
 interface TaskActualModalProps {
   task: Task
+  date: string
   onClose: () => void
 }
 
@@ -21,7 +22,7 @@ function formatMinutes(minutes: number): string {
   return `${h}시간 ${m}분`
 }
 
-export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
+export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
   const dateActual = task.actual
 
   const [actualStartAt, setActualStartAt] = useState(
@@ -31,7 +32,7 @@ export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
     dateActual ? utcToLocalInput(dateActual.actualEndAt) : utcToLocalInput(task.plannedEndAt)
   )
 
-  const { mutate, isPending, error } = useUpdateActualTask()
+  const { mutate, isPending, error } = useUpdateActualTask(date)
 
   const handleSubmit = () => {
     mutate(

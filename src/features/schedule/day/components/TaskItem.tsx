@@ -169,7 +169,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
         </div>
       </li>
 
-      {isActualModalOpen && <TaskActualModal task={task} onClose={() => setIsActualModalOpen(false)} />}
+      {isActualModalOpen && <TaskActualModal date={date} task={task} onClose={() => setIsActualModalOpen(false)} />}
       {isEditModalOpen && <TaskEditModal task={task} onClose={() => setIsEditModalOpen(false)} />}
     </>
   )

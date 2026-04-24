@@ -4,6 +4,7 @@ import {
   DailyTasksParams,
   Task,
   TaskActualItem,
+  TaskActualUpdateBody,
 } from '@/src/features/schedule/day/types'
 import { ApiCallResult } from '@/src/types/common'
 import { apiCallServer } from '@/src/lib/api.server'
@@ -51,5 +52,22 @@ export async function patchActualTask(taskId: number, body: UpdateActualTaskBody
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+  })
+}
+
+export async function patchTaskActual(
+  taskActualId: number,
+  body: TaskActualUpdateBody
+): Promise<ApiCallResult<TaskActualItem>> {
+  return apiCallServer(`/v1/task-actuals/${taskActualId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
+export async function deleteTaskActual(taskActualId: number): Promise<ApiCallResult<void>> {
+  return apiCallServer(`/v1/task-actuals/${taskActualId}`, {
+    method: 'DELETE',
   })
 }

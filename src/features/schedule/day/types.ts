@@ -65,3 +65,11 @@ export interface CreateTaskActualBody {
   actualStartAt: string
   actualEndAt: string
 }
+
+export interface TaskActualUpdateBody {
+  taskName: string
+  goalCategoryId: number
+  generalCategoryId: number
+  actualStartAt: string
+  actualEndAt: string
+}

@@ -118,7 +118,7 @@ export function DayTaskList({ date, filter }: DayTaskListProps) {
               {!actuals?.length ? (
                 <p className="text-muted-foreground text-sm">실제 기록이 없어요</p>
               ) : (
-                actuals.map((actual) => <ActualTaskItem key={actual.taskActualId} actual={actual} />)
+                actuals.map((actual) => <ActualTaskItem date={params.date} key={actual.taskActualId} actual={actual} />)
               )}
             </ul>
           )}

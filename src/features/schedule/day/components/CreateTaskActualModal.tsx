@@ -4,18 +4,18 @@ import { useState } from 'react'
 import { Modal } from '@/src/components/common/Modal'
 import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
+import { Dropdown, DropdownOption } from '@/src/components/common/Dropdown'
 import { useCreateTaskActual } from '../hooks/useCreateTaskActual'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
-import { cn } from '@/src/lib/utils'
 import { CreateTaskActualBody } from '../types'
 import { localInputToUtc } from '@/src/lib/datetime'
-import Label from '@/src/components/common/Label'
+import { DateTimePicker } from '@/src/components/common/DateTimePicker'
 
 interface TaskActualModalProps {
   isOpen: boolean
   onClose: () => void
-  date: string // 현재 날짜 (invalidate용)
-  defaultDate?: string // datetime-local 기본값
+  date: string
+  defaultDate?: string
 }
 
 interface FormState {
@@ -58,16 +58,27 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
   const { mutate: createActual, isPending } = useCreateTaskActual(date)
   const { data: goalCategories = [], isLoading: isLoadingCategories } = useGoalCategories()
 
+  // DropdownOption 변환
+  const goalOptions: DropdownOption<number>[] = goalCategories.map((g) => ({
+    label: g.goalCategoryName,
+    value: g.goalCategoryId,
+  }))
+
   const generalCategories =
     goalCategories.find((g) => g.goalCategoryId === form.goalCategoryId)?.generalCategories ?? []
+
+  const generalOptions: DropdownOption<number>[] = generalCategories.map((g) => ({
+    label: g.generalCategoryName,
+    value: g.generalCategoryId,
+  }))
 
   function handleChange<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
-  function handleGoalChange(goalCategoryId: number | null) {
-    setForm((prev) => ({ ...prev, goalCategoryId, generalCategoryId: null }))
+  function handleGoalChange(value: number) {
+    setForm((prev) => ({ ...prev, goalCategoryId: value, generalCategoryId: null }))
     setErrors((prev) => ({ ...prev, goalCategoryId: undefined, generalCategoryId: undefined }))
   }
 
@@ -116,86 +127,54 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
       <div className="flex flex-col gap-4">
         <Input
           label="할 일"
+          isRequired
           placeholder="실제로 한 일을 입력해주세요"
           value={form.taskName}
           onChange={(e) => handleChange('taskName', e.target.value)}
           error={errors.taskName}
-          required
         />
 
-        {/* 목표 카테고리 */}
-        <div className="flex flex-col gap-1.5">
-          <Label isRequired={true}>목표 카테고리</Label>
-          <select
-            value={form.goalCategoryId ?? ''}
-            onChange={(e) => handleGoalChange(e.target.value ? Number(e.target.value) : null)}
-            disabled={isLoadingCategories}
-            className={cn(
-              'bg-background text-foreground border-border h-9 w-full rounded-md border px-3 text-sm',
-              'focus:border-foreground focus:ring-foreground transition-colors outline-none focus:ring-1',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              errors.goalCategoryId && 'border-red-400 focus:border-red-500 focus:ring-red-500'
-            )}
-          >
-            <option value="">목표를 선택해주세요</option>
-            {goalCategories.map((goal) => (
-              <option key={goal.goalCategoryId} value={goal.goalCategoryId}>
-                {goal.goalCategoryName}
-              </option>
-            ))}
-          </select>
-          {errors.goalCategoryId && <p className="text-xs text-red-500">{errors.goalCategoryId}</p>}
-        </div>
+        <Dropdown
+          label="목표 카테고리"
+          isRequired
+          options={goalOptions}
+          value={form.goalCategoryId}
+          onChange={handleGoalChange}
+          placeholder={isLoadingCategories ? '불러오는 중...' : '목표를 선택해주세요'}
+          disabled={isLoadingCategories}
+          error={errors.goalCategoryId}
+        />
 
-        {/* 일반 카테고리 */}
-        <div className="flex flex-col gap-1.5">
-          <Label isRequired={true}>일반 카테고리</Label>
-          <select
-            value={form.generalCategoryId ?? ''}
-            onChange={(e) => handleChange('generalCategoryId', e.target.value ? Number(e.target.value) : null)}
-            disabled={!form.goalCategoryId || generalCategories.length === 0}
-            className={cn(
-              'bg-background text-foreground border-border h-9 w-full rounded-md border px-3 text-sm',
-              'focus:border-foreground focus:ring-foreground transition-colors outline-none focus:ring-1',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              errors.generalCategoryId && 'border-red-400 focus:border-red-500 focus:ring-red-500'
-            )}
-          >
-            <option value="">
-              {!form.goalCategoryId
-                ? '목표를 먼저 선택해주세요'
-                : generalCategories.length === 0
-                  ? '등록된 카테고리가 없어요'
-                  : '일반 카테고리를 선택해주세요'}
-            </option>
-            {generalCategories.map((general) => (
-              <option key={general.generalCategoryId} value={general.generalCategoryId}>
-                {general.generalCategoryName}
-              </option>
-            ))}
-          </select>
-          {errors.generalCategoryId && <p className="text-xs text-red-500">{errors.generalCategoryId}</p>}
-        </div>
-
-        {/* 실제 시간 */}
-        <div className="grid grid-cols-2 gap-3">
-          <Input
-            label="실제 시작"
-            type="datetime-local"
-            value={form.actualStartAt}
-            onChange={(e) => handleChange('actualStartAt', e.target.value)}
-            error={errors.actualStartAt}
-            required
-          />
-          <Input
-            label="실제 종료"
-            type="datetime-local"
-            value={form.actualEndAt}
-            onChange={(e) => handleChange('actualEndAt', e.target.value)}
-            error={errors.actualEndAt}
-            required
-          />
-        </div>
+        <Dropdown
+          label="일반 카테고리"
+          isRequired
+          options={generalOptions}
+          value={form.generalCategoryId}
+          onChange={(value) => handleChange('generalCategoryId', value as number)}
+          placeholder={
+            !form.goalCategoryId
+              ? '목표를 먼저 선택해주세요'
+              : generalCategories.length === 0
+                ? '등록된 카테고리가 없어요'
+                : '일반 카테고리를 선택해주세요'
+          }
+          disabled={!form.goalCategoryId || generalCategories.length === 0}
+          error={errors.generalCategoryId}
+        />
+        <DateTimePicker
+          label="실제 시작"
+          isRequired
+          value={form.actualStartAt}
+          onChange={(value) => handleChange('actualStartAt', value)}
+          error={errors.actualStartAt}
+        />
+        <DateTimePicker
+          label="실제 종료"
+          isRequired
+          value={form.actualStartAt}
+          onChange={(value) => handleChange('actualEndAt', value)}
+          error={errors.actualStartAt}
+        />
       </div>
     </Modal>
   )

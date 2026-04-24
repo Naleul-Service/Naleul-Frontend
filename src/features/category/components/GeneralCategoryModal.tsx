@@ -9,6 +9,7 @@ import { useCreateGeneralCategory } from '@/src/features/category/hooks/useGener
 import { GoalCategory } from '@/src/features/category/api/goalCategory'
 import { ColorPicker } from './ColorPicker'
 import { AddColorInput } from '@/src/features/category/components/AddColorInput'
+import Label from '@/src/components/common/Label'
 
 interface GeneralCategoryModalProps {
   isOpen: boolean
@@ -73,9 +74,7 @@ export function GeneralCategoryModal({ isOpen, onClose, goalCategory }: GeneralC
           required
         />
         <div className="flex flex-col gap-2">
-          <p className="text-foreground text-xs font-medium">
-            색상 <span className="text-red-500">*</span>
-          </p>
+          <Label isRequired={true}>색상</Label>
           <ColorPicker
             colors={colors}
             isLoading={isColorsLoading}

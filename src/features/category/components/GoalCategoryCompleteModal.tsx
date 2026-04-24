@@ -7,6 +7,7 @@ import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
 import { useCompleteGoalCategory } from '../hooks/useGoalCategoryMutations'
 import { GoalCategory } from '../api/goalCategory'
+import Label from '@/src/components/common/Label'
 
 interface GoalCategoryCompleteModalProps {
   isOpen: boolean
@@ -106,9 +107,7 @@ export function GoalCategoryCompleteModal({ isOpen, onClose, category }: GoalCat
 
         {/* 달성 내용 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">
-            달성 내용 <span className="text-destructive">*</span>
-          </label>
+          <Label isRequired={true}>달성 내용</Label>
           <textarea
             value={form.achievement}
             onChange={(e) => {

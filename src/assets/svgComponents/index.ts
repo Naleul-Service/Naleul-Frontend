@@ -1,6 +1,8 @@
+export { default as CalendarIcon } from './CalendarIcon'
 export { default as CheckIcon } from './CheckIcon'
 export { default as ChevronLeft } from './ChevronLeft'
 export { default as ChevronRight } from './ChevronRight'
+export { default as FilterIcon } from './FilterIcon'
 export { default as GripVerticalIcon } from './GripVerticalIcon'
 export { default as Logo } from './Logo'
 export { default as OptionIcon } from './OptionIcon'

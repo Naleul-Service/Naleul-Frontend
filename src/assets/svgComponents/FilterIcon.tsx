@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgFilterIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 32 32" {...props}><g stroke="#637580" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.25} clipPath="url(#filter-icon_svg__a)"><path d="M16 11a1.666 1.666 0 1 0 3.333 0A1.666 1.666 0 0 0 16 11M9.333 11H16M19.333 11h3.334M11 16a1.666 1.666 0 1 0 3.333 0A1.666 1.666 0 0 0 11 16M9.333 16H11M14.333 16h8.334M18.5 21a1.666 1.666 0 1 0 3.333 0 1.666 1.666 0 0 0-3.333 0M9.333 21H18.5M21.833 21h.834" /></g><defs><clipPath id="filter-icon_svg__a"><path fill="#fff" d="M6 6h20v20H6z" /></clipPath></defs></svg>;
+export default SvgFilterIcon;

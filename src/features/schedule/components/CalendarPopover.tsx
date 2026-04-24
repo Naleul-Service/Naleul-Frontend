@@ -2,8 +2,9 @@
 
 import { useRef } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
+import { CalendarIcon } from '@/src/assets/svgComponents'
 
 function formatDateLabel(dateStr: string): string {
   const d = new Date(dateStr)
@@ -38,7 +39,7 @@ export function CalendarPopover() {
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex h-[40px] items-center gap-1 rounded-[8px] border border-gray-100">
       {/* 이전 날짜 */}
       <Button
         variant="ghost"
@@ -46,17 +47,17 @@ export function CalendarPopover() {
         aria-label="이전 날짜"
         onClick={() => navigateTo(shiftDate(currentDate, -1))}
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={16} className="text-[#8FA0A8]" />
       </Button>
 
       {/* 날짜 표시 + 달력 열기 */}
       <div className="relative">
         <button
           onClick={() => inputRef.current?.showPicker()}
-          className="text-foreground hover:text-foreground/70 flex items-center gap-1.5 text-sm font-medium transition-colors"
+          className="label-md hover:text-foreground/70 flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors"
           aria-label="날짜 선택"
         >
-          <CalendarIcon size={14} className="text-muted-foreground" />
+          <CalendarIcon width={20} height={20} />
           {formatDateLabel(currentDate)}
         </button>
 
@@ -76,7 +77,7 @@ export function CalendarPopover() {
         aria-label="다음 날짜"
         onClick={() => navigateTo(shiftDate(currentDate, 1))}
       >
-        <ChevronRight size={16} />
+        <ChevronRight size={16} className="text-[#8FA0A8]" />
       </Button>
     </div>
   )

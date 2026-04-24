@@ -10,6 +10,7 @@ import { AddTaskModal } from '@/src/features/task/components/AddTaskModal'
 import { CreateTaskActualModal } from '@/src/features/schedule/day/components/CreateTaskActualModal'
 import { parseDateParam, toDateString } from '@/src/features/schedule/day/utils/day'
 import { useSearchParams } from 'next/navigation'
+import PageHeader from '@/src/components/layout/PageHeader'
 
 export default function SchedulePageLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
@@ -22,7 +23,8 @@ export default function SchedulePageLayout({ children }: { children: React.React
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCreateTaskActualModalOpen, setIsCreateTaskActualModalOpen] = useState(false)
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-6 p-5">
+      <PageHeader title={'일정 관리'} subtitle={'할 일을 작성하고 관리할 수 있어요.'} />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <ScheduleTabBarContainer />
@@ -47,7 +49,7 @@ export default function SchedulePageLayout({ children }: { children: React.React
         </div>
       </div>
       {children}
-      
+
       {/* 할 일 계획 모달 */}
       <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultDate={`${dateString}T09:00`} />
 

@@ -3,5 +3,9 @@
 import SchedulePageLayout from '@/src/features/schedule/day/components/SchedulePageLayout'
 
 export default function ScheduleLayout({ children }: { children: React.ReactNode }) {
-  return <SchedulePageLayout>{children}</SchedulePageLayout>
+  return (
+    <main>
+      <SchedulePageLayout>{children}</SchedulePageLayout>
+    </main>
+  )
 }

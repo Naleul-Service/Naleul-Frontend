@@ -1,24 +1,51 @@
 'use client'
 
-import { useSidebarStore } from '@/src/components/store/useSidebarStore'
-import { cn } from '@/src/lib/utils'
-import Link from 'next/link'
+import { LogoutIcon } from '@/src/assets/svgComponents'
 import { useUserStore } from '@/src/components/store/useUserStore'
-import { OptionIcon } from '@/src/assets/svgComponents'
-import Badge from '../../common/Badge'
-import { useRef, useState } from 'react'
-import SidebarMenu from '@/src/components/layout/sidebar/SidebarMenu'
+import { useRouter } from 'next/navigation'
+import Badge from '@/src/components/common/Badge'
+import { useSidebarStore } from '@/src/components/store/useSidebarStore'
+import Link from 'next/link'
+import { cn } from '@/src/lib/utils'
 import { ROLE_LABEL } from '@/src/components/layout/sidebar/constants'
+
+async function clearAuthCookies() {
+  const res = await fetch('/api/auth/cookies', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  const json = await res.json()
+
+  console.log('postColor response:', json)
+
+  if (!json.success) throw new Error(json.error ?? '쿠키 삭제 실패')
+  return json.data
+}
+
+interface SidebarMenuProps {
+  onClose: () => void
+}
 
 const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}&response_type=code`
 
-export function SidebarFooter() {
+export default function SidebarMenu({ onClose }: SidebarMenuProps) {
   const isCollapsed = useSidebarStore((s) => s.isCollapsed)
+
+  const router = useRouter()
   const { user, clearUser } = useUserStore()
 
-  // 1. 메뉴 열림 상태 관리
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const handleLogout = async () => {
+    try {
+      await clearAuthCookies()
+      localStorage.clear()
+      clearUser()
+      onClose()
+      window.location.href = '/'
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error)
+      alert('로그아웃에 실패했습니다.')
+    }
+  }
 
   if (!user) {
     return (
@@ -40,36 +67,25 @@ export function SidebarFooter() {
   }
 
   return (
-    <div className="border-border relative border-t px-[14px] py-3" ref={menuRef}>
-      {/* 3. 사이드바 메뉴 (로그아웃 팝업) 위치 설정 */}
-      {isMenuOpen && (
+    <div className="z-50 min-w-[180px] rounded-[12px] border border-gray-100 bg-white p-1.5 shadow-[0_0_12px_0_rgba(17,26,31,0.10)]">
+      {isCollapsed ? (
         <div
           className={cn(
-            'absolute bottom-full z-50 mb-2',
-            // 접혔을 때: 사이드바 오른쪽으로 메뉴가 튀어나오도록 설정
-            isCollapsed
-              ? 'bottom-0 left-[calc(100%+8px)]' // 사이드바 옆에 붙임
-              : 'right-0 left-0' // 펼쳐졌을 때는 푸터 너비에 맞춤
+            'flex items-center gap-2 rounded-md border-b border-gray-100 px-3 py-2',
+            isCollapsed && 'justify-center'
           )}
         >
-          <SidebarMenu onClose={() => setIsMenuOpen(false)} />
-        </div>
-      )}
+          {/* 아바타 영역 클릭 시에도 메뉴 토글 (접혔을 때 유용) */}
+          <div
+            title={isCollapsed ? user.userName : undefined}
+            className={cn(
+              'flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-yellow-100 text-xs font-medium text-yellow-700',
+              isCollapsed && 'transition-all hover:ring-2 hover:ring-yellow-200'
+            )}
+          >
+            {user.userName?.[0] ?? 'K'}
+          </div>
 
-      <div className={cn('flex items-center gap-2 rounded-md', isCollapsed && 'justify-center')}>
-        {/* 아바타 영역 클릭 시에도 메뉴 토글 (접혔을 때 유용) */}
-        <div
-          onClick={() => isCollapsed && setIsMenuOpen(!isMenuOpen)}
-          title={isCollapsed ? user.userName : undefined}
-          className={cn(
-            'flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-yellow-100 text-xs font-medium text-yellow-700',
-            isCollapsed && 'transition-all hover:ring-2 hover:ring-yellow-200'
-          )}
-        >
-          {user.userName?.[0] ?? 'K'}
-        </div>
-
-        {!isCollapsed && (
           <div className="flex w-full justify-between">
             <div className="flex min-w-0 flex-col gap-y-[2px]">
               <div className="flex items-center gap-1.5">
@@ -97,17 +113,17 @@ export function SidebarFooter() {
               </div>
               <p className="caption-sm truncate text-gray-300">{user.userEmail}</p>
             </div>
-
-            {/* 4. 옵션 아이콘 버튼화 */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="rounded-md transition-colors hover:bg-gray-100"
-            >
-              <OptionIcon width={32} height={32} iconColor={'#8FA0A8'} />
-            </button>
           </div>
-        )}
-      </div>
+        </div>
+      ) : null}
+
+      <button
+        onClick={handleLogout}
+        className="flex w-full items-center gap-x-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50"
+      >
+        <LogoutIcon width={20} height={20} />
+        <span className="font-medium">로그아웃</span>
+      </button>
     </div>
   )
 }

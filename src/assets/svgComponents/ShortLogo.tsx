@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgShortLogo = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 32 21" {...props}><path fill="#0D4556" d="M7.856 0a1.3 1.3 0 0 1 1.3 1.3v4.012L14.8 1.06A3.89 3.89 0 0 1 17.469 0h.838a4.42 4.42 0 0 1 4.419 4.419V19.7a1.3 1.3 0 0 1-1.3 1.3h-6.557a1.3 1.3 0 0 1-1.3-1.3V8.035H9.156V19.7a1.3 1.3 0 0 1-1.3 1.3H1.3A1.3 1.3 0 0 1 0 19.7V1.3A1.3 1.3 0 0 1 1.3 0zM24.12 20.245c0 .417.338.755.755.755h5.502a.755.755 0 0 0 .755-.755v-3.56a2.697 2.697 0 0 0-2.697-2.697h-3.56a.755.755 0 0 0-.755.755z" /></svg>;
+export default SvgShortLogo;

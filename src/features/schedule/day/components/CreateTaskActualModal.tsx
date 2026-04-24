@@ -9,6 +9,7 @@ import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategori
 import { cn } from '@/src/lib/utils'
 import { CreateTaskActualBody } from '../types'
 import { localInputToUtc } from '@/src/lib/datetime'
+import Label from '@/src/components/common/Label'
 
 interface TaskActualModalProps {
   isOpen: boolean
@@ -103,10 +104,10 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
       size="md"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={handleClose} disabled={isPending}>
+          <Button variant="secondary" size="lg" className="w-full" onClick={handleClose} disabled={isPending}>
             취소
           </Button>
-          <Button size="sm" onClick={handleSubmit} isLoading={isPending}>
+          <Button size="lg" className="w-full" onClick={handleSubmit} isLoading={isPending}>
             저장
           </Button>
         </div>
@@ -124,9 +125,7 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
 
         {/* 목표 카테고리 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">
-            목표 <span className="text-red-500">*</span>
-          </label>
+          <Label isRequired={true}>목표 카테고리</Label>
           <select
             value={form.goalCategoryId ?? ''}
             onChange={(e) => handleGoalChange(e.target.value ? Number(e.target.value) : null)}
@@ -150,9 +149,7 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
 
         {/* 일반 카테고리 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">
-            일반 카테고리 <span className="text-red-500">*</span>
-          </label>
+          <Label isRequired={true}>일반 카테고리</Label>
           <select
             value={form.generalCategoryId ?? ''}
             onChange={(e) => handleChange('generalCategoryId', e.target.value ? Number(e.target.value) : null)}

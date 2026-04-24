@@ -50,7 +50,7 @@ export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
     <Modal
       isOpen
       onClose={onClose}
-      title={task.taskName}
+      title={`'${task.taskName}' 완료`}
       description={task.goalCategoryName ?? undefined}
       size="sm"
       footer={
@@ -66,11 +66,13 @@ export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
     >
       <div className="space-y-4">
         {/* 계획 시간 */}
-        <div className="bg-muted rounded-lg px-4 py-3">
-          <p className="text-muted-foreground mb-1 text-xs font-medium">계획</p>
-          <p className="text-foreground text-sm">
-            {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
-            <span className="text-muted-foreground ml-2 text-xs">({formatMinutes(task.plannedDurationMinutes)})</span>
+        <div className="flex flex-col gap-y-[6px] rounded-[10px] bg-gray-50 px-4 py-3">
+          <p className="body-md-medium text-gray-300">계획</p>
+          <p className="flex items-center gap-x-2">
+            <p className="body-lg-medium">
+              {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
+            </p>
+            <span className="h4 text-primary-400">{formatMinutes(task.plannedDurationMinutes)}</span>
           </p>
         </div>
 

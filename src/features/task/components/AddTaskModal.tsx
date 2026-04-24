@@ -9,6 +9,7 @@ import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategori
 import { cn } from '@/src/lib/utils'
 import { CreateTaskBody, TASK_PRIORITIES, TaskPriority } from '@/src/features/task/types'
 import { localInputToUtc } from '@/src/lib/datetime'
+import Label from '@/src/components/common/Label'
 
 interface AddTaskModalProps {
   isOpen: boolean
@@ -105,10 +106,10 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
       size="md"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={handleClose} disabled={isPending}>
+          <Button variant="secondary" size="lg" className={'w-full'} onClick={handleClose} disabled={isPending}>
             취소
           </Button>
-          <Button size="sm" onClick={handleSubmit} isLoading={isPending}>
+          <Button size="lg" className={'w-full'} onClick={handleSubmit} isLoading={isPending}>
             추가
           </Button>
         </div>
@@ -124,11 +125,28 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
           required
         />
 
+        {/* 우선순위 */}
+        <div className="flex flex-col gap-1.5">
+          <Label>우선순위</Label>
+          <div className="flex gap-2">
+            {TASK_PRIORITIES.map((priority) => (
+              <Button
+                onClick={() => handleChange('taskPriority', priority)}
+                key={priority}
+                type="button"
+                className={'w-full'}
+                variant={form.taskPriority === priority ? 'primary' : 'outline'}
+                size={'md'}
+              >
+                {priority}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         {/* 목표 카테고리 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">
-            목표 <span className="text-red-500">*</span>
-          </label>
+          <Label isRequired={true}>목표</Label>
           <select
             value={form.goalCategoryId ?? ''}
             onChange={(e) => handleGoalChange(e.target.value ? Number(e.target.value) : null)}
@@ -152,9 +170,7 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
 
         {/* 일반 카테고리 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">
-            일반 카테고리 <span className="text-red-500">*</span>
-          </label>
+          <Label isRequired={true}>일반 카테고리</Label>
           <select
             value={form.generalCategoryId ?? ''}
             onChange={(e) => handleChange('generalCategoryId', e.target.value ? Number(e.target.value) : null)}
@@ -180,28 +196,6 @@ export function AddTaskModal({ isOpen, onClose, defaultDate }: AddTaskModalProps
             ))}
           </select>
           {errors.generalCategoryId && <p className="text-xs text-red-500">{errors.generalCategoryId}</p>}
-        </div>
-
-        {/* 우선순위 */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-foreground text-xs font-medium">우선순위</span>
-          <div className="flex gap-2">
-            {TASK_PRIORITIES.map((priority) => (
-              <button
-                key={priority}
-                type="button"
-                onClick={() => handleChange('taskPriority', priority)}
-                className={cn(
-                  'h-8 w-10 rounded-md text-xs font-semibold transition-colors',
-                  form.taskPriority === priority
-                    ? 'bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:bg-muted border'
-                )}
-              >
-                {priority}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* 시간 */}

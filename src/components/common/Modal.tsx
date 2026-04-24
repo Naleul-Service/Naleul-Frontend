@@ -18,6 +18,7 @@ interface ModalProps {
   children: ReactNode
   footer?: ReactNode
   className?: string
+  isHeaderBorder?: boolean
 }
 
 const sizeStyles: Record<ModalSize, string> = {
@@ -49,6 +50,7 @@ export function Modal({
   children,
   footer,
   className,
+  isHeaderBorder = true,
 }: ModalProps) {
   // ESC 키로 닫기
   useEffect(() => {
@@ -94,7 +96,7 @@ export function Modal({
             aria-modal="true"
             aria-labelledby={title ? 'modal-title' : undefined}
             className={cn(
-              'bg-background relative z-10 flex w-full flex-col gap-y-[16px] rounded-[16px] border border-gray-100 p-6 shadow-lg',
+              'bg-background relative z-10 flex w-full max-w-[440px] flex-col gap-y-[16px] rounded-[16px] border border-gray-100 p-6 shadow-lg',
               'flex max-h-[90vh] flex-col',
               sizeStyles[size],
               className
@@ -107,7 +109,9 @@ export function Modal({
           >
             {/* 헤더 */}
             {(title || !hideCloseButton) && (
-              <div className="flex shrink-0 items-start justify-between border-b border-gray-100 pb-[16px]">
+              <div
+                className={`${isHeaderBorder ? 'border-b border-gray-100' : ''} flex shrink-0 items-start justify-between pb-[16px]`}
+              >
                 <div className="min-w-0 flex-1 gap-y-1">
                   {title && (
                     <h2 id="modal-title" className="h3 text-gray-950">

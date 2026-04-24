@@ -1,25 +1,31 @@
-import { useCallback, useState } from 'react'
+// src/features/schedule/day/hooks/useTaskFilter.ts
+import { create } from 'zustand'
 import { INITIAL_FILTER, TaskFilterState, TaskPriority } from '@/src/features/task/types'
 
-export function useTaskFilter() {
-  const [filter, setFilter] = useState<TaskFilterState>(INITIAL_FILTER)
-
-  const setPriority = useCallback((priority: TaskPriority | null) => {
-    setFilter((prev) => ({ ...prev, priority }))
-  }, [])
-
-  const setGoalCategory = useCallback((goalCategoryId: number | null) => {
-    setFilter((prev) => ({ ...prev, goalCategoryId, generalCategoryId: null }))
-    // 목표 카테고리 바꾸면 일반 카테고리 초기화 — UX 고려
-  }, [])
-
-  const setGeneralCategory = useCallback((generalCategoryId: number | null) => {
-    setFilter((prev) => ({ ...prev, generalCategoryId }))
-  }, [])
-
-  const reset = useCallback(() => setFilter(INITIAL_FILTER), [])
-
-  const isActive = Object.values(filter).some(Boolean)
-
-  return { filter, setPriority, setGoalCategory, setGeneralCategory, reset, isActive }
+interface TaskFilterStore {
+  filter: TaskFilterState
+  setPriority: (priority: TaskPriority | null) => void
+  setGoalCategory: (goalCategoryId: number | null) => void
+  setGeneralCategory: (generalCategoryId: number | null) => void
+  reset: () => void
+  isActive: boolean
 }
+
+export const useTaskFilter = create<TaskFilterStore>((set, get) => ({
+  filter: INITIAL_FILTER,
+
+  setPriority: (priority) => set((state) => ({ filter: { ...state.filter, priority } })),
+
+  setGoalCategory: (goalCategoryId) =>
+    set((state) => ({
+      filter: { ...state.filter, goalCategoryId, generalCategoryId: null },
+    })),
+
+  setGeneralCategory: (generalCategoryId) => set((state) => ({ filter: { ...state.filter, generalCategoryId } })),
+
+  reset: () => set({ filter: INITIAL_FILTER }),
+
+  get isActive() {
+    return Object.values(get().filter).some(Boolean)
+  },
+}))

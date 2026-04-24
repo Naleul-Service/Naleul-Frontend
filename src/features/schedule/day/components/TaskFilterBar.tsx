@@ -7,11 +7,11 @@ import { TaskPriority } from '@/src/features/task/types'
 const PRIORITIES: TaskPriority[] = ['A', 'B', 'C', 'D', 'E']
 
 const PRIORITY_COLOR: Record<TaskPriority, string> = {
-  A: 'bg-red-500',
-  B: 'bg-orange-500',
-  C: 'bg-yellow-500',
-  D: 'bg-green-500',
-  E: 'bg-blue-500',
+  A: 'bg-[#FF6B6B]',
+  B: 'bg-[#FB923C]',
+  C: 'bg-[#FFE46A]',
+  D: 'bg-[#9AE470]',
+  E: 'bg-[#3BBBF6]',
 }
 
 interface TaskFilterBarProps {
@@ -58,7 +58,7 @@ export function TaskFilterBar({
             active={filter.goalCategoryId === g.goalCategoryId}
             onClick={() => onGoalCategoryChange(g.goalCategoryId)}
           >
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: g.colorCode }} />
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: g.colorCode ?? '#637580' }} />
             {g.goalCategoryName}
           </Chip>
         ))}
@@ -76,7 +76,7 @@ export function TaskFilterBar({
               active={filter.generalCategoryId === g.generalCategoryId}
               onClick={() => onGeneralCategoryChange(g.generalCategoryId)}
             >
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: g.colorCode }} />
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: g.colorCode ?? '#637580' }} />
               {g.generalCategoryName}
             </Chip>
           ))}
@@ -101,8 +101,10 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       type="button"
       onClick={onClick}
       className={[
-        'flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition-colors',
-        active ? 'bg-foreground text-background' : 'border-border text-muted-foreground hover:text-foreground border',
+        'label-sm flex items-center gap-1 rounded-full px-[10px] py-1 transition-colors',
+        active
+          ? 'bg-foreground text-background'
+          : 'hover:text-foreground border border-gray-100 bg-gray-50 text-gray-500',
       ].join(' ')}
     >
       {children}

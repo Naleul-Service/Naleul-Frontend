@@ -2,35 +2,44 @@
 
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { ScheduleTabBarContainer } from '@/src/features/schedule/components/ScheduleTabBarContainer'
 import { CalendarPopover } from '@/src/features/schedule/components/CalendarPopover'
-import { FilterIcon } from '@/src/assets/svgComponents'
 import { Button } from '@/src/components/common/Button'
 import { AddTaskModal } from '@/src/features/task/components/AddTaskModal'
 import { CreateTaskActualModal } from '@/src/features/schedule/day/components/CreateTaskActualModal'
 import { parseDateParam, toDateString } from '@/src/features/schedule/day/utils/day'
-import { useSearchParams } from 'next/navigation'
+import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import PageHeader from '@/src/components/layout/PageHeader'
+import { TaskFilterPopover } from '@/src/features/schedule/day/components/TaskFilterPopover'
+import { useTaskFilter } from '@/src/features/schedule/day/hooks/useTaskFilter'
 
 export default function SchedulePageLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const selectedDate = parseDateParam(searchParams.get('date'))
-  const dateString = toDateString(selectedDate) // 공통으로 사용할 날짜 문자열
+  const dateString = toDateString(selectedDate)
 
-  const tableParams = {
-    date: dateString,
-  }
+  const { filter, setPriority, setGoalCategory, setGeneralCategory } = useTaskFilter()
+  const { data: goalCategories = [] } = useGoalCategories()
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCreateTaskActualModalOpen, setIsCreateTaskActualModalOpen] = useState(false)
+
   return (
     <div className="flex flex-col gap-6 p-5">
-      <PageHeader title={'일정 관리'} subtitle={'할 일을 작성하고 관리할 수 있어요.'} />
+      <PageHeader title="일정 관리" subtitle="할 일을 작성하고 관리할 수 있어요." />
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <ScheduleTabBarContainer />
-          <div className="rounded-[8px] border border-gray-100">
-            <FilterIcon width={32} height={32} />
-          </div>
+          {/* FilterIcon → 팝오버 트리거로 교체 */}
+          <TaskFilterPopover
+            filter={filter}
+            goalCategories={goalCategories}
+            onPriorityChange={setPriority}
+            onGoalCategoryChange={setGoalCategory}
+            onGeneralCategoryChange={setGeneralCategory}
+          />
         </div>
 
         <div className="flex items-center gap-x-3">
@@ -48,17 +57,16 @@ export default function SchedulePageLayout({ children }: { children: React.React
           </Button>
         </div>
       </div>
+
+      {/* filter를 children에게 내려줘야 하면 Context 고려 */}
       {children}
 
-      {/* 할 일 계획 모달 */}
       <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultDate={`${dateString}T09:00`} />
-
-      {/* 실제 기록 추가 모달 */}
       <CreateTaskActualModal
         isOpen={isCreateTaskActualModalOpen}
         onClose={() => setIsCreateTaskActualModalOpen(false)}
-        date={dateString} // invalidateQuery에 사용될 날짜
-        defaultDate={`${dateString}T12:00`} // 기본 시작 시간을 낮 12시 등으로 설정
+        date={dateString}
+        defaultDate={`${dateString}T12:00`}
       />
     </div>
   )

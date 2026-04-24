@@ -4,11 +4,13 @@ import { useSearchParams } from 'next/navigation'
 import { DayTaskList } from '@/src/features/schedule/day/components/DayTaskList'
 import { DailyTimeTable } from '@/src/features/schedule/day/components/DailyTimeTable'
 import { parseDateParam, toDateString } from '@/src/features/schedule/day/utils/day'
+import { useTaskFilter } from '@/src/features/schedule/day/hooks/useTaskFilter'
 
 export function DayPageContent() {
   const searchParams = useSearchParams()
   const selectedDate = parseDateParam(searchParams.get('date'))
   const dateString = toDateString(selectedDate) // 공통으로 사용할 날짜 문자열
+  const { filter } = useTaskFilter()
 
   const tableParams = {
     date: dateString,
@@ -24,7 +26,7 @@ export function DayPageContent() {
         }}
       >
         <div className="min-w-0">
-          <DayTaskList date={selectedDate} />
+          <DayTaskList filter={filter} date={selectedDate} />
         </div>
         <div className="min-w-0">
           <DailyTimeTable params={tableParams} />

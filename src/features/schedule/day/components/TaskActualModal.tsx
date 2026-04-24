@@ -68,12 +68,12 @@ export function TaskActualModal({ task, onClose }: TaskActualModalProps) {
         {/* 계획 시간 */}
         <div className="flex flex-col gap-y-[6px] rounded-[10px] bg-gray-50 px-4 py-3">
           <p className="body-md-medium text-gray-300">계획</p>
-          <p className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-2">
             <p className="body-lg-medium">
               {utcIsoToKstTimeLabel(task.plannedStartAt)} ~ {utcIsoToKstTimeLabel(task.plannedEndAt)}
             </p>
             <span className="h4 text-primary-400">{formatMinutes(task.plannedDurationMinutes)}</span>
-          </p>
+          </div>
         </div>
 
         {/* 실제 시간 입력 */}

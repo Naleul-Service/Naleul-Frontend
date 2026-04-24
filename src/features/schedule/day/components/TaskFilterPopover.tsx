@@ -50,7 +50,7 @@ export function TaskFilterPopover({
 
       {/* 팝오버 패널 */}
       {isOpen && (
-        <div className="bg-background border-border absolute top-full left-0 z-50 mt-2 w-80 w-[440px] rounded-xl border p-4 shadow-lg">
+        <div className="bg-background absolute top-full left-0 z-50 mt-2 w-[440px] rounded-[12px] border border-gray-200 p-4">
           <TaskFilterBar
             filter={filter}
             goalCategories={goalCategories}

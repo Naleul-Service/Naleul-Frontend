@@ -88,8 +88,8 @@ export function TaskFilterBar({
 
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-muted-foreground w-20 shrink-0 text-xs">{label}</span>
+    <div className="flex items-start gap-2">
+      <span className="body-md-medium w-20 shrink-0 text-gray-300">{label}</span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
   )

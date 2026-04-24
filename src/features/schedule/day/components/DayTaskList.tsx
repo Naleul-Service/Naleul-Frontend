@@ -37,7 +37,15 @@ export function DayTaskList({ date, filter }: DayTaskListProps) {
   )
 
   const { data: tasks, isPending: isTasksPending, isError: isTasksError } = useDailyTasks(params)
-  const { data: actuals, isPending: isActualsPending, isError: isActualsError } = useDailyActuals({ date: dateString })
+  const {
+    data: actuals,
+    isPending: isActualsPending,
+    isError: isActualsError,
+  } = useDailyActuals({
+    date: dateString,
+    ...(filter.goalCategoryId != null && { goalCategoryId: filter.goalCategoryId }),
+    ...(filter.generalCategoryId != null && { generalCategoryId: filter.generalCategoryId }),
+  })
 
   const plannedTasks = useMemo(() => tasks?.filter((t) => t.actual === null) ?? [], [tasks])
   const doneTasks = useMemo(() => tasks?.filter((t) => t.actual !== null) ?? [], [tasks])

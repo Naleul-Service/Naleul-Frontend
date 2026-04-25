@@ -14,16 +14,16 @@ export function CalendarGrid({ year, month, tasksByDate }: Props) {
   const days = buildCalendarDays(year, month)
 
   return (
-    <div className="overflow-hidden rounded-b-xl border border-gray-200 bg-white">
-      <div className="grid grid-cols-7 border-b border-gray-200">
+    <div className="overflow-hidden bg-white">
+      <div className="grid h-[28px] grid-cols-7 items-center justify-center bg-gray-50">
         {DAY_LABELS.map((label) => (
-          <div key={label} className="py-2 text-center text-xs font-medium text-gray-500">
+          <div key={label} className="label-sm text-center text-gray-500">
             {label}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7 border border-gray-100">
         {days.map((date) => {
           const key = toDateKey(date)
           return (

@@ -5,14 +5,18 @@ interface Props {
 }
 
 export function TaskChip({ task }: Props) {
-  const bg = task.goalCategoryColorCode ?? '#E5E7EB'
+  const generalColor = task.generalCategoryColorCode ?? '#E5E7EB'
+  const goalColor = task.goalCategoryColorCode ?? '#E5E7EB'
 
   return (
     <div
-      className="truncate rounded-[3px] px-1.5 py-0.5 text-[10px] leading-[1.4]"
+      className="label-xs truncate rounded-[4px] px-[6px] py-[3px] text-gray-800"
       style={{
-        backgroundColor: bg + '33', // 투명도 20%
-        color: bg,
+        backgroundColor: `${generalColor}33`,
+        borderTop: `1px solid ${generalColor}`,
+        borderBottom: `1px solid ${generalColor}`,
+        borderRight: `1px solid ${generalColor}`,
+        borderLeft: `3px solid ${goalColor}`,
       }}
       title={task.taskName}
     >

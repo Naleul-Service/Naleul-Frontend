@@ -2,7 +2,7 @@ import { TaskChip } from './TaskChip'
 import { Task } from '@/src/features/schedule/day/types'
 import { useRouter } from 'next/navigation'
 
-const MAX_VISIBLE = 5
+const MAX_VISIBLE = 3
 
 interface Props {
   date: Date
@@ -28,30 +28,27 @@ export function CalendarCell({ date, tasks, isCurrentMonth, isToday }: Props) {
   const overflowCount = tasks.length - MAX_VISIBLE
 
   return (
-    <div
-      onClick={handleDateClick}
-      className={[
-        'min-h-[90px] border-r border-b border-gray-200 bg-white p-1.5',
-        isCurrentMonth ? '' : 'opacity-40',
-      ].join(' ')}
-    >
-      {/* 날짜 숫자 */}
-      <span
-        className={[
-          'mb-1 flex h-[22px] w-[22px] items-center justify-center rounded-full text-xs font-medium',
-          isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground',
-        ].join(' ')}
-      >
-        {date.getDate()}
-      </span>
+    <div className="h-[150px] border-r border-b border-gray-100 bg-white p-2">
+      <div className={!isCurrentMonth ? 'opacity-40' : ''} onClick={handleDateClick}>
+        {/* 날짜 숫자 */}
+        <span
+          className={[
+            'label-sm mb-1 flex h-[24px] w-[24px] items-center justify-center rounded-full text-gray-500',
+            isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground',
+          ].join(' ')}
+        >
+          {date.getDate()}
+        </span>
 
-      {/* 할 일 칩 */}
-      <div className="flex flex-col gap-[2px]">
-        {visibleTasks.map((task) => (
-          <TaskChip key={task.taskId} task={task} />
-        ))}
-
-        {overflowCount > 0 && <span className="text-muted-foreground px-1 text-[10px]">+{overflowCount}개</span>}
+        {/* 할 일 칩 */}
+        <div className="flex flex-col gap-[2px]">
+          {visibleTasks.map((task) => (
+            <TaskChip key={task.taskId} task={task} />
+          ))}
+          {overflowCount > 0 && (
+            <span className="text-muted-foreground label-xs mt-[4px] px-1">+{overflowCount}개</span>
+          )}
+        </div>
       </div>
     </div>
   )

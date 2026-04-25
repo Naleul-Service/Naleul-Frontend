@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useMonthlyTasks } from '../hooks/useMonthlyTasks'
 import { CalendarGrid } from './CalendarGrid'
-import { CalendarHeader } from '@/src/features/schedule/month/ui/CalendarHeader'
 
 export function MonthCalendar() {
   const today = new Date()
@@ -29,8 +28,6 @@ export function MonthCalendar() {
 
   return (
     <div className="w-full space-y-4">
-      <CalendarHeader year={year} month={month} onPrev={handlePrev} onNext={handleNext} />
-
       {isLoading ? (
         <div className="text-muted-foreground flex h-[400px] items-center justify-center text-sm">불러오는 중...</div>
       ) : (

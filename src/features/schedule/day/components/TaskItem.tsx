@@ -26,7 +26,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
 
   return (
     <>
-      <li className="group flex flex-col gap-y-1 rounded-[10px] border border-gray-100 px-3 py-[10px]">
+      <li className="group flex flex-col gap-y-1 rounded-[10px] border border-gray-100 bg-white px-3 py-[10px]">
         {/* 상단 행: 체크 + 우선순위 + 이름 + ... */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-[10px]">
@@ -47,7 +47,9 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
               <PriorityBadge label={task.taskPriority} />
 
               {/* 태스크 이름 */}
-              <p className={`body-md-medium min-w-0 flex-1 ${isDone ? 'text-gray-300 line-through' : 'text-gray-500'}`}>
+              <p
+                className={`body-md-medium min-w-0 flex-1 text-start ${isDone ? 'text-gray-300 line-through' : 'text-gray-500'}`}
+              >
                 {task.taskName}
               </p>
             </div>

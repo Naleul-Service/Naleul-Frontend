@@ -1,15 +1,16 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import { useWeeklyTasks } from '../hooks/useWeeklyTasks'
 import { useWeekRange } from '../hooks/useWeekRange'
 import { useTaskFilter } from '@/src/features/schedule/day/hooks/useTaskFilter'
-import { TaskFilterBar } from '@/src/features/schedule/day/components/TaskFilterBar'
 import { TaskItem } from '@/src/features/schedule/day/components/TaskItem'
 import { WeekTimeTable } from '@/src/features/schedule/week/ui/WeekTimeTable'
 import { useWeeklyActuals } from '@/src/features/schedule/week/hooks/useWeeklyActuals'
 import { formatLocalDate } from '@/src/lib/datetime'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Task } from '@/src/features/schedule/day/types'
 
 const DAY_LABELS: Record<string, string> = {
   MONDAY: '월',
@@ -26,6 +27,68 @@ interface WeekTaskListProps {
   date: Date
 }
 
+// ─── DaySection ──────────────────────────────────────────────────────────────
+interface DaySectionProps {
+  day: string
+  dateStr: string
+  tasks: Task[]
+  completedCount: number
+}
+
+function DaySection({ day, dateStr, tasks, completedCount }: DaySectionProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className={`${isOpen ? 'bg-primary-50' : 'bg-gray-50'} border-y border-gray-100 last:border-none`}>
+      {/* 헤더 */}
+      <button
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className={`${isOpen ? 'bg-primary-50' : 'bg-gray-50'} flex w-full items-center justify-between px-3 py-3`}
+      >
+        <div className="flex w-full gap-x-1">
+          <div className="shrink-0">
+            {isOpen ? (
+              <ChevronUp size={16} className="text-[#8FA0A8]" />
+            ) : (
+              <ChevronDown size={16} className="text-[#8FA0A8]" />
+            )}
+          </div>
+
+          <section className="w-full">
+            <section className="flex w-full justify-between">
+              <section className="flex items-center gap-x-1">
+                <span className={`${isOpen ? 'text-primary-400' : 'text-gray-950'} body-md-medium`}>
+                  {DAY_LABELS[day]}요일
+                </span>
+                <span className="text-xs text-gray-400">{dateStr.slice(5)}</span>
+              </section>
+              <span className="label-xs h-fit w-fit rounded-[4px] bg-gray-50 px-[6px] py-[1px] text-gray-300">
+                {completedCount}/{tasks.length}
+              </span>
+            </section>
+            {/* 태스크 목록 */}
+            {isOpen && (
+              <div className="mt-[5px] pb-3">
+                {tasks.length === 0 ? (
+                  <p className="text-muted-foreground px-1 text-xs">할 일이 없어요</p>
+                ) : (
+                  <ul className="flex flex-col gap-2">
+                    {tasks.map((task) => (
+                      <TaskItem key={task.taskId} task={task} date={dateStr} />
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </section>
+        </div>
+      </button>
+    </div>
+  )
+}
+
+// ─── WeekTaskList ─────────────────────────────────────────────────────────────
 export function WeekTaskList({ date }: WeekTaskListProps) {
   const { filter, dayOfWeek, setPriority, setGoalCategory, setGeneralCategory, setDayOfWeek } = useTaskFilter()
   const { data: goalCategories = [] } = useGoalCategories()
@@ -62,69 +125,27 @@ export function WeekTaskList({ date }: WeekTaskListProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <TaskFilterBar
-        filter={filter}
-        goalCategories={goalCategories}
-        onPriorityChange={setPriority}
-        onGoalCategoryChange={setGoalCategory}
-        onGeneralCategoryChange={setGeneralCategory}
-      />
-
-      {/* 요일 필터 */}
-      <div className="flex gap-1.5">
-        {DAY_ORDER.map((day) => (
-          <button
-            key={day}
-            type="button"
-            onClick={() => setDayOfWeek(dayOfWeek === day ? undefined : day)}
-            className={[
-              'h-7 flex-1 rounded-md text-xs font-medium transition-colors',
-              dayOfWeek === day
-                ? 'bg-foreground text-background'
-                : 'border-border text-muted-foreground hover:bg-muted border',
-            ].join(' ')}
-          >
-            {DAY_LABELS[day]}
-          </button>
-        ))}
-      </div>
-
       {isPending && <p className="text-muted-foreground text-sm">불러오는 중...</p>}
       {isError && <p className="text-sm text-red-500">할 일을 불러오지 못했어요</p>}
 
       <div className="flex gap-4">
-        {/* 태스크 리스트 */}
+        {/* 태스크 리스트 — 아코디언 */}
         {taskData && (
-          <div className="flex w-64 shrink-0 flex-col gap-6">
+          <div className="w-64 shrink-0">
             {visibleDays.map((day) => {
               const tasks = taskData.tasksByDay[day] ?? []
               const dayOffset = DAY_ORDER.indexOf(day)
               const dayDate = new Date(startDate)
               dayDate.setDate(dayDate.getDate() + dayOffset)
               const dateStr = formatLocalDate(dayDate)
+              const completedCount = tasks.filter((t) => t.actual !== null).length
 
-              return (
-                <div key={day}>
-                  <p className="text-muted-foreground mb-2 text-xs font-medium">
-                    {DAY_LABELS[day]}요일
-                    {tasks.length > 0 && <span className="ml-1.5">({tasks.length})</span>}
-                  </p>
-                  {tasks.length === 0 ? (
-                    <p className="text-muted-foreground text-xs">할 일이 없어요</p>
-                  ) : (
-                    <ul className="flex flex-col gap-2">
-                      {tasks.map((task) => (
-                        <TaskItem key={task.taskId} task={task} date={dateStr} />
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )
+              return <DaySection key={day} day={day} dateStr={dateStr} tasks={tasks} completedCount={completedCount} />
             })}
           </div>
         )}
 
-        {/* 주간 타임테이블 — 두 데이터 모두 로드된 후 렌더 */}
+        {/* 주간 타임테이블 */}
         {taskData && actualData && (
           <div className="min-w-0 flex-1 overflow-x-auto">
             <WeekTimeTable taskData={taskData} actualData={actualData} startDate={startDate} />

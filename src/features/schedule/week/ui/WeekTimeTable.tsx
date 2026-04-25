@@ -127,15 +127,8 @@ function DayColumn({ label, date, actuals }: DayColumnProps) {
       style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
     >
       {/* 헤더 */}
-      <div
-        style={{
-          textAlign: 'center',
-          borderBottom: '1px solid #E5E7EB',
-          marginBottom: 4,
-          paddingBottom: 4,
-        }}
-      >
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#111827' }}>{label}</span>
+      <div className="mb-[6px] flex h-[28px] items-center justify-center rounded-[4px] bg-gray-50">
+        <span className="label-sm text-gray-500">{label}</span>
         <span style={{ fontSize: 9, color: '#9CA3AF', marginLeft: 4 }}>{date.slice(5)}</span>
       </div>
       {HOUR_LABELS.map((hour) => (

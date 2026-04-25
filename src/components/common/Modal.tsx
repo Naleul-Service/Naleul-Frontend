@@ -15,7 +15,7 @@ interface ModalProps {
   size?: ModalSize
   hideCloseButton?: boolean
   closeOnOverlayClick?: boolean
-  children: ReactNode
+  children?: ReactNode
   footer?: ReactNode
   className?: string
   isHeaderBorder?: boolean

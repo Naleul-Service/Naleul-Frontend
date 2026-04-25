@@ -1,8 +1,9 @@
-// features/retrospective/ui/RetrospectiveCard.tsx
-
 'use client'
 
+import { useState } from 'react'
 import type { RetrospectiveResponse, ReviewType } from '../types'
+import { Modal } from '@/src/components/common/Modal'
+import { Button } from '@/src/components/common/Button'
 
 const TYPE_LABEL: Record<ReviewType, string> = {
   DAILY: '일간',
@@ -23,59 +24,124 @@ interface Props {
 }
 
 export function RetrospectiveCard({ retrospective, onEdit, onDelete }: Props) {
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
+
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-      {/* 헤더 */}
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${TYPE_COLOR[retrospective.reviewType]}`}>
-            {TYPE_LABEL[retrospective.reviewType]}
-          </span>
-          <span className="text-xs text-gray-400">{retrospective.reviewDate}</span>
+    <>
+      <div
+        onClick={() => setIsDetailOpen(true)}
+        className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+      >
+        {/* 헤더 */}
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${TYPE_COLOR[retrospective.reviewType]}`}>
+              {TYPE_LABEL[retrospective.reviewType]}
+            </span>
+            <span className="text-xs text-gray-400">{retrospective.reviewDate}</span>
+          </div>
+
+          {/* 액션 버튼 */}
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit(retrospective)
+              }}
+              className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              aria-label="수정"
+            >
+              <PencilIcon />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(retrospective.retrospectiveId)
+              }}
+              className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+              aria-label="삭제"
+            >
+              <TrashIcon />
+            </button>
+          </div>
         </div>
 
-        {/* 액션 버튼 */}
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            onClick={() => onEdit(retrospective)}
-            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-            aria-label="수정"
-          >
-            <PencilIcon />
-          </button>
-          <button
-            onClick={() => onDelete(retrospective.retrospectiveId)}
-            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
-            aria-label="삭제"
-          >
-            <TrashIcon />
-          </button>
-        </div>
+        {/* 카테고리 뱃지 */}
+        {(retrospective.goalCategoryName || retrospective.generalCategoryName) && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {retrospective.goalCategoryName && (
+              <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                🎯 {retrospective.goalCategoryName}
+              </span>
+            )}
+            {retrospective.generalCategoryName && (
+              <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                📁 {retrospective.generalCategoryName}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* 본문 — 미리보기 */}
+        <p className="line-clamp-3 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
+          {retrospective.content}
+        </p>
+
+        {/* 더보기 힌트 */}
+        {retrospective.content.length > 100 && <p className="caption-md mt-2 text-gray-300">눌러서 전체 보기</p>}
       </div>
 
-      {/* 카테고리 뱃지 */}
-      {(retrospective.goalCategoryName || retrospective.generalCategoryName) && (
-        <div className="mb-3 flex flex-wrap gap-2">
-          {retrospective.goalCategoryName && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-              🎯 {retrospective.goalCategoryName}
-            </span>
+      {/* 상세 모달 */}
+      <Modal
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        title={`${TYPE_LABEL[retrospective.reviewType]} 회고`}
+        description={retrospective.reviewDate}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button
+              className="w-full"
+              variant="secondary"
+              size="lg"
+              onClick={() => {
+                setIsDetailOpen(false)
+                onEdit(retrospective)
+              }}
+            >
+              수정
+            </Button>
+            <Button className="w-full" variant="primary" size="lg" onClick={() => setIsDetailOpen(false)}>
+              닫기
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          {/* 카테고리 뱃지 */}
+          {(retrospective.goalCategoryName || retrospective.generalCategoryName) && (
+            <div className="flex flex-wrap gap-2">
+              {retrospective.goalCategoryName && (
+                <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  🎯 {retrospective.goalCategoryName}
+                </span>
+              )}
+              {retrospective.generalCategoryName && (
+                <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  📁 {retrospective.generalCategoryName}
+                </span>
+              )}
+            </div>
           )}
-          {retrospective.generalCategoryName && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-              📁 {retrospective.generalCategoryName}
-            </span>
-          )}
-        </div>
-      )}
 
-      {/* 본문 */}
-      <p className="line-clamp-3 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{retrospective.content}</p>
-    </div>
+          {/* 전체 본문 */}
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{retrospective.content}</p>
+        </div>
+      </Modal>
+    </>
   )
 }
 
-// 인라인 아이콘 (lucide 없을 때 대비)
 function PencilIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

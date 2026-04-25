@@ -14,7 +14,7 @@ export function CalendarGrid({ year, month, tasksByDate }: Props) {
   const days = buildCalendarDays(year, month)
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="overflow-hidden rounded-t-[6px] bg-white">
       <div className="grid h-[28px] grid-cols-7 items-center justify-center bg-gray-50">
         {DAY_LABELS.map((label) => (
           <div key={label} className="label-sm text-center text-gray-500">
@@ -23,7 +23,7 @@ export function CalendarGrid({ year, month, tasksByDate }: Props) {
         ))}
       </div>
 
-      <div className="grid grid-cols-7 border border-gray-100">
+      <div className="grid grid-cols-7 border-t border-l border-gray-100">
         {days.map((date) => {
           const key = toDateKey(date)
           return (

@@ -9,10 +9,21 @@ import { useCreateGoalCategory } from '@/src/features/category/hooks/useGoalCate
 import { ColorPicker } from './ColorPicker'
 import { AddColorInput } from '@/src/features/category/components/AddColorInput'
 import Label from '@/src/components/common/Label'
+import { DatePicker } from '@/src/components/common/picker/DatePicker'
 
 interface GoalCategoryModalProps {
   isOpen: boolean
   onClose: () => void
+}
+
+function getDefaultStartDate(): string {
+  const now = new Date()
+  const h = now.getHours()
+  const m = now.getMinutes()
+  const meridiem = h < 12 ? 'AM' : 'PM'
+  const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(hour12)}:${pad(m)}`
 }
 
 export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
@@ -21,13 +32,18 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
 
   const [name, setName] = useState('')
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null)
-  const [startDate, setStartDate] = useState(() => new Date().toISOString().split('T')[0])
   const [error, setError] = useState<string | null>(null)
+
+  const [startDate, setStartDate] = useState(() => {
+    const now = new Date()
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+  })
 
   const handleClose = () => {
     setName('')
     setSelectedColorId(null)
-    setStartDate(new Date().toISOString().split('T')[0])
+    setStartDate(getDefaultStartDate())
     setError(null)
     onClose()
   }
@@ -35,13 +51,21 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
   const handleSubmit = () => {
     if (!name.trim()) return setError('카테고리 이름을 입력해 주세요')
     if (!selectedColorId) return setError('색상을 선택해 주세요')
+    if (!startDate) return setError('시작일을 입력해 주세요')
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const selected = new Date(startDate)
+    selected.setHours(0, 0, 0, 0)
+
+    const goalCategoryStatus = selected > today ? 'NOT_STARTED' : 'IN_PROGRESS'
 
     setError(null)
     mutate(
       {
         colorId: selectedColorId,
         goalCategoryName: name.trim(),
-        goalCategoryStatus: 'NOT_STARTED',
+        goalCategoryStatus,
         goalCategoryStartDate: startDate,
       },
       { onSuccess: handleClose, onError: (err) => setError(err.message) }
@@ -57,10 +81,10 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
       size="md"
       footer={
         <div className="flex justify-end gap-2">
-          <Button className={'w-full'} variant={'secondary'} size={'lg'} onClick={handleClose} disabled={isPending}>
+          <Button className="w-full" variant="secondary" size="lg" onClick={handleClose} disabled={isPending}>
             취소
           </Button>
-          <Button className={'w-full'} variant={'primary'} size={'lg'} onClick={handleSubmit} isLoading={isPending}>
+          <Button className="w-full" variant="primary" size="lg" onClick={handleSubmit} isLoading={isPending}>
             만들기
           </Button>
         </div>
@@ -69,22 +93,17 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
       <div className="flex flex-col gap-5">
         <Input
           label="카테고리명"
-          isRequired={true}
+          isRequired
           placeholder="예) 건강, 자기계발, 재테크"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
         />
-        <Input
-          label="시작일"
-          isRequired={true}
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          required
-        />
+
+        {/* 시작일 — DateTimePicker로 교체 */}
+        <DatePicker label="시작일" isRequired value={startDate} onChange={setStartDate} />
+
         <div className="flex flex-col gap-2">
-          <Label isRequired={true}>색상</Label>
+          <Label isRequired>색상</Label>
           <ColorPicker
             colors={colors}
             isLoading={isColorsLoading}
@@ -93,6 +112,7 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
           />
           <AddColorInput existingColors={colors} onAdded={(newColor) => setSelectedColorId(newColor.userColorId)} />
         </div>
+
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     </Modal>

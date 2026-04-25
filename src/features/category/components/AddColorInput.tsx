@@ -4,6 +4,8 @@
 import { useState } from 'react'
 import { useAddColor } from '../hooks/useAddColor'
 import { Color } from '../api/colors'
+import { Input } from '@/src/components/common/Input'
+import { Button } from '@/src/components/common/Button'
 
 interface AddColorInputProps {
   existingColors: Color[]
@@ -43,24 +45,25 @@ export function AddColorInput({ existingColors, onAdded }: AddColorInputProps) {
           style={{ backgroundColor: isValidHex ? value : 'transparent' }}
         />
 
-        <input
+        <Input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="#FF5733"
           maxLength={7}
-          className="border-border focus:ring-foreground h-8 flex-1 rounded-md border bg-transparent px-2 text-sm focus:ring-1 focus:outline-none"
         />
 
-        <button
+        <Button
+          className={'shrink-0'}
+          variant={'primary'}
+          size={'md'}
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="bg-foreground text-background h-8 rounded-md px-3 text-xs disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isPending ? '추가 중…' : '추가'}
-        </button>
+        </Button>
       </div>
 
       {/* 인라인 에러 - 타이핑 중일 때만 */}

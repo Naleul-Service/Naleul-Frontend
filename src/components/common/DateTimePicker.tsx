@@ -132,7 +132,9 @@ export function DateTimePicker({
 
     if (isNaN(num)) return
 
-    // ✅ 핵심 수정: 첫 자리로 2자리 유효값 가능성 여부 판단
+    // hour는 자동 포커스 이동 안 함
+    if (key === 'hour') return
+
     const shouldAutoAdvance = digits.length === maxLength || (digits.length === maxLength - 1 && num * 10 > max)
 
     if (shouldAutoAdvance) {

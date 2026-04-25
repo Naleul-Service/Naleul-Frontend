@@ -157,18 +157,17 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
               <span className="ml-1 text-gray-400">({task.plannedDurationMinutes}분)</span>
             )}
           </div>
-
-          {/* 실제 기록 */}
-          {task.actual && (
-            <div className="caption-md mt-1 flex items-center gap-x-[6px] text-[#34C759]">
-              <CheckIcon width={13} height={13} />
-              실제 {utcIsoToKstTimeLabel(task.actual.actualStartAt)} ~ {utcIsoToKstTimeLabel(task.actual.actualEndAt)}
-              {task.actual.actualDurationMinutes != null && (
-                <span className="ml-1">({task.actual.actualDurationMinutes}분)</span>
-              )}
-            </div>
-          )}
         </div>
+        {/* 실제 기록 */}
+        {task.actual && (
+          <div className="caption-md mt-1 ml-8 flex items-center gap-x-[4px] text-[#34C759]">
+            <CheckIcon width={13} height={13} />
+            완료 {utcIsoToKstTimeLabel(task.actual.actualStartAt)} ~ {utcIsoToKstTimeLabel(task.actual.actualEndAt)}
+            {task.actual.actualDurationMinutes != null && (
+              <span className="">({task.actual.actualDurationMinutes}분)</span>
+            )}
+          </div>
+        )}
       </li>
 
       {isActualModalOpen && <TaskActualModal date={date} task={task} onClose={() => setIsActualModalOpen(false)} />}

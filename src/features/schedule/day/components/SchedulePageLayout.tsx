@@ -32,7 +32,6 @@ export default function SchedulePageLayout({ children }: { children: React.React
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <ScheduleTabBarContainer />
-          {/* FilterIcon → 팝오버 트리거로 교체 */}
           <TaskFilterPopover
             filter={filter}
             goalCategories={goalCategories}
@@ -50,7 +49,7 @@ export default function SchedulePageLayout({ children }: { children: React.React
             leftIcon={<Plus size={16} />}
             onClick={() => setIsCreateTaskActualModalOpen(true)}
           >
-            실제로 한 일 추가
+            실행 완료 추가
           </Button>
           <Button size="md" leftIcon={<Plus size={16} />} onClick={() => setIsModalOpen(true)}>
             할 일 추가

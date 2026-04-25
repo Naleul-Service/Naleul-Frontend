@@ -4,7 +4,6 @@ interface BlockItem {
   taskName: string
   generalCategoryColorCode: string | null
   goalCategoryColorCode: string | null
-  // Task는 actual 있음, TaskActualItem은 없음
   actual?: unknown
   plannedStartAt?: string
   plannedEndAt?: string
@@ -37,11 +36,14 @@ export function TaskBlock<T extends BlockItem>({ positioned }: TaskBlockProps<T>
         bottom: 2,
         left: `${leftPercent}%`,
         width: `${widthPercent}%`,
+        backgroundColor: isDone ? `${generalColor}33` : 'transparent',
+        borderTop: `1px solid ${generalColor}`,
+        borderBottom: `1px solid ${generalColor}`,
+        borderRight: `1px solid ${generalColor}`,
+        borderLeft: `4px solid ${goalColor}`, // ✅ border 단축속성 제거하고 개별 선언만 유지
         borderRadius: 6,
         overflow: 'hidden',
         cursor: 'pointer',
-        backgroundColor: isDone ? `${generalColor}33` : 'transparent',
-        border: `1.5px solid ${generalColor}`,
         display: 'flex',
         alignItems: 'center',
         gap: 3,
@@ -52,18 +54,8 @@ export function TaskBlock<T extends BlockItem>({ positioned }: TaskBlockProps<T>
       {widthPercent > 15 && (
         <div className="flex items-center gap-x-2">
           <span
+            className="body-md-medium text-primary-800"
             style={{
-              width: 5,
-              height: 5,
-              borderRadius: '50%',
-              backgroundColor: goalColor,
-              flexShrink: 0,
-            }}
-          />
-          <span
-            className="body-md-medium"
-            style={{
-              color: generalColor,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

@@ -40,7 +40,7 @@ function DaySection({ day, dateStr, tasks, completedCount }: DaySectionProps) {
 
   return (
     <div className={`${isOpen ? 'bg-primary-50' : 'bg-gray-50'} border-y border-gray-100 last:border-none`}>
-      {/* 헤더 */}
+      {/* 헤더 — 버튼은 헤더만 */}
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
@@ -54,36 +54,34 @@ function DaySection({ day, dateStr, tasks, completedCount }: DaySectionProps) {
               <ChevronDown size={16} className="text-[#8FA0A8]" />
             )}
           </div>
-
-          <section className="w-full">
-            <section className="flex w-full justify-between">
-              <section className="flex items-center gap-x-1">
-                <span className={`${isOpen ? 'text-primary-400' : 'text-gray-950'} body-md-medium`}>
-                  {DAY_LABELS[day]}요일
-                </span>
-                <span className="text-xs text-gray-400">{dateStr.slice(5)}</span>
-              </section>
-              <span className="label-xs h-fit w-fit rounded-[4px] bg-gray-50 px-[6px] py-[1px] text-gray-300">
-                {completedCount}/{tasks.length}
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-x-1">
+              <span className={`${isOpen ? 'text-primary-400' : 'text-gray-950'} body-md-medium`}>
+                {DAY_LABELS[day]}요일
               </span>
-            </section>
-            {/* 태스크 목록 */}
-            {isOpen && (
-              <div className="mt-[5px] pb-3">
-                {tasks.length === 0 ? (
-                  <p className="text-muted-foreground px-1 text-xs">할 일이 없어요</p>
-                ) : (
-                  <ul className="flex flex-col gap-2">
-                    {tasks.map((task) => (
-                      <TaskItem key={task.taskId} task={task} date={dateStr} />
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </section>
+              <span className="text-xs text-gray-400">{dateStr.slice(5)}</span>
+            </div>
+            <span className="label-xs h-fit w-fit rounded-[4px] bg-gray-50 px-[6px] py-[1px] text-gray-300">
+              {completedCount}/{tasks.length}
+            </span>
+          </div>
         </div>
       </button>
+
+      {/* 태스크 목록 — 버튼 밖으로 분리 */}
+      {isOpen && (
+        <div className="px-3 pb-3">
+          {tasks.length === 0 ? (
+            <p className="text-muted-foreground px-1 text-xs">할 일이 없어요</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {tasks.map((task) => (
+                <TaskItem key={task.taskId} task={task} date={dateStr} />
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -17,7 +17,7 @@ export default function Badge({
   textColor,
   botColor,
   type = 'DEFAULT',
-  opacity = 10, // 배경 투명도 기본값 10%
+  opacity = 100, // 배경 투명도 기본값 10%
 }: BadgeProps) {
   const isDotType = type === 'DOT'
 

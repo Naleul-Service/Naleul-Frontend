@@ -56,10 +56,10 @@ export function GeneralCategoryModal({ isOpen, onClose, goalCategory }: GeneralC
       size="md"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={handleClose} disabled={isPending}>
+          <Button className="w-full" variant="secondary" size="lg" onClick={handleClose} disabled={isPending}>
             취소
           </Button>
-          <Button onClick={handleSubmit} isLoading={isPending}>
+          <Button className="w-full" size="lg" onClick={handleSubmit} isLoading={isPending}>
             만들기
           </Button>
         </div>
@@ -68,6 +68,7 @@ export function GeneralCategoryModal({ isOpen, onClose, goalCategory }: GeneralC
       <div className="flex flex-col gap-5">
         <Input
           label="카테고리 이름"
+          isRequired={true}
           placeholder="예) 헬스, 독서, 저축"
           value={name}
           onChange={(e) => setName(e.target.value)}

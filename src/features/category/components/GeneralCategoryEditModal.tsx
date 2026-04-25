@@ -9,6 +9,7 @@ import { useColors } from '../hooks/useColors'
 import { useUpdateGeneralCategory } from '../hooks/useGeneralCategoryMutations'
 import { GeneralCategoryItemType, GoalCategory } from '../api/goalCategory'
 import { AddColorInput } from '@/src/features/category/components/AddColorInput'
+import Label from '@/src/components/common/Label'
 
 interface GeneralCategoryEditModalProps {
   isOpen: boolean
@@ -72,11 +73,12 @@ export function GeneralCategoryEditModal({ isOpen, onClose, item, goalCategory }
       title="일반 카테고리 수정"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={handleClose} disabled={isPending}>
+          <Button className="w-full" variant="secondary" size="lg" onClick={handleClose} disabled={isPending}>
             취소
           </Button>
           <Button
-            size="sm"
+            className="w-full"
+            size="lg"
             onClick={handleSubmit}
             isLoading={isPending}
             disabled={!form.generalCategoryName.trim() || !form.colorId}
@@ -89,6 +91,7 @@ export function GeneralCategoryEditModal({ isOpen, onClose, item, goalCategory }
       <div className="flex flex-col gap-4">
         <Input
           label="카테고리 이름"
+          isRequired={true}
           value={form.generalCategoryName}
           onChange={(e) => {
             setForm((prev) => ({ ...prev, generalCategoryName: e.target.value }))
@@ -100,7 +103,7 @@ export function GeneralCategoryEditModal({ isOpen, onClose, item, goalCategory }
         />
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">색상</label>
+          <Label isRequired={true}>색상</Label>
           <ColorPicker
             colors={colors}
             isLoading={isColorsLoading}

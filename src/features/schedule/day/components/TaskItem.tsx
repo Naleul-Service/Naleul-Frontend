@@ -129,6 +129,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
           {/* 목표 카테고리 */}
           {task.goalCategoryName && (
             <Badge
+              opacity={10}
               textColor={task.goalCategoryColorCode}
               bgColor={task.goalCategoryColorCode}
               type={'DOT'}
@@ -141,6 +142,7 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
           {/* 일반 카테고리 */}
           {task.generalCategoryName && (
             <Badge
+              opacity={10}
               textColor={task.generalCategoryColorCode}
               bgColor={task.generalCategoryColorCode}
               type={'DOT'}

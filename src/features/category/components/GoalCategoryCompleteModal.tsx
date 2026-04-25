@@ -71,11 +71,12 @@ export function GoalCategoryCompleteModal({ isOpen, onClose, category }: GoalCat
       title="목표 완료"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={handleClose} disabled={isPending}>
+          <Button className="w-full" variant="secondary" size="lg" onClick={handleClose} disabled={isPending}>
             취소
           </Button>
           <Button
-            size="sm"
+            className="w-full"
+            size="lg"
             onClick={handleSubmit}
             isLoading={isPending}
             disabled={!form.goalCategoryEndDate || !form.achievement.trim()}

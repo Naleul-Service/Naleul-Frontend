@@ -9,12 +9,13 @@ import { useColors } from '../hooks/useColors'
 import { useUpdateGoalCategory } from '../hooks/useGoalCategoryMutations'
 import { GoalCategory, GoalCategoryStatus } from '../api/goalCategory'
 import { AddColorInput } from '@/src/features/category/components/AddColorInput'
+import Label from '@/src/components/common/Label'
 
 const STATUS_OPTIONS = [
   { value: 'NOT_STARTED', label: '시작 전' },
   { value: 'IN_PROGRESS', label: '진행 중' },
   { value: 'COMPLETED', label: '완료' },
-  { value: 'STOPPED', label: '완료' },
+  { value: 'STOPPED', label: '중단' },
 ] as const
 
 interface GoalCategoryEditModalProps {
@@ -94,11 +95,12 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
       title="목표 카테고리 수정"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={handleClose} disabled={isPending}>
+          <Button className="w-full" variant="secondary" size="lg" onClick={handleClose} disabled={isPending}>
             취소
           </Button>
           <Button
-            size="sm"
+            size="lg"
+            className="w-full"
             onClick={handleSubmit}
             isLoading={isPending}
             disabled={!form.goalCategoryName.trim() || !form.colorId}
@@ -112,6 +114,7 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
         {/* 이름 */}
         <Input
           label="목표 이름"
+          isRequired={true}
           value={form.goalCategoryName}
           onChange={(e) => {
             setForm((prev) => ({ ...prev, goalCategoryName: e.target.value }))
@@ -124,22 +127,22 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
 
         {/* 상태 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">진행 상태</label>
+          <Label isRequired={true}>진행 상태</Label>
           <div className="flex gap-2">
             {STATUS_OPTIONS.map((opt) => (
-              <button
+              <Button
+                variant={form.goalCategoryStatus === opt.value ? 'primary' : 'outline'}
                 key={opt.value}
                 type="button"
-                onClick={() => setForm((prev) => ({ ...prev, goalCategoryStatus: opt.value }))}
-                className={[
-                  'rounded-full border px-3 py-1 text-xs transition-colors',
-                  form.goalCategoryStatus === opt.value
-                    ? 'bg-foreground text-background border-foreground'
-                    : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground',
-                ].join(' ')}
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    goalCategoryStatus: opt.value,
+                  }))
+                }
               >
                 {opt.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -147,6 +150,7 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
         {/* 시작일 */}
         <Input
           label="시작일"
+          isRequired={true}
           type="date"
           value={form.goalCategoryStartDate}
           onChange={(e) => setForm((prev) => ({ ...prev, goalCategoryStartDate: e.target.value }))}
@@ -154,7 +158,7 @@ export function GoalCategoryEditModal({ isOpen, onClose, category }: GoalCategor
 
         {/* 색상 */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-foreground text-xs font-medium">색상</label>
+          <Label isRequired={true}>색상</Label>
           <ColorPicker
             colors={colors}
             isLoading={isColorsLoading}

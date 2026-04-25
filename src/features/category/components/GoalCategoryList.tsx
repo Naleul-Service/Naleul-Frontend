@@ -27,7 +27,7 @@ import { useDeleteGoalCategory } from '@/src/features/category/hooks/useGoalCate
 import { useDeleteGeneralCategory } from '@/src/features/category/hooks/useGeneralCategoryMutations'
 import { cn } from '@/src/lib/utils'
 import { GeneralCategoryEditModal } from '@/src/features/category/components/GeneralCategoryEditModal'
-import { STATUS_LABEL } from '@/src/features/category/constants'
+import { STATUS_BADGE_STYLE, STATUS_LABEL } from '@/src/features/category/constants'
 import { Button } from '@/src/components/common/Button'
 import Badge from '@/src/components/common/Badge'
 
@@ -294,6 +294,7 @@ function GoalCategoryItem({
 }: GoalCategoryItemProps) {
   const generalIds = category.generalCategories.map((g) => g.generalCategoryId)
   const isCompleted = category.goalCategoryStatus === 'COMPLETED'
+  const isEtc = category.goalCategoryName === '기타'
 
   return (
     <div className="bg-background rounded-[12px] border border-gray-100">
@@ -306,7 +307,11 @@ function GoalCategoryItem({
           <section className="flex flex-col gap-y-[2px]">
             <p className="h4 text-gray-950">{category.goalCategoryName}</p>
             <div className="flex items-center gap-x-1">
-              <Badge bgColor={'bg-gray-100'} textColor={'text-gray-500'}>
+              <Badge
+                opacity={100}
+                bgColor={STATUS_BADGE_STYLE[category.goalCategoryStatus]?.bg}
+                textColor={STATUS_BADGE_STYLE[category.goalCategoryStatus]?.text}
+              >
                 {STATUS_LABEL[category.goalCategoryStatus]}
               </Badge>
               <p className="body-md text-gray-500">{category.goalCategoryStartDate}</p>
@@ -324,15 +329,17 @@ function GoalCategoryItem({
             세부 목표 추가
           </Button>
 
-          <GoalCategoryContextMenu
-            isOpen={isMenuOpen}
-            onToggle={onMenuToggle}
-            onClose={onMenuClose}
-            onEdit={onEdit}
-            onComplete={onComplete}
-            onDelete={onDelete}
-            isCompleted={isCompleted}
-          />
+          {!isEtc && (
+            <GoalCategoryContextMenu
+              isOpen={isMenuOpen}
+              onToggle={onMenuToggle}
+              onClose={onMenuClose}
+              onEdit={onEdit}
+              onComplete={onComplete}
+              onDelete={onDelete}
+              isCompleted={isCompleted}
+            />
+          )}
         </div>
       </section>
 
@@ -410,6 +417,7 @@ function SortableGeneralCategoryItem({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.generalCategoryId,
   })
+  const isEtc = item.generalCategoryName === 'ETC'
 
   return (
     <div
@@ -422,14 +430,16 @@ function SortableGeneralCategoryItem({
       )}
     >
       <section className="flex gap-x-[10px]">
-        <button
-          {...attributes}
-          {...listeners}
-          className="text-muted-foreground hover:text-foreground cursor-grab rounded p-0.5 transition-colors active:cursor-grabbing"
-          aria-label="드래그 핸들"
-        >
-          <GripVertical size={16} className="text-gray-300" />
-        </button>
+        {!isEtc && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="text-muted-foreground hover:text-foreground cursor-grab rounded p-0.5 transition-colors active:cursor-grabbing"
+            aria-label="드래그 핸들"
+          >
+            <GripVertical size={16} className="text-gray-300" />
+          </button>
+        )}
 
         <section className="flex items-center gap-x-[10px]">
           <div
@@ -440,13 +450,15 @@ function SortableGeneralCategoryItem({
         </section>
       </section>
 
-      <GeneralItemContextMenu
-        isMenuOpen={isMenuOpen}
-        onMenuToggle={onMenuToggle}
-        onMenuClose={onMenuClose}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
+      {!isEtc && (
+        <GeneralItemContextMenu
+          isMenuOpen={isMenuOpen}
+          onMenuToggle={onMenuToggle}
+          onMenuClose={onMenuClose}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      )}
     </div>
   )
 }

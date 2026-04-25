@@ -32,13 +32,14 @@ export function TaskItem({ task, date }: { task: Task; date: string }) {
           <div className="flex items-center gap-x-[10px]">
             {/* 완료 체크버튼 */}
             {isDone ? (
-              <CheckIcon width={20} height={20} />
+              <CheckIcon width={20} height={20} className="shrink-0" />
             ) : (
               <UncheckIcon
                 type="button"
                 onClick={() => setIsActualModalOpen(true)}
                 width={20}
                 height={20}
+                className="shrink-0"
                 aria-label={isDone ? '완료됨' : '완료 기록하기'}
               />
             )}

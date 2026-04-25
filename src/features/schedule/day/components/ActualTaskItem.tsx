@@ -104,6 +104,7 @@ export function ActualTaskItem({ actual, date }: ActualTaskItemProps) {
         <div className="ml-8 flex flex-wrap items-center gap-[6px]">
           {actual.goalCategoryName && (
             <Badge
+              opacity={10}
               textColor={actual.goalCategoryColorCode}
               bgColor={actual.goalCategoryColorCode}
               type="DOT"
@@ -114,6 +115,7 @@ export function ActualTaskItem({ actual, date }: ActualTaskItemProps) {
           )}
           {actual.generalCategoryName && (
             <Badge
+              opacity={10}
               textColor={actual.generalCategoryColorCode}
               bgColor={actual.generalCategoryColorCode}
               type="DOT"

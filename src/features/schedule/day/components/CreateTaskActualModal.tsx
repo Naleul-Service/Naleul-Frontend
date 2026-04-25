@@ -5,11 +5,11 @@ import { Modal } from '@/src/components/common/Modal'
 import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
 import { Dropdown, DropdownOption } from '@/src/components/common/Dropdown'
+import { DateTimePicker } from '@/src/components/common/DateTimePicker'
 import { useCreateTaskActual } from '../hooks/useCreateTaskActual'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import { CreateTaskActualBody } from '../types'
 import { localInputToUtc } from '@/src/lib/datetime'
-import { DateTimePicker } from '@/src/components/common/DateTimePicker'
 
 interface TaskActualModalProps {
   isOpen: boolean
@@ -58,7 +58,6 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
   const { mutate: createActual, isPending } = useCreateTaskActual(date)
   const { data: goalCategories = [], isLoading: isLoadingCategories } = useGoalCategories()
 
-  // DropdownOption 변환
   const goalOptions: DropdownOption<number>[] = goalCategories.map((g) => ({
     label: g.goalCategoryName,
     value: g.goalCategoryId,
@@ -150,7 +149,7 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
           isRequired
           options={generalOptions}
           value={form.generalCategoryId}
-          onChange={(value) => handleChange('generalCategoryId', value as number)}
+          onChange={(v) => handleChange('generalCategoryId', v)}
           placeholder={
             !form.goalCategoryId
               ? '목표를 먼저 선택해주세요'
@@ -161,19 +160,21 @@ export function CreateTaskActualModal({ isOpen, onClose, date, defaultDate }: Ta
           disabled={!form.goalCategoryId || generalCategories.length === 0}
           error={errors.generalCategoryId}
         />
+
         <DateTimePicker
           label="실제 시작"
           isRequired
           value={form.actualStartAt}
-          onChange={(value) => handleChange('actualStartAt', value)}
+          onChange={(v) => handleChange('actualStartAt', v)}
           error={errors.actualStartAt}
         />
+
         <DateTimePicker
           label="실제 종료"
           isRequired
-          value={form.actualStartAt}
-          onChange={(value) => handleChange('actualEndAt', value)}
-          error={errors.actualStartAt}
+          value={form.actualEndAt}
+          onChange={(v) => handleChange('actualEndAt', v)}
+          error={errors.actualEndAt}
         />
       </div>
     </Modal>

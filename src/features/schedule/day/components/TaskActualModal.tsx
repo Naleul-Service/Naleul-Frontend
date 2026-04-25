@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { Task } from '../types'
 import { useUpdateActualTask } from '../hooks/useUpdateActualTask'
 import { Modal } from '@/src/components/common/Modal'
-import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
+import { DateTimePicker } from '@/src/components/common/DateTimePicker'
 import { localInputToUtc, utcIsoToKstTimeLabel, utcToLocalInput } from '@/src/lib/datetime'
 
 interface TaskActualModalProps {
@@ -34,7 +34,7 @@ export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
 
   const { mutate, isPending, error } = useUpdateActualTask(date)
 
-  const handleSubmit = () => {
+  function handleSubmit() {
     mutate(
       {
         taskId: task.taskId,
@@ -56,16 +56,16 @@ export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
       size="sm"
       footer={
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={onClose}>
+          <Button className="w-full" variant="secondary" size="lg" onClick={onClose}>
             취소
           </Button>
-          <Button variant="primary" className="flex-1" onClick={handleSubmit} isLoading={isPending}>
+          <Button className="w-full" size="lg" onClick={handleSubmit} isLoading={isPending}>
             저장
           </Button>
         </div>
       }
     >
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {/* 계획 시간 */}
         <div className="flex flex-col gap-y-[6px] rounded-[10px] bg-gray-50 px-4 py-3">
           <p className="body-md-medium text-gray-300">계획</p>
@@ -77,19 +77,8 @@ export function TaskActualModal({ task, date, onClose }: TaskActualModalProps) {
           </div>
         </div>
 
-        {/* 실제 시간 입력 */}
-        <Input
-          label="실제 시작"
-          type="datetime-local"
-          value={actualStartAt}
-          onChange={(e) => setActualStartAt(e.target.value)}
-        />
-        <Input
-          label="실제 종료"
-          type="datetime-local"
-          value={actualEndAt}
-          onChange={(e) => setActualEndAt(e.target.value)}
-        />
+        <DateTimePicker label="실제 시작" value={actualStartAt} onChange={setActualStartAt} />
+        <DateTimePicker label="실제 종료" value={actualEndAt} onChange={setActualEndAt} />
 
         {error && <p className="text-xs text-red-500">{error.message}</p>}
       </div>

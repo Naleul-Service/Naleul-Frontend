@@ -1,4 +1,4 @@
-import { Task } from '@/src/features/schedule/day/types'
+import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
 import { TaskPriority } from '@/src/features/task/types'
 
 export interface WeeklyTasksParams {
@@ -12,4 +12,15 @@ export interface WeeklyTasksParams {
 
 export interface WeeklyTasksResponse {
   tasksByDay: Record<string, Task[]>
+}
+
+export interface WeeklyActualsResponse {
+  actualsByDay: Record<string, TaskActualItem[]>
+}
+
+export interface WeeklyActualsParams {
+  startDate: string
+  endDate: string
+  goalCategoryId?: number
+  generalCategoryId?: number
 }

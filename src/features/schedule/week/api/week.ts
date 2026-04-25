@@ -1,6 +1,6 @@
 import { apiCallServer } from '@/src/lib/api.server'
 import { ApiCallResult } from '@/src/types/common'
-import { WeeklyTasksParams, WeeklyTasksResponse } from '../types'
+import { WeeklyActualsParams, WeeklyActualsResponse, WeeklyTasksParams, WeeklyTasksResponse } from '../types'
 
 export async function getWeeklyTasks(params: WeeklyTasksParams): Promise<ApiCallResult<WeeklyTasksResponse>> {
   const searchParams = new URLSearchParams({
@@ -14,4 +14,16 @@ export async function getWeeklyTasks(params: WeeklyTasksParams): Promise<ApiCall
   if (params.dayOfWeek) searchParams.set('dayOfWeek', params.dayOfWeek)
 
   return apiCallServer(`/v1/tasks/weekly?${searchParams}`)
+}
+
+export async function getWeeklyActuals(params: WeeklyActualsParams): Promise<ApiCallResult<WeeklyActualsResponse>> {
+  const searchParams = new URLSearchParams({
+    startDate: params.startDate,
+    endDate: params.endDate,
+  })
+
+  if (params.goalCategoryId != null) searchParams.set('goalCategoryId', String(params.goalCategoryId))
+  if (params.generalCategoryId != null) searchParams.set('generalCategoryId', String(params.generalCategoryId))
+
+  return apiCallServer(`/v1/task-actuals/weekly?${searchParams}`)
 }

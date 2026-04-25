@@ -40,7 +40,7 @@ export function DailyTimeTable({ params }: DailyTimeTableProps) {
       <div className="flex h-[24px] bg-gray-50 py-1">
         <div className="label-sm flex w-full items-center justify-center text-gray-500">계획</div>
         <div className="label-sm flex w-[44px] items-center justify-center text-gray-500">시간</div>
-        <div className="label-sm flex w-full items-center justify-center text-gray-500">실제</div>
+        <div className="label-sm flex w-full items-center justify-center text-gray-500">완료</div>
       </div>
 
       {HOUR_LABELS.map((hour) => (

@@ -5,6 +5,7 @@ import { Sidebar } from '@/src/components/layout/sidebar/SideBar'
 import { cookies } from 'next/headers'
 import { UserStoreInitializer } from '@/src/components/providers/UserStoreInitializer'
 import { QueryProvider } from '@/src/components/providers/QueryProvider'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,6 +32,7 @@ export default async function RootLayout({
   const userName = cookieStore.get('userName')?.value
   const userEmail = cookieStore.get('userEmail')?.value
   const userRole = cookieStore.get('userRole')?.value as 'FREE' | 'PRO' | 'ADMIN' | undefined
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body>
@@ -44,6 +46,7 @@ export default async function RootLayout({
           </div>
         </QueryProvider>
       </body>
+      <GoogleAnalytics gaId="G-C8XZ1EJLH9" />
     </html>
   )
 }

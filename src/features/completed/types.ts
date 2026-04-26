@@ -1,3 +1,5 @@
+import { GeneralCategoryType } from '@/src/features/category/types'
+
 export interface CompletedGoalCategory {
   goalCategoryId: number
   goalCategoryName: string
@@ -5,14 +7,20 @@ export interface CompletedGoalCategory {
   totalActualMinutes: number
   durationDays: number
   taskCount: number
+  colorCode: string
+  startDate: string
+  endDate: string
+  generalCategories: GeneralCategoryType[]
 }
 
 export interface CompletedGoalCategoryPage {
+  totalCompletedCount: number
+  totalActualMinutes: number
+  averageDurationDays: number
   content: CompletedGoalCategory[]
+  pageNumber: number
+  pageSize: number
   totalElements: number
   totalPages: number
-  number: number
-  first: boolean
   last: boolean
-  size: number
 }

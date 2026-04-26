@@ -72,15 +72,18 @@ export function CompletedGoalCategoryList() {
   }
 
   return (
-    <div className="flex flex-col gap-3 p-4">
-      {items.map((item) => (
-        <CompletedGoalCategoryCard key={item.goalCategoryId} item={item} />
-      ))}
+    <div className="flex flex-col gap-y-2">
+      <h1 className="h3">완료 목표</h1>
+      <div className="flex flex-col gap-y-2">
+        {items.map((item) => (
+          <CompletedGoalCategoryCard key={item.goalCategoryId} item={item} />
+        ))}
 
-      {/* 무한 스크롤 트리거 */}
-      <div ref={bottomRef} />
+        {/* 무한 스크롤 트리거 */}
+        <div ref={bottomRef} />
 
-      {isFetchingNextPage && <CardSkeleton />}
+        {isFetchingNextPage && <CardSkeleton />}
+      </div>
     </div>
   )
 }

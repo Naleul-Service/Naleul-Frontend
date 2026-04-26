@@ -15,6 +15,6 @@ export function useCompletedGoalCategories() {
     queryKey: ['goal-categories', 'completed'],
     queryFn: ({ pageParam = 0 }) => fetchCompleted(pageParam as number),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.pageNumber + 1),
   })
 }

@@ -32,16 +32,16 @@ export function TaskBlock<T extends BlockItem>({ positioned }: TaskBlockProps<T>
       title={task.taskName}
       style={{
         position: 'absolute',
-        top: 2,
-        bottom: 2,
+        top: 0,
+        bottom: 0,
         left: `${leftPercent}%`,
         width: `${widthPercent}%`,
         backgroundColor: isDone ? `${generalColor}33` : 'transparent',
         borderTop: `1px solid ${generalColor}`,
         borderBottom: `1px solid ${generalColor}`,
         borderRight: `1px solid ${generalColor}`,
-        borderLeft: `4px solid ${goalColor}`, // ✅ border 단축속성 제거하고 개별 선언만 유지
-        borderRadius: 6,
+        borderLeft: `4px solid ${goalColor}`,
+        borderRadius: '4px 6px 6px 4px',
         overflow: 'hidden',
         cursor: 'pointer',
         display: 'flex',

@@ -21,9 +21,9 @@ interface Props {
 
 export function RetrospectiveFilter({ selectedType, onTypeChange, baseDate, onDateChange }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <nav className="label-md flex w-fit gap-1 rounded-[8px] bg-gray-50 px-[6px] py-[5px] text-gray-300">
       {/* 타입 탭 */}
-      <div className="flex overflow-hidden rounded-lg border border-gray-200">
+      <div className="flex overflow-hidden">
         {(['ALL', 'DAILY', 'WEEKLY', 'MONTHLY'] as const).map((type) => {
           const value = type === 'ALL' ? undefined : type
           const isActive = selectedType === value
@@ -31,23 +31,16 @@ export function RetrospectiveFilter({ selectedType, onTypeChange, baseDate, onDa
             <button
               key={type}
               onClick={() => onTypeChange(value)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                isActive ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
-              }`}
+              className={[
+                'flex-1 rounded-md px-4 py-1.5 text-center transition-colors',
+                isActive ? 'bg-white text-gray-950 shadow-sm' : 'bg-gray-50 hover:text-gray-300',
+              ].join(' ')}
             >
               {REVIEW_TYPE_LABELS[type]}
             </button>
           )
         })}
       </div>
-
-      {/* 날짜 */}
-      <input
-        type="date"
-        value={baseDate}
-        onChange={(e) => onDateChange(e.target.value)}
-        className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
-      />
-    </div>
+    </nav>
   )
 }

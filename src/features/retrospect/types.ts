@@ -11,8 +11,10 @@ export interface RetrospectiveResponse {
   content: string
   goalCategoryId: number | null
   goalCategoryName: string | null
+  goalCategoryColorCode: string | null
   generalCategoryId: number | null
   generalCategoryName: string | null
+  generalCategoryColorCode: string | null
 }
 
 export interface RetrospectiveCreateRequest {

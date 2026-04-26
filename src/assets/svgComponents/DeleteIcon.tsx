@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgDeleteIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 24 24" {...props}><g stroke="#475660" strokeLinecap="round" strokeLinejoin="round" clipPath="url(#delete-icon_svg__a)"><path d="M6 8h12M16.667 8v9.333c0 .667-.667 1.334-1.334 1.334H8.667c-.667 0-1.334-.667-1.334-1.334V8M9.333 8V6.666c0-.666.667-1.333 1.334-1.333h2.666c.667 0 1.334.667 1.334 1.333V8M10.667 11.333v4M13.333 11.333v4" /></g><defs><clipPath id="delete-icon_svg__a"><path fill="#fff" d="M4 4h16v16H4z" /></clipPath></defs></svg>;
+export default SvgDeleteIcon;

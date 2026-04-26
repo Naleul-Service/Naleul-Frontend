@@ -10,6 +10,9 @@ import type {
   RetrospectiveUpdateRequest,
   ReviewType,
 } from '../types'
+import { Dropdown } from '@/src/components/common/Dropdown'
+import { DatePicker } from '@/src/components/common/picker/DatePicker'
+import { Button } from '@/src/components/common/Button'
 
 const REVIEW_TYPES: { value: ReviewType; label: string }[] = [
   { value: 'DAILY', label: '일간' },
@@ -79,18 +82,15 @@ export function RetrospectiveForm(props: Props) {
           <label className="mb-2 block text-sm font-medium text-gray-700">회고 유형</label>
           <div className="flex gap-2">
             {REVIEW_TYPES.map(({ value, label }) => (
-              <button
+              <Button
                 key={value}
                 type="button"
+                className="w-full"
                 onClick={() => handleReviewTypeChange(value)}
-                className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${
-                  reviewType === value
-                    ? 'border-gray-900 bg-gray-900 text-white'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400'
-                }`}
+                variant={reviewType === value ? 'primary' : 'outline'}
               >
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -98,85 +98,47 @@ export function RetrospectiveForm(props: Props) {
 
       {/* 날짜 — 타입별로 다른 input */}
       {!isEdit && (
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">날짜</label>
-
-          {/* 일간: date picker */}
-          {reviewType === 'DAILY' && (
-            <input
-              type="date"
-              value={reviewDate}
-              onChange={(e) => setReviewDate(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
-            />
-          )}
-
-          {/* 주간: 월-일 범위 표시 + week picker */}
-          {reviewType === 'WEEKLY' && (
-            <div className="flex flex-col gap-1.5">
-              <input
-                type="week"
-                value={dateToWeekValue(reviewDate)}
-                onChange={(e) => setReviewDate(weekValueToMonday(e.target.value))}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
-              />
-              <p className="text-xs text-gray-400">{getWeekRangeLabel(reviewDate)}</p>
-            </div>
-          )}
-
-          {/* 월간: month picker */}
-          {reviewType === 'MONTHLY' && (
-            <div className="flex flex-col gap-1.5">
-              <input
-                type="month"
-                value={reviewDate.slice(0, 7)} // "yyyy-MM"
-                onChange={(e) => setReviewDate(`${e.target.value}-01`)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
-              />
-              <p className="text-xs text-gray-400">{getMonthLabel(reviewDate)}</p>
-            </div>
-          )}
-        </div>
+        <>
+          {/* 날짜 */}
+          <DatePicker
+            label="날짜"
+            variant={reviewType === 'DAILY' ? 'day' : reviewType === 'WEEKLY' ? 'week' : 'month'}
+            value={reviewDate}
+            onChange={(date) => {
+              if (reviewType === 'WEEKLY') setReviewDate(getMonday(new Date(date)))
+              else if (reviewType === 'MONTHLY') setReviewDate(`${date.slice(0, 7)}-01`)
+              else setReviewDate(date)
+            }}
+          />
+        </>
       )}
 
       {/* 목표 카테고리 */}
-      <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
-          목표 카테고리 <span className="text-gray-400">(선택)</span>
-        </label>
-        <select
-          value={goalCategoryId ?? ''}
-          onChange={(e) => handleGoalCategoryChange(e.target.value ? Number(e.target.value) : null)}
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
-        >
-          <option value="">선택 안 함</option>
-          {props.goalCategories.map((g) => (
-            <option key={g.goalCategoryId} value={g.goalCategoryId}>
-              {g.goalCategoryName}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Dropdown
+        label="목표 카테고리"
+        placeholder="선택 안 함"
+        value={goalCategoryId}
+        onChange={(v) => handleGoalCategoryChange(Number(v))}
+        options={[
+          ...props.goalCategories.map((g) => ({
+            label: g.goalCategoryName,
+            value: g.goalCategoryId,
+          })),
+        ]}
+      />
 
       {/* 일반 카테고리 */}
-      <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
-          일반 카테고리 <span className="text-gray-400">(선택)</span>
-        </label>
-        <select
-          value={generalCategoryId ?? ''}
-          onChange={(e) => setGeneralCategoryId(e.target.value ? Number(e.target.value) : null)}
-          disabled={!goalCategoryId || generalCategories.length === 0}
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <option value="">{!goalCategoryId ? '목표 카테고리를 먼저 선택하세요' : '선택 안 함'}</option>
-          {generalCategories.map((g) => (
-            <option key={g.generalCategoryId} value={g.generalCategoryId}>
-              {g.generalCategoryName}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Dropdown
+        label="일반 카테고리"
+        placeholder={!goalCategoryId ? '목표 카테고리를 먼저 선택하세요' : '선택 안 함'}
+        value={generalCategoryId}
+        onChange={(v) => setGeneralCategoryId(Number(v))}
+        disabled={!goalCategoryId || generalCategories.length === 0}
+        options={generalCategories.map((g) => ({
+          label: g.generalCategoryName,
+          value: g.generalCategoryId,
+        }))}
+      />
 
       {/* 내용 */}
       <div>

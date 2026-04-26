@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgEditIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 24 24" {...props}><path stroke="#475660" strokeLinecap="round" strokeLinejoin="round" d="M12 6H7.333A1.333 1.333 0 0 0 6 7.333v9.334A1.333 1.333 0 0 0 7.333 18h9.334A1.334 1.334 0 0 0 18 16.667V12" /><path stroke="#475660" strokeLinecap="round" strokeLinejoin="round" d="M16.25 5.75a1.414 1.414 0 1 1 2 2l-6.009 6.01a1.34 1.34 0 0 1-.568.336l-1.916.56a.334.334 0 0 1-.413-.413l.56-1.915c.063-.215.179-.41.337-.569z" /></svg>;
+export default SvgEditIcon;

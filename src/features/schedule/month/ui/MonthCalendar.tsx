@@ -1,30 +1,18 @@
 'use client'
 
-import { useState } from 'react'
 import { useMonthlyTasks } from '../hooks/useMonthlyTasks'
 import { CalendarGrid } from './CalendarGrid'
+import { useSearchParams } from 'next/navigation'
 
 export function MonthCalendar() {
-  const today = new Date()
-  const [year, setYear] = useState(today.getFullYear())
-  const [month, setMonth] = useState(today.getMonth() + 1)
+  const searchParams = useSearchParams()
+  const dateParam = searchParams.get('date') ?? new Date().toISOString().split('T')[0]
+  const d = new Date(dateParam)
+  const year = d.getFullYear()
+  const month = d.getMonth() + 1
 
   const { data, isLoading } = useMonthlyTasks({ year, month })
-  const tasksByDate = data ?? {} // .tasksByDate 제거
-
-  const handlePrev = () => {
-    if (month === 1) {
-      setYear((y) => y - 1)
-      setMonth(12)
-    } else setMonth((m) => m - 1)
-  }
-
-  const handleNext = () => {
-    if (month === 12) {
-      setYear((y) => y + 1)
-      setMonth(1)
-    } else setMonth((m) => m + 1)
-  }
+  const tasksByDate = data ?? {}
 
   return (
     <div className="w-full space-y-4">

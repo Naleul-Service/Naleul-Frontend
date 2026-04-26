@@ -100,9 +100,12 @@ export function RetrospectiveCard({ retrospective, onEdit, onDelete }: Props) {
         size="md"
         footer={
           <div className="flex gap-2">
+            <Button className="w-full" variant="secondary" size="lg" onClick={() => setIsDetailOpen(false)}>
+              닫기
+            </Button>
             <Button
               className="w-full"
-              variant="secondary"
+              variant="primary"
               size="lg"
               onClick={() => {
                 setIsDetailOpen(false)
@@ -110,9 +113,6 @@ export function RetrospectiveCard({ retrospective, onEdit, onDelete }: Props) {
               }}
             >
               수정
-            </Button>
-            <Button className="w-full" variant="primary" size="lg" onClick={() => setIsDetailOpen(false)}>
-              닫기
             </Button>
           </div>
         }

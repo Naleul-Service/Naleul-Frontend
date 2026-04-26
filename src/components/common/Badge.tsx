@@ -2,8 +2,8 @@ import { cn } from '@/src/lib/utils'
 
 interface BadgeProps {
   children: React.ReactNode
-  bgColor: string | null // #ffffff 형식
-  textColor: string | null // #ffffff 형식
+  bgColor?: string | null // #ffffff 형식
+  textColor?: string | null // #ffffff 형식
   type?: 'DOT' | 'DEFAULT'
   botColor?: string | null // #ffffff 형식
   opacity?: number // 0 ~ 100 사이의 숫자 (기본값 10으로 설정)

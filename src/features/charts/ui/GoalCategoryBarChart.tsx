@@ -16,9 +16,9 @@ export function GoalCategoryBarChart({ slices, totalMinutes }: Props) {
   return (
     <div className="flex flex-col gap-5">
       {/* 총 시간 */}
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-2xl font-bold text-gray-800">{formatMinutes(totalMinutes)}</span>
-        <span className="label-md text-sm text-gray-400">총 소요 시간</span>
+      <div className="flex items-baseline gap-2">
+        <span className="h1">{formatMinutes(totalMinutes)}</span>
+        <span className="label-md text-[#8FA0A8]">총 소요 시간</span>
       </div>
 
       <div className="flex gap-8">
@@ -36,9 +36,9 @@ export function GoalCategoryBarChart({ slices, totalMinutes }: Props) {
         </ul>
 
         {/* 막대 차트 */}
-        <div className="flex-1">
+        <div className="flex flex-1 flex-col">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" barSize={20} margin={{ right: 52, top: 4, bottom: 4 }}>
+            <BarChart data={data} layout="vertical" barSize={24} margin={{ right: 52, top: 4, bottom: 4 }}>
               <XAxis type="number" hide domain={[0, 'dataMax']} />
               <YAxis type="category" dataKey="name" width={0} hide />
               <Tooltip

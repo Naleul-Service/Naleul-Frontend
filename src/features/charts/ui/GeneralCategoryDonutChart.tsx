@@ -14,9 +14,9 @@ export function GeneralCategoryDonutChart({ slices, totalMinutes }: Props) {
   const data = toPieChartData(slices)
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col items-center gap-8">
       {/* 도넛 차트 */}
-      <div className="relative h-[168px] w-[168px] shrink-0">
+      <div className="relative h-[196px] w-[196px] shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -55,13 +55,18 @@ export function GeneralCategoryDonutChart({ slices, totalMinutes }: Props) {
       </div>
 
       {/* 범례 */}
-      <ul className="flex flex-1 flex-col gap-3">
+      <ul className="flex w-full flex-1 flex-col gap-[8px]">
         {slices.map((s) => (
-          <li key={s.id} className="flex items-center gap-2.5">
-            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.colorHex || FALLBACK_COLOR }} />
-            <span className="body-md-medium truncate">{s.name}</span>
-            <span className="text-xs text-gray-300">{formatMinutes(s.totalMinutes)}</span>
-            <span className="w-10 text-right text-sm font-semibold text-gray-800">{s.percentage}%</span>
+          <li key={s.id} className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: s.colorHex || FALLBACK_COLOR }}
+              />
+              <span className="body-md-medium truncate">{s.name}</span>
+              <span className="text-xs text-gray-300">{formatMinutes(s.totalMinutes)}</span>
+            </div>
+            <span className="text-primary-500 label-lg w-10 text-right">{s.percentage}%</span>
           </li>
         ))}
       </ul>

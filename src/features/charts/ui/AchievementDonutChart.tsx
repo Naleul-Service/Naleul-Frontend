@@ -20,9 +20,9 @@ export function AchievementDonutChart({ data }: Props) {
   const safeData = data.totalCount === 0 ? [{ name: '없음', value: 1, fill: UNACHIEVED_COLOR }] : chartData
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center">
       {/* 도넛 */}
-      <section className="relative h-[180px] w-[180px] shrink-0">
+      <section className="relative h-[196px] w-[196px] shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -78,10 +78,6 @@ export function AchievementDonutChart({ data }: Props) {
               style={{ width: `${100 - data.achievementRate}%` }}
             />
           </div>
-        </div>
-
-        <div className="mt-1 border-t border-gray-100 pt-3">
-          <span className="text-xs text-gray-400">전체 {data.totalCount}개 Task 기준</span>
         </div>
       </section>
     </div>

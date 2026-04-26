@@ -9,7 +9,7 @@ interface Props {
   data: GoalCategoryChart[]
 }
 
-export const BAR_SIZE = 18
+export const BAR_SIZE = 20
 export const BAR_GAP = 6
 export const CHART_Y_PADDING = 14
 

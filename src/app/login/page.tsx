@@ -5,6 +5,9 @@ import Image from 'next/image'
 
 const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}&response_type=code`
 
+const BRAND_COLOR = '#1E7A90'
+
+// ─── Hooks ───────────────────────────────────────────────────
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(false)
@@ -23,6 +26,7 @@ function useInView(threshold = 0.1) {
   return { ref, inView }
 }
 
+// ─── 공통 컴포넌트 ────────────────────────────────────────────
 function KakaoIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
@@ -36,91 +40,161 @@ function KakaoIcon({ size = 18 }: { size?: number }) {
   )
 }
 
-// ─── 섹션 래퍼 ───────────────────────────────────────────────
-function Section({
+function KakaoButton({ className = '' }: { className?: string }) {
+  return (
+    <a
+      href={KAKAO_AUTH_URL}
+      className={`flex items-center justify-center gap-2.5 rounded-2xl bg-[#FEE500] px-8 py-4 text-base font-semibold text-[#3C1E1E] shadow-md transition-all hover:opacity-90 hover:shadow-lg active:scale-95 ${className}`}
+    >
+      <KakaoIcon size={20} />
+      카카오로 무료 시작하기
+    </a>
+  )
+}
+
+// ─── 섹션 헤더 ───────────────────────────────────────────────
+function SectionHeader({
   number,
   tag,
   title,
   description,
   accent,
-  children,
-  reverse = false,
+  inView,
 }: {
   number: string
   tag: string
   title: string
   description: string
   accent: string
-  children: React.ReactNode
-  reverse?: boolean
+  inView: boolean
+}) {
+  return (
+    <div
+      className="flex flex-col gap-3"
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(24px)',
+        transition: 'opacity 0.7s ease, transform 0.7s ease',
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-sm font-bold" style={{ color: accent }}>
+          {number}
+        </span>
+        <span
+          className="rounded-full px-3 py-1 text-xs font-semibold"
+          style={{ backgroundColor: `${accent}15`, color: accent }}
+        >
+          {tag}
+        </span>
+      </div>
+      <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">{title}</h2>
+      <p className="max-w-xl text-sm leading-relaxed text-gray-500 sm:text-base">{description}</p>
+      <div className="h-1 w-12 rounded-full" style={{ backgroundColor: accent }} />
+    </div>
+  )
+}
+
+// ─── 이미지 카드 아이템 ──────────────────────────────────────
+// GridSection 내부 map에서 훅을 쓸 수 없으므로 별도 컴포넌트로 분리
+// Rules of Hooks: 훅은 반드시 컴포넌트 최상위에서 호출해야 함
+function GridItem({
+  src,
+  label,
+  desc,
+  accent,
+  index,
+}: {
+  src: string
+  label: string
+  desc: string
+  accent: string
+  index: number
 }) {
   const { ref, inView } = useInView()
 
   return (
-    <section ref={ref} className="px-6 py-20">
+    <div
+      ref={ref}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(24px)',
+        transition: `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`,
+      }}
+      className="flex flex-col gap-3"
+    >
       <div
-        className={`mx-auto flex max-w-6xl flex-col gap-12 ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center`}
+        className="overflow-hidden rounded-2xl border border-gray-100 shadow-md"
+        style={{ boxShadow: `0 8px 32px ${accent}18` }}
       >
-        {/* 텍스트 */}
-        <div
-          className="flex flex-1 flex-col gap-5"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? 'translateX(0)' : reverse ? 'translateX(24px)' : 'translateX(-24px)',
-            transition: 'opacity 0.7s ease, transform 0.7s ease',
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-sm font-bold" style={{ color: accent }}>
-              {number}
-            </span>
-            <span
-              className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ backgroundColor: `${accent}15`, color: accent }}
-            >
-              {tag}
-            </span>
-          </div>
-          <h2 className="text-3xl leading-tight font-bold text-gray-900">{title}</h2>
-          <p className="text-base leading-relaxed text-gray-500">{description}</p>
-          <div className="h-1 w-12 rounded-full" style={{ backgroundColor: accent }} />
+        <Image src={src} alt={label} width={800} height={400} className="h-auto w-full object-cover" unoptimized />
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-gray-800">{label}</p>
+        <p className="text-xs text-gray-400">{desc}</p>
+      </div>
+    </div>
+  )
+}
+
+// ─── 그리드 섹션 ─────────────────────────────────────────────
+function GridSection({
+  number,
+  tag,
+  title,
+  description,
+  accent,
+  bgColor = 'bg-white',
+  items,
+  cols = 2,
+}: {
+  number: string
+  tag: string
+  title: string
+  description: string
+  accent: string
+  bgColor?: string
+  items: { src: string; label: string; desc: string }[]
+  cols?: 2 | 3
+}) {
+  const { ref, inView } = useInView()
+
+  return (
+    <section className={`${bgColor} px-4 py-12 sm:px-6 sm:py-16 lg:py-20`}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:gap-12">
+        <div ref={ref}>
+          <SectionHeader
+            number={number}
+            tag={tag}
+            title={title}
+            description={description}
+            accent={accent}
+            inView={inView}
+          />
         </div>
 
-        {/* 이미지 영역 */}
         <div
-          className="w-full flex-1"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(24px)',
-            transition: 'opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s',
-          }}
+          className={`grid grid-cols-1 gap-4 sm:gap-6 ${
+            cols === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'
+          }`}
         >
-          {children}
+          {items.map(({ src, label, desc }, i) => (
+            <GridItem key={label} src={src} label={label} desc={desc} accent={accent} index={i} />
+          ))}
         </div>
       </div>
     </section>
   )
 }
 
-// ─── 이미지 카드 ─────────────────────────────────────────────
-function ImgCard({ src, alt, accent }: { src: string; alt: string; accent: string }) {
-  return (
-    <div
-      className="overflow-hidden rounded-2xl border border-gray-100 shadow-lg"
-      style={{ boxShadow: `0 8px 32px ${accent}18` }}
-    >
-      <Image src={src} alt={alt} width={900} height={600} className="h-auto w-full object-cover" unoptimized />
-    </div>
-  )
-}
-
+// ─── 메인 페이지 ─────────────────────────────────────────────
 export default function LoginPage() {
   const { ref: heroRef, inView: heroInView } = useInView(0.05)
 
   return (
     <div className="min-h-screen bg-white">
       {/* ── 히어로 ── */}
-      <section className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 px-6 pt-20 text-center">
+      <section className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4 pt-16 text-center sm:px-6 sm:pt-20">
         <div
           ref={heroRef}
           style={{
@@ -128,30 +202,30 @@ export default function LoginPage() {
             transform: heroInView ? 'translateY(0)' : 'translateY(24px)',
             transition: 'opacity 0.7s ease, transform 0.7s ease',
           }}
-          className="flex flex-col items-center gap-7"
+          className="flex w-full max-w-2xl flex-col items-center gap-5 sm:gap-7"
         >
-          <span className="bg-primary-100 text-primary-600 h2 rounded-full px-4 py-1 text-[#0D4556]">
+          <span className="rounded-full bg-[#E0F2F7] px-4 py-1 text-sm font-medium text-[#0D4556]">
             목표 · 시간 · 성장
           </span>
-          <h1 className="max-w-2xl text-5xl leading-tight font-bold tracking-tight text-gray-900 md:text-6xl">
+
+          {/* 모바일: text-4xl / sm: text-5xl / md: text-6xl */}
+          <h1 className="text-4xl leading-tight font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
             내 하루를 <span className="text-[#1E7A90]">기록</span>하고
             <br />
             매일 <span className="text-[#1E7A90]">성장</span>해요
           </h1>
-          <p className="max-w-md text-base leading-relaxed text-gray-500">
+
+          <p className="max-w-sm text-sm leading-relaxed text-gray-500 sm:max-w-md sm:text-base">
             목표를 세우고, 시간을 계획하고, 실제로 어떻게 썼는지 확인해요.
-            <br />
+            <br className="hidden sm:block" />
             회고로 더 나은 내일을 만들어요.
           </p>
-          <a
-            href={KAKAO_AUTH_URL}
-            className="flex items-center gap-2.5 rounded-2xl bg-[#FEE500] px-8 py-4 text-base font-semibold text-[#3C1E1E] shadow-md transition-all hover:opacity-90 hover:shadow-lg"
-          >
-            <KakaoIcon size={20} />
-            카카오로 무료 시작하기
-          </a>
-          <div className="mt-4 flex flex-col items-center gap-1 text-gray-300">
-            <span className="label-sm text-gray-500">스크롤해서 더 보기</span>
+
+          {/* 모바일에서 w-full로 터치 영역 확보 */}
+          <KakaoButton className="desktop:w-[300px] tablet:w-[300px] w-[250px] sm:w-auto" />
+
+          <div className="mt-2 flex flex-col items-center gap-1 sm:mt-4">
+            <span className="text-xs text-gray-400 sm:text-sm">스크롤해서 더 보기</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="animate-bounce">
               <path
                 d="M4 6l4 4 4-4"
@@ -241,115 +315,17 @@ export default function LoginPage() {
       />
 
       {/* ── 하단 CTA ── */}
-      <section className="border-t border-gray-100 px-6 py-24 text-center">
-        <div className="mx-auto flex max-w-md flex-col items-center gap-6">
-          <h2 className="text-3xl font-bold text-gray-900">지금 바로 시작해요</h2>
-          <p className="text-gray-400">목표를 세우고 하루를 기록하는 첫 걸음</p>
-          <a
-            href={KAKAO_AUTH_URL}
-            className="flex items-center gap-2.5 rounded-2xl bg-[#FEE500] px-8 py-4 text-base font-semibold text-[#3C1E1E] shadow-md transition-all hover:opacity-90 hover:shadow-lg"
-          >
-            <KakaoIcon size={20} />
-            카카오로 무료 시작하기
-          </a>
+      <section className="border-t border-gray-100 px-4 py-16 text-center sm:px-6 sm:py-24">
+        <div className="mx-auto flex max-w-md flex-col items-center gap-5 sm:gap-6">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">지금 바로 시작해요</h2>
+          <p className="text-sm text-gray-400 sm:text-base">목표를 세우고 하루를 기록하는 첫 걸음</p>
+          <KakaoButton className="w-full sm:w-auto" />
         </div>
       </section>
 
-      <footer className="border-t border-gray-100 bg-white px-8 py-6 text-center">
+      <footer className="border-t border-gray-100 bg-white px-4 py-5 text-center sm:px-8 sm:py-6">
         <p className="text-xs text-gray-300">© 2026 나를(Naleul). All rights reserved.</p>
       </footer>
     </div>
-  )
-}
-
-// ─── 그리드 섹션 ─────────────────────────────────────────────
-function GridSection({
-  number,
-  tag,
-  title,
-  description,
-  accent,
-  bgColor = 'bg-white',
-  items,
-  cols = 2,
-}: {
-  number: string
-  tag: string
-  title: string
-  description: string
-  accent: string
-  bgColor?: string
-  items: { src: string; label: string; desc: string }[]
-  cols?: 2 | 3
-}) {
-  const { ref, inView } = useInView()
-
-  return (
-    <section className={`${bgColor} px-6 py-20`}>
-      <div className="mx-auto flex max-w-6xl flex-col gap-12">
-        {/* 헤더 */}
-        <div
-          ref={ref}
-          className="flex flex-col gap-3"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(24px)',
-            transition: 'opacity 0.7s ease, transform 0.7s ease',
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-sm font-bold" style={{ color: accent }}>
-              {number}
-            </span>
-            <span
-              className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ backgroundColor: `${accent}15`, color: accent }}
-            >
-              {tag}
-            </span>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
-          <p className="max-w-xl text-base leading-relaxed text-gray-500">{description}</p>
-          <div className="h-1 w-12 rounded-full" style={{ backgroundColor: accent }} />
-        </div>
-
-        {/* 그리드 */}
-        <div className={`grid grid-cols-1 gap-6 ${cols === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
-          {items.map(({ src, label, desc }, i) => {
-            const { ref, inView } = useInView()
-            return (
-              <div
-                key={label}
-                ref={ref}
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transform: inView ? 'translateY(0)' : 'translateY(24px)',
-                  transition: `opacity 0.6s ease ${i * 0.15}s, transform 0.6s ease ${i * 0.15}s`,
-                }}
-                className="flex flex-col gap-3"
-              >
-                <div
-                  className="overflow-hidden rounded-2xl border border-gray-100 shadow-md"
-                  style={{ boxShadow: `0 8px 32px ${accent}18` }}
-                >
-                  <Image
-                    src={src}
-                    alt={label}
-                    width={800}
-                    height={400}
-                    className="h-auto w-full object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">{label}</p>
-                  <p className="text-xs text-gray-400">{desc}</p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
   )
 }

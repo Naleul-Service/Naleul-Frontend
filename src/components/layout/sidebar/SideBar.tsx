@@ -13,7 +13,8 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'sticky top-0 z-40 flex h-screen flex-col border-r border-gray-100',
+        'sticky top-0 z-40 h-screen flex-col border-r border-gray-100',
+        'tablet:flex hidden', // ✅ tablet(768px) 미만 hidden, 이상 flex
         'transition-all duration-200 ease-in-out',
         isCollapsed ? 'w-[60px]' : 'w-[200px]'
       )}

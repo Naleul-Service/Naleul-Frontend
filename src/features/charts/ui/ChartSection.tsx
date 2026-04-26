@@ -58,8 +58,10 @@ export function ChartSection() {
   const generalCategory = useGeneralCategoryChart()
   const achievement = useAchievementChart()
 
+  const isAnyLoading =
+    goalCategory.isPending || goalDetail.isPending || generalCategory.isPending || achievement.isPending
+
   return (
-    // 부모 컨테이너: gap-5로 사이 간격을 유지합니다.
     <div className="flex flex-col gap-y-[20px] p-5">
       <PageHeader
         title={'홈'}
@@ -72,9 +74,14 @@ export function ChartSection() {
           </div>
         }
       />
+
       <div className="flex flex-col gap-y-[20px]">
+        {/* 통계 요약 */}
         <section className="flex gap-x-4">
-          <GoalStatsItem title="총 소요 시간" content={`${formatMinutes(goalCategory.data?.totalMinutes)}`} />
+          <GoalStatsItem
+            title="총 소요 시간"
+            content={goalCategory.isPending ? '-' : formatMinutes(goalCategory.data?.totalMinutes ?? 0)}
+          />
           <GoalStatsItem
             title="계획 달성률"
             badge={
@@ -82,51 +89,53 @@ export function ChartSection() {
                 50% 일치 수준
               </Badge>
             }
-            content={`${achievement.data?.achievementRate}%`}
-            indicator={`${achievement.data?.achievedCount} / ${achievement.data?.totalCount} Task`}
+            content={achievement.isPending ? '-' : `${achievement.data?.achievementRate ?? 0}%`}
+            indicator={
+              achievement.isPending
+                ? '-'
+                : `${achievement.data?.achievedCount ?? 0} / ${achievement.data?.totalCount ?? 0} Task`
+            }
           />
-          <GoalStatsItem title="총 목표" content={`${goalDetail.data?.length} 개`} />
+          <GoalStatsItem title="총 목표" content={goalDetail.isPending ? '-' : `${goalDetail.data?.length ?? 0} 개`} />
         </section>
+
         <section className="flex gap-5">
-          {/* 왼쪽 섹션 (2/3 비율) */}
+          {/* 왼쪽 */}
           <section className="flex flex-[2] flex-col gap-y-[20px]">
-            {/* 7-1-1: 전체 카테고리 */}
             <SectionWrapper title="전체 카테고리">
               {goalCategory.isPending ? (
                 <ChartSkeleton />
-              ) : goalCategory.isError || !goalCategory.data ? (
-                <p className="text-sm text-gray-400">데이터가 없습니다</p>
-              ) : goalCategory.data.slices.length === 0 ? (
-                <p className="text-sm text-gray-400">기록된 Task가 없습니다</p>
+              ) : goalCategory.isError ? (
+                <EmptyState message="데이터를 불러오지 못했습니다" />
+              ) : !goalCategory.data || goalCategory.data.slices.length === 0 ? (
+                <EmptyState message="기록된 Task가 없습니다" />
               ) : (
                 <GoalCategoryBarChart slices={goalCategory.data.slices} totalMinutes={goalCategory.data.totalMinutes} />
               )}
             </SectionWrapper>
 
-            {/* 7-2-1: 목표 카테고리 */}
             <SectionWrapper title="목표 카테고리">
               {goalDetail.isPending ? (
                 <ChartSkeleton />
-              ) : goalDetail.isError || !goalDetail.data ? (
-                <p className="text-sm text-gray-400">데이터가 없습니다</p>
-              ) : goalDetail.data.length === 0 ? (
-                <p className="text-sm text-gray-400">기록된 Task가 없습니다</p>
+              ) : goalDetail.isError ? (
+                <EmptyState message="데이터를 불러오지 못했습니다" />
+              ) : !goalDetail.data || goalDetail.data.length === 0 ? (
+                <EmptyState message="기록된 Task가 없습니다" />
               ) : (
                 <GoalCategoryDetailChart data={goalDetail.data} />
               )}
             </SectionWrapper>
           </section>
 
-          {/* 오른쪽 섹션 (1/3 비율) */}
+          {/* 오른쪽 */}
           <div className="flex flex-[1] flex-col gap-y-[20px]">
-            {/* 7-3-1: 일반 카테고리 */}
             <SectionWrapper title="일반 카테고리">
               {generalCategory.isPending ? (
                 <ChartSkeleton />
-              ) : generalCategory.isError || !generalCategory.data ? (
-                <p className="text-sm text-gray-400">데이터가 없습니다</p>
-              ) : generalCategory.data.slices.length === 0 ? (
-                <p className="text-sm text-gray-400">기록된 Task가 없습니다</p>
+              ) : generalCategory.isError ? (
+                <EmptyState message="데이터를 불러오지 못했습니다" />
+              ) : !generalCategory.data || generalCategory.data.slices.length === 0 ? (
+                <EmptyState message="기록된 Task가 없습니다" />
               ) : (
                 <GeneralCategoryDonutChart
                   slices={generalCategory.data.slices}
@@ -138,17 +147,19 @@ export function ChartSection() {
             <SectionWrapper title="계획 달성률" subtitle="계획 시간과 실제 시간이 50% 이상 일치한 Task 기준">
               {achievement.isPending ? (
                 <ChartSkeleton />
-              ) : achievement.isError || !achievement.data ? (
-                <EmptyState message="데이터가 없습니다" />
+              ) : achievement.isError ? (
+                <EmptyState message="데이터를 불러오지 못했습니다" />
+              ) : !achievement.data ? (
+                <EmptyState message="기록된 Task가 없습니다" />
               ) : (
                 <AchievementDonutChart data={achievement.data} />
               )}
             </SectionWrapper>
           </div>
         </section>
-
-        <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultDate={`${todayString}T09:00`} />
       </div>
+
+      <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultDate={`${todayString}T09:00`} />
     </div>
   )
 }

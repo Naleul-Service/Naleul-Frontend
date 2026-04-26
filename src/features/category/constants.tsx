@@ -10,5 +10,5 @@ export const STATUS_BADGE_STYLE: Record<GoalCategoryStatus, { bg: string; text: 
   NOT_STARTED: { bg: '#E0E7EA', text: '#475660' },
   IN_PROGRESS: { bg: '#C4DDE3', text: '#0D4556' },
   COMPLETED: { bg: '#EBF6F1', text: '#1F5C3A' },
-  STOPPED: { bg: '#EBF6F1', text: '#1F5C3A' },
+  STOPPED: { bg: '#FEF0F0', text: '#DC4E4E' },
 }

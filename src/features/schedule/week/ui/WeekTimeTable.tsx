@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { TaskActualItem } from '@/src/features/schedule/day/types'
-import { WeeklyActualsResponse, WeeklyTasksResponse } from '../types'
-import { HOUR_LABELS, PositionedTask } from '@/src/features/schedule/day/utils/timeTable'
+import { WeeklyActualsResponse } from '../types'
+import { HOUR_LABELS, PositionedTask, utcIsoToKstDateStr } from '@/src/features/schedule/day/utils/timeTable'
 import { formatLocalDate } from '@/src/lib/datetime'
 import { groupActualsByHour } from '@/src/features/schedule/week/utils/timeTable' // ─── 상수 ───────────────────────────────────────────────────────────────────
 
@@ -30,6 +30,34 @@ function getDayDate(startDate: string, dayIndex: number): string {
   const d = new Date(startDate + 'T00:00:00')
   d.setDate(d.getDate() + dayIndex)
   return formatLocalDate(d)
+}
+
+/** 각 요일 DayColumn에 넘길 actuals를 계산
+ *  - 자신의 날짜에 속한 태스크
+ *  - 전날 태스크 중 KST endDate가 자신의 날짜인 오버나이트 태스크 포함
+ */
+function resolveActualsForDay(
+  actualData: WeeklyActualsResponse,
+  dayIndex: number, // 0 = MONDAY ... 6 = SUNDAY
+  startDate: string
+): TaskActualItem[] {
+  const currentDay = DAY_ORDER[dayIndex]
+  const ownActuals = actualData.actualsByDay[currentDay] ?? []
+
+  // 전날이 없으면 자신 것만
+  if (dayIndex === 0) return ownActuals
+
+  const prevDay = DAY_ORDER[dayIndex - 1]
+  const prevActuals = actualData.actualsByDay[prevDay] ?? []
+  const currentDateStr = getDayDate(startDate, dayIndex)
+
+  // 전날 데이터 중 KST endDate가 오늘인 오버나이트 태스크
+  const overflowFromPrev = prevActuals.filter((actual) => {
+    const endDateStr = utcIsoToKstDateStr(actual.actualEndAt)
+    return endDateStr === currentDateStr
+  })
+
+  return [...ownActuals, ...overflowFromPrev]
 }
 
 // ─── WeekTaskBlock ───────────────────────────────────────────────────────────
@@ -120,6 +148,11 @@ interface DayColumnProps {
 function DayColumn({ label, date, actuals }: DayColumnProps) {
   const actual = groupActualsByHour(actuals, date)
   const router = useRouter()
+  console.log(utcIsoToKstDateStr('2026-04-24T00:00:00'))
+  // 뭐가 나와?
+
+  console.log(utcIsoToKstDateStr('2026-04-23T15:00:00'))
+  // 이건?
 
   return (
     <div
@@ -142,7 +175,6 @@ function DayColumn({ label, date, actuals }: DayColumnProps) {
 
 // ─── WeekTimeTable ───────────────────────────────────────────────────────────
 interface WeekTimeTableProps {
-  taskData: WeeklyTasksResponse
   actualData: WeeklyActualsResponse
   startDate: string
 }
@@ -178,9 +210,10 @@ export function WeekTimeTable({ actualData, startDate }: WeekTimeTableProps) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, flex: 1 }}>
         {DAY_ORDER.map((day, i) => {
           const dateStr = getDayDate(startDate, i)
-          return (
-            <DayColumn key={day} label={DAY_LABELS[day]} date={dateStr} actuals={actualData.actualsByDay[day] ?? []} />
-          )
+          // ✅ 여기만 변경
+          const actuals = resolveActualsForDay(actualData, i, startDate)
+
+          return <DayColumn key={day} label={DAY_LABELS[day]} date={dateStr} actuals={actuals} />
         })}
       </div>
     </div>

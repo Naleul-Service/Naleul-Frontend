@@ -27,7 +27,8 @@ export function utcIsoToKstTimeLabel(iso: string): string {
 /** UTC ISO → KST 분 단위 (시간표 계산용) */
 export function utcIsoToKstMinutes(iso: string): number {
   const d = new Date(iso + 'Z')
-  return d.getHours() * 60 + d.getMinutes()
+  const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000)
+  return kst.getUTCHours() * 60 + kst.getUTCMinutes()
 }
 
 /** Date 객체 → "YYYY-MM-DD" (로컬 기준, timezone 안전) */

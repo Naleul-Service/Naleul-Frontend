@@ -117,6 +117,13 @@ export default function SidebarMenu({ onClose }: SidebarMenuProps) {
         </div>
       ) : null}
 
+      <Link
+        href={'https://forms.gle/eP1XVMMC2PSu7dRM7'}
+        className="flex w-full items-center gap-x-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50"
+      >
+        <span className="font-medium">피드백 남기기</span>
+      </Link>
+
       <button
         onClick={handleLogout}
         className="flex w-full items-center gap-x-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50"

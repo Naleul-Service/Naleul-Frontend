@@ -1,6 +1,6 @@
 'use client'
 
-import { CalendarIcon, CategoryIcon, GoalIcon, HomeIcon, RetrospectIcon } from '@/src/assets/svgComponents'
+import { CategoryIcon, GoalIcon, HomeIcon, RetrospectIcon, SidebarScheduleIcon } from '@/src/assets/svgComponents'
 import { NavItem } from './types'
 
 const getTodayDateParam = () => {
@@ -34,8 +34,8 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'schedule',
     label: '일정관리',
     href: '/schedule',
-    selectedIcon: <CalendarIcon width={20} height={20} />,
-    unselectedIcon: <CalendarIcon width={20} height={20} />,
+    selectedIcon: <SidebarScheduleIcon width={32} height={32} />,
+    unselectedIcon: <SidebarScheduleIcon width={32} height={32} />,
     getHref: () => `/schedule?date=${getTodayDateParam()}`,
   },
   {

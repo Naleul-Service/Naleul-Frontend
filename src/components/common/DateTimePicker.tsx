@@ -1,10 +1,11 @@
-// src/components/common/DateTimePicker.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import Label from '@/src/components/common/Label'
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface DateTimePickerProps {
   value: string
@@ -25,6 +26,13 @@ interface DateTimeParts {
   minute: string
 }
 
+// ─── 변환 유틸 ────────────────────────────────────────────────────────────────
+
+/**
+ * "2026-04-26T00:30" → DateTimeParts (12시간제)
+ * - 00시 → 오전 12시
+ * - 13시 → 오후 01시
+ */
 function toDateTimeParts(value: string): DateTimeParts {
   if (!value) {
     return { year: '', month: '', day: '', meridiem: 'AM', hour: '', minute: '' }
@@ -34,6 +42,7 @@ function toDateTimeParts(value: string): DateTimeParts {
   const [h, minute] = (timePart ?? '').split(':')
   const hour24 = parseInt(h ?? '0', 10)
   const meridiem = hour24 < 12 ? 'AM' : 'PM'
+  // 00시 → 12 (오전 12시 = 자정), 12시 → 12 (오후 12시 = 정오), 13시 → 1, ...
   const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24
   return {
     year: year ?? '',
@@ -45,6 +54,11 @@ function toDateTimeParts(value: string): DateTimeParts {
   }
 }
 
+/**
+ * DateTimeParts → "2026-04-26T00:30" (24시간제 ISO)
+ * - 오전 12시 → 00시 (자정)
+ * - 오후 12시 → 12시 (정오)
+ */
 function toDateTimeString(parts: DateTimeParts): string {
   const { year, month, day, meridiem, hour, minute } = parts
   if (!year || !month || !day || !hour || !minute) return ''
@@ -58,7 +72,9 @@ function toDateTimeString(parts: DateTimeParts): string {
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${String(hour24).padStart(2, '0')}:${minute.padStart(2, '0')}`
 }
 
-const DAYS_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토']
+// ─── 달력 유틸 ────────────────────────────────────────────────────────────────
+
+const DAYS_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토'] as const
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month, 0).getDate()
@@ -67,6 +83,8 @@ function getDaysInMonth(year: number, month: number) {
 function getFirstDayOfWeek(year: number, month: number) {
   return new Date(year, month - 1, 1).getDay()
 }
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function DateTimePicker({
   value,
@@ -88,17 +106,17 @@ export function DateTimePicker({
     return parseInt(p.month || String(new Date().getMonth() + 1), 10)
   })
 
-  // 현재 포커스된 필드 추적 — useEffect의 외부 동기화를 포커스 중엔 막기 위해
+  // 포커스 중인 필드 추적 — 외부 value 동기화를 포커스 중엔 막기 위해
   const focusedFieldRef = useRef<keyof DateTimeParts | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const fieldRefs = useRef<Partial<Record<keyof DateTimeParts, HTMLInputElement | null>>>({})
-  const fieldOrder: (keyof DateTimeParts)[] = ['year', 'month', 'day', 'hour', 'minute']
 
   // value prop 변경 시 내부 상태 동기화 — 포커스 중이면 완전히 무시
   useEffect(() => {
     if (focusedFieldRef.current !== null) return
     setParts(toDateTimeParts(value))
   }, [value])
+
   // 외부 클릭 시 달력 닫기
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -111,45 +129,49 @@ export function DateTimePicker({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isCalendarOpen])
 
+  // ─── 핸들러 ─────────────────────────────────────────────────────────────────
+
   function commitParts(next: DateTimeParts) {
     setParts(next)
     const result = toDateTimeString(next)
     if (result) onChange(result)
   }
 
-  function handleNumberChange(key: keyof DateTimeParts, raw: string, max: number, min: number = 1) {
+  /**
+   * 숫자 입력 핸들러
+   * - 자동 포커스 이동 없음 (year/month/day/hour/minute 모두)
+   * - 숫자만 허용
+   */
+  function handleNumberChange(key: keyof DateTimeParts, raw: string) {
     const digits = raw.replace(/\D/g, '')
     const updated = { ...parts, [key]: digits }
     setParts(updated)
 
-    if (digits) {
-      const result = toDateTimeString(updated)
-      if (result) onChange(result)
-    }
-
-    const num = parseInt(digits, 10)
-    const maxLength = String(max).length
-
-    if (isNaN(num)) return
-
-    // hour는 자동 포커스 이동 안 함
-    if (key === 'hour') return
-
-    const shouldAutoAdvance = digits.length === maxLength || (digits.length === maxLength - 1 && num * 10 > max)
-
-    if (shouldAutoAdvance) {
-      focusNextField(key)
-    }
+    const result = toDateTimeString(updated)
+    if (result) onChange(result)
   }
 
+  /** 포커스 시 해당 필드 초기화 (재입력 편의성) */
   function handleNumberFocus(key: keyof DateTimeParts) {
     focusedFieldRef.current = key
-    // onChange 호출 없이 내부 상태만 비우기
     setParts((prev) => ({ ...prev, [key]: '' }))
   }
 
+  /**
+   * blur 시 유효값으로 보정
+   *
+   * hour 규칙 (12시간제):
+   *   - 0 입력 → 12로 보정 (오전 12시 = 자정, 오후 12시 = 정오)
+   *   - 1~12 → 그대로
+   *   - 13 이상 → 12로 clamp
+   *
+   * minute 규칙:
+   *   - min=0 허용 (00분)
+   *
+   * 나머지(year/month/day):
+   *   - min~max 범위로 clamp
+   */
   function handleNumberBlur(key: keyof DateTimeParts, max: number, min: number = 1) {
-    // setTimeout으로 다음 포커스 대상 확인 후 처리
     setTimeout(() => {
       // blur 후 포커스가 컨테이너 내부로 이동했으면 패딩 스킵
       if (containerRef.current?.contains(document.activeElement)) {
@@ -164,27 +186,58 @@ export function DateTimePicker({
       const num = parseInt(raw, 10)
       if (!raw || isNaN(num)) return
 
-      const clamped = Math.min(Math.max(num, min), max)
-      const padded = String(clamped).padStart(key === 'year' ? 4 : 2, '0')
-      const updated = { ...parts, [key]: padded }
-      commitParts(updated)
+      let clamped: number
+      if (key === 'hour') {
+        // 0 입력 시 12로 보정 (12시간제에서 0시 없음)
+        clamped = num === 0 ? 12 : Math.min(Math.max(num, 1), 12)
+      } else {
+        clamped = Math.min(Math.max(num, min), max)
+      }
+
+      const padLength = key === 'year' ? 4 : 2
+      const padded = String(clamped).padStart(padLength, '0')
+      commitParts({ ...parts, [key]: padded })
     }, 0)
   }
 
-  function focusNextField(current: keyof DateTimeParts) {
-    const idx = fieldOrder.indexOf(current)
-    if (idx < fieldOrder.length - 1) {
-      fieldRefs.current[fieldOrder[idx + 1]]?.focus()
-    }
+  function handleMeridiemToggle() {
+    commitParts({ ...parts, meridiem: parts.meridiem === 'AM' ? 'PM' : 'AM' })
   }
 
   function handleSelectDate(day: number) {
     const month = String(calendarMonth).padStart(2, '0')
     const dayStr = String(day).padStart(2, '0')
-    const updated = { ...parts, year: String(calendarYear), month, day: dayStr }
-    commitParts(updated)
+    commitParts({ ...parts, year: String(calendarYear), month, day: dayStr })
     setIsCalendarOpen(false)
   }
+
+  function handleCalendarIconClick() {
+    if (parts.year && parts.month) {
+      setCalendarYear(parseInt(parts.year, 10))
+      setCalendarMonth(parseInt(parts.month, 10))
+    }
+    setIsCalendarOpen((v) => !v)
+  }
+
+  function handlePrevMonth() {
+    if (calendarMonth === 1) {
+      setCalendarMonth(12)
+      setCalendarYear((y) => y - 1)
+    } else {
+      setCalendarMonth((m) => m - 1)
+    }
+  }
+
+  function handleNextMonth() {
+    if (calendarMonth === 12) {
+      setCalendarMonth(1)
+      setCalendarYear((y) => y + 1)
+    } else {
+      setCalendarMonth((m) => m + 1)
+    }
+  }
+
+  // ─── 달력 렌더 ───────────────────────────────────────────────────────────────
 
   function renderCalendar() {
     const daysInMonth = getDaysInMonth(calendarYear, calendarMonth)
@@ -206,15 +259,11 @@ export function DateTimePicker({
 
     return (
       <div className="absolute top-[calc(100%+4px)] right-0 z-50 w-[280px] rounded-[12px] border border-gray-200 bg-white p-4 shadow-lg">
+        {/* 월 네비게이션 */}
         <div className="mb-3 flex items-center justify-between">
           <button
             type="button"
-            onClick={() => {
-              if (calendarMonth === 1) {
-                setCalendarMonth(12)
-                setCalendarYear((y) => y - 1)
-              } else setCalendarMonth((m) => m - 1)
-            }}
+            onClick={handlePrevMonth}
             className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-gray-100"
           >
             <ChevronLeft size={15} />
@@ -224,18 +273,14 @@ export function DateTimePicker({
           </span>
           <button
             type="button"
-            onClick={() => {
-              if (calendarMonth === 12) {
-                setCalendarMonth(1)
-                setCalendarYear((y) => y + 1)
-              } else setCalendarMonth((m) => m + 1)
-            }}
+            onClick={handleNextMonth}
             className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-gray-100"
           >
             <ChevronRight size={15} />
           </button>
         </div>
 
+        {/* 요일 헤더 */}
         <div className="mb-1 grid grid-cols-7">
           {DAYS_OF_WEEK.map((d, i) => (
             <span
@@ -251,6 +296,7 @@ export function DateTimePicker({
           ))}
         </div>
 
+        {/* 날짜 셀 */}
         <div className="grid grid-cols-7">
           {cells.map((day, idx) => (
             <button
@@ -276,6 +322,8 @@ export function DateTimePicker({
     )
   }
 
+  // ─── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <div className={cn('flex w-full flex-col gap-1.5', className)}>
       {label && <Label isRequired={isRequired}>{label}</Label>}
@@ -290,7 +338,7 @@ export function DateTimePicker({
             disabled && 'cursor-not-allowed border-gray-200 bg-gray-100'
           )}
         >
-          {/* 연 */}
+          {/* 연도 */}
           <input
             data-field="year"
             ref={(el) => {
@@ -303,7 +351,7 @@ export function DateTimePicker({
             value={parts.year}
             disabled={disabled}
             onFocus={() => handleNumberFocus('year')}
-            onChange={(e) => handleNumberChange('year', e.target.value, 9999, 1000)}
+            onChange={(e) => handleNumberChange('year', e.target.value)}
             onBlur={() => handleNumberBlur('year', 9999, 1000)}
             className="w-[40px] bg-transparent text-center text-sm text-gray-950 outline-none placeholder:text-gray-300 disabled:text-gray-300"
           />
@@ -322,7 +370,7 @@ export function DateTimePicker({
             value={parts.month}
             disabled={disabled}
             onFocus={() => handleNumberFocus('month')}
-            onChange={(e) => handleNumberChange('month', e.target.value, 12)}
+            onChange={(e) => handleNumberChange('month', e.target.value)}
             onBlur={() => handleNumberBlur('month', 12)}
             className="w-[28px] bg-transparent text-center text-sm text-gray-950 outline-none placeholder:text-gray-300 disabled:text-gray-300"
           />
@@ -341,21 +389,18 @@ export function DateTimePicker({
             value={parts.day}
             disabled={disabled}
             onFocus={() => handleNumberFocus('day')}
-            onChange={(e) => handleNumberChange('day', e.target.value, 31)}
+            onChange={(e) => handleNumberChange('day', e.target.value)}
             onBlur={() => handleNumberBlur('day', 31)}
             className="w-[28px] bg-transparent text-center text-sm text-gray-950 outline-none placeholder:text-gray-300 disabled:text-gray-300"
           />
 
           <div className="mx-2 h-4 w-px bg-gray-200" />
 
-          {/* 오전/오후 */}
+          {/* 오전/오후 토글 */}
           <button
             type="button"
             disabled={disabled}
-            onClick={() => {
-              const updated = { ...parts, meridiem: parts.meridiem === 'AM' ? 'PM' : 'AM' } as DateTimeParts
-              commitParts(updated)
-            }}
+            onClick={handleMeridiemToggle}
             className="hover:text-primary-400 text-sm text-gray-700 disabled:text-gray-300"
           >
             {parts.meridiem === 'AM' ? '오전' : '오후'}
@@ -363,7 +408,7 @@ export function DateTimePicker({
 
           <div className="mx-1" />
 
-          {/* 시 */}
+          {/* 시 — 12시간제 (1~12, 0 입력 시 blur에서 12로 보정) */}
           <input
             data-field="hour"
             ref={(el) => {
@@ -376,13 +421,13 @@ export function DateTimePicker({
             value={parts.hour}
             disabled={disabled}
             onFocus={() => handleNumberFocus('hour')}
-            onChange={(e) => handleNumberChange('hour', e.target.value, 12)}
+            onChange={(e) => handleNumberChange('hour', e.target.value)}
             onBlur={() => handleNumberBlur('hour', 12)}
             className="w-[24px] bg-transparent text-center text-sm text-gray-950 outline-none placeholder:text-gray-300 disabled:text-gray-300"
           />
           <span className="text-gray-400">:</span>
 
-          {/* 분 */}
+          {/* 분 (0~59) */}
           <input
             data-field="minute"
             ref={(el) => {
@@ -395,7 +440,7 @@ export function DateTimePicker({
             value={parts.minute}
             disabled={disabled}
             onFocus={() => handleNumberFocus('minute')}
-            onChange={(e) => handleNumberChange('minute', e.target.value, 59, 0)}
+            onChange={(e) => handleNumberChange('minute', e.target.value)}
             onBlur={() => handleNumberBlur('minute', 59, 0)}
             className="w-[24px] bg-transparent text-center text-sm text-gray-950 outline-none placeholder:text-gray-300 disabled:text-gray-300"
           />
@@ -404,13 +449,7 @@ export function DateTimePicker({
           <button
             type="button"
             disabled={disabled}
-            onClick={() => {
-              if (parts.year && parts.month) {
-                setCalendarYear(parseInt(parts.year, 10))
-                setCalendarMonth(parseInt(parts.month, 10))
-              }
-              setIsCalendarOpen((v) => !v)
-            }}
+            onClick={handleCalendarIconClick}
             className="hover:text-primary-400 ml-auto text-gray-400 disabled:text-gray-300"
           >
             <CalendarDays size={16} />

@@ -7,7 +7,6 @@ import { Button } from '@/src/components/common/Button'
 import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGoalCategory } from '@/src/features/category/hooks/useGoalCategories'
 import { ColorPicker } from './ColorPicker'
-import { AddColorInput } from '@/src/features/category/components/AddColorInput'
 import Label from '@/src/components/common/Label'
 import { DatePicker } from '@/src/components/common/picker/DatePicker'
 
@@ -110,7 +109,6 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
             selectedColorId={selectedColorId}
             onSelect={setSelectedColorId}
           />
-          <AddColorInput existingColors={colors} onAdded={(newColor) => setSelectedColorId(newColor.userColorId)} />
         </div>
 
         {error && <p className="text-xs text-red-500">{error}</p>}

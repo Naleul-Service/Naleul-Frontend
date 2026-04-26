@@ -8,7 +8,6 @@ import { ColorPicker } from './ColorPicker'
 import { useColors } from '../hooks/useColors'
 import { useUpdateGeneralCategory } from '../hooks/useGeneralCategoryMutations'
 import { GeneralCategoryItemType, GoalCategory } from '../api/goalCategory'
-import { AddColorInput } from '@/src/features/category/components/AddColorInput'
 import Label from '@/src/components/common/Label'
 
 interface GeneralCategoryEditModalProps {
@@ -109,10 +108,6 @@ export function GeneralCategoryEditModal({ isOpen, onClose, item, goalCategory }
             isLoading={isColorsLoading}
             selectedColorId={form.colorId}
             onSelect={(colorId) => setForm((prev) => ({ ...prev, colorId }))}
-          />
-          <AddColorInput
-            existingColors={colors}
-            onAdded={(newColor) => setForm((prev) => ({ ...prev, colorId: newColor.userColorId }))}
           />
         </div>
       </div>

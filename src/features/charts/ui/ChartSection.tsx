@@ -77,7 +77,7 @@ export function ChartSection() {
 
       <div className="flex flex-col gap-y-[20px]">
         {/* 통계 요약 */}
-        <section className="flex gap-x-4">
+        <section className="flex gap-x-5">
           <GoalStatsItem
             title="총 소요 시간"
             content={goalCategory.isPending ? '-' : formatMinutes(goalCategory.data?.totalMinutes ?? 0)}

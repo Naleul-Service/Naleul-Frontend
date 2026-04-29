@@ -96,6 +96,7 @@ export function DateTimePicker({
   className,
 }: DateTimePickerProps) {
   const [parts, setParts] = useState<DateTimeParts>(() => toDateTimeParts(value))
+  const [calendarPosition, setCalendarPosition] = useState<'top' | 'bottom'>('bottom')
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [calendarYear, setCalendarYear] = useState(() => {
     const p = toDateTimeParts(value)
@@ -216,6 +217,15 @@ export function DateTimePicker({
       setCalendarYear(parseInt(parts.year, 10))
       setCalendarMonth(parseInt(parts.month, 10))
     }
+
+    // 열기 전에 공간 계산
+    if (!isCalendarOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      const calendarHeight = 320 // 달력 높이 추정값
+      const spaceBelow = window.innerHeight - rect.bottom
+      setCalendarPosition(spaceBelow < calendarHeight ? 'top' : 'bottom')
+    }
+
     setIsCalendarOpen((v) => !v)
   }
 
@@ -258,7 +268,13 @@ export function DateTimePicker({
       calendarYear === today.getFullYear() && calendarMonth === today.getMonth() + 1 && d === today.getDate()
 
     return (
-      <div className="absolute top-[calc(100%+4px)] right-0 z-50 w-[280px] rounded-[12px] border border-gray-200 bg-white p-4 shadow-lg">
+      <div
+        className={cn(
+          'absolute z-50 w-[280px] rounded-[12px] border border-gray-200 bg-white p-4 shadow-lg',
+          calendarPosition === 'bottom' ? 'top-[calc(100%+4px)]' : 'bottom-[calc(100%+4px)]',
+          'right-0'
+        )}
+      >
         {/* 월 네비게이션 */}
         <div className="mb-3 flex items-center justify-between">
           <button

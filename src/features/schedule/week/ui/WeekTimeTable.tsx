@@ -1,11 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { TaskActualItem } from '@/src/features/schedule/day/types'
-import { WeeklyActualsResponse } from '../types'
+import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
+import { WeeklyActualsResponse, WeeklyTasksResponse } from '../types'
 import { HOUR_LABELS, PositionedTask, utcIsoToKstDateStr } from '@/src/features/schedule/day/utils/timeTable'
-import { formatLocalDate } from '@/src/lib/datetime'
-import { groupActualsByHour } from '@/src/features/schedule/week/utils/timeTable' // ─── 상수 ───────────────────────────────────────────────────────────────────
+import { formatLocalDate, utcIsoToKstMinutes } from '@/src/lib/datetime'
+import { groupActualsByHour, groupPlannedByHour } from '@/src/features/schedule/week/utils/timeTable' // ─── 상수 ───────────────────────────────────────────────────────────────────
 
 // ─── 상수 ───────────────────────────────────────────────────────────────────
 const DAY_ORDER = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const
@@ -21,7 +21,7 @@ const DAY_LABELS: Record<DayKey, string> = {
   SUNDAY: '일',
 }
 
-const HOUR_HEIGHT = 24
+const HOUR_HEIGHT = 28
 const TEN_MIN_CELLS = Array.from({ length: 6 })
 const ROWS: (DayKey | null)[][] = [DAY_ORDER.slice(0, 4) as DayKey[], [...(DAY_ORDER.slice(4, 7) as DayKey[]), null]]
 
@@ -38,26 +38,49 @@ function getDayDate(startDate: string, dayIndex: number): string {
  */
 function resolveActualsForDay(
   actualData: WeeklyActualsResponse,
-  dayIndex: number, // 0 = MONDAY ... 6 = SUNDAY
+  dayIndex: number,
   startDate: string
 ): TaskActualItem[] {
   const currentDay = DAY_ORDER[dayIndex]
   const ownActuals = actualData.actualsByDay[currentDay] ?? []
-
-  // 전날이 없으면 자신 것만
   if (dayIndex === 0) return ownActuals
 
-  const prevDay = DAY_ORDER[dayIndex - 1]
-  const prevActuals = actualData.actualsByDay[prevDay] ?? []
   const currentDateStr = getDayDate(startDate, dayIndex)
 
-  // 전날 데이터 중 KST endDate가 오늘인 오버나이트 태스크
-  const overflowFromPrev = prevActuals.filter((actual) => {
-    const endDateStr = utcIsoToKstDateStr(actual.actualEndAt)
-    return endDateStr === currentDateStr
+  // 전날 하나만이 아니라 앞선 모든 날 체크
+  const overflowFromPrev = DAY_ORDER.slice(0, dayIndex).flatMap((prevDay) => {
+    const prevActuals = actualData.actualsByDay[prevDay] ?? []
+    return prevActuals.filter((actual) => {
+      const endDateStr = utcIsoToKstDateStr(actual.actualEndAt)
+      return endDateStr === currentDateStr
+    })
   })
 
   return [...ownActuals, ...overflowFromPrev]
+}
+
+function resolvePlannedForDay(taskData: WeeklyTasksResponse, dayIndex: number, startDate: string): Task[] {
+  const currentDay = DAY_ORDER[dayIndex]
+  const ownTasks = taskData.tasksByDay[currentDay] ?? []
+  if (dayIndex === 0) return ownTasks
+
+  const currentDateStr = getDayDate(startDate, dayIndex)
+  const ownTaskIds = new Set(ownTasks.map((t) => t.taskId)) // 추가
+
+  const overflowFromPrev = DAY_ORDER.slice(0, dayIndex).flatMap((prevDay) => {
+    const prevTasks = taskData.tasksByDay[prevDay] ?? []
+    return prevTasks.filter((task) => {
+      if (task.actual !== null) return false
+      if (ownTaskIds.has(task.taskId)) return false // 이미 있으면 skip
+      const endDateStr = utcIsoToKstDateStr(task.plannedEndAt)
+      if (endDateStr !== currentDateStr) return false
+      const kstEndMinutes = utcIsoToKstMinutes(task.plannedEndAt)
+      if (kstEndMinutes === 0) return false
+      return true
+    })
+  })
+
+  return [...ownTasks, ...overflowFromPrev]
 }
 
 // ─── WeekTaskBlock ───────────────────────────────────────────────────────────
@@ -88,7 +111,7 @@ function WeekTaskBlock({ positioned, isActual }: WeekTaskBlockProps) {
         bottom: 1,
         left: `${leftPercent}%`,
         width: `${widthPercent}%`,
-        backgroundColor: isActual ? `${generalColor}33` : `${generalColor}15`,
+        backgroundColor: isActual ? `${generalColor}33` : 'transparent',
         borderLeft: `3px solid ${goalColor}`,
         borderRight: `1px solid ${generalColor}`,
         borderTop: `1px solid ${generalColor}`,
@@ -110,9 +133,14 @@ function WeekTaskBlock({ positioned, isActual }: WeekTaskBlockProps) {
 // WeekHourSlot — plannedTasks prop 제거, renderTimeBlock 하나만
 interface WeekHourSlotProps {
   actualTasks: PositionedTask<TaskActualItem>[]
+  plannedTasks: PositionedTask<Task>[]
 }
 
-function WeekHourSlot({ actualTasks }: WeekHourSlotProps) {
+// WeekHourSlot — 위(planned) / 아래(actual) 분리
+function WeekHourSlot({ actualTasks, plannedTasks }: WeekHourSlotProps) {
+  const tasksToRender = actualTasks.length > 0 ? actualTasks : plannedTasks
+  const isActual = actualTasks.length > 0
+
   return (
     <div style={{ display: 'flex', height: HOUR_HEIGHT, alignItems: 'stretch' }}>
       <div style={{ flex: 1, position: 'relative' }}>
@@ -129,8 +157,12 @@ function WeekHourSlot({ actualTasks }: WeekHourSlotProps) {
             <div key={i} style={{ borderRight: i < 5 ? '1px solid #E0E7EA' : 'none' }} />
           ))}
         </div>
-        {actualTasks.map((p, i) => (
-          <WeekTaskBlock key={p.task.taskName + i} positioned={p as PositionedTask<BlockItem>} isActual={true} />
+        {tasksToRender.map((p, i) => (
+          <WeekTaskBlock
+            key={isActual ? `${p.task.taskName}-actual-${p.hour}-${i}` : `${p.task.taskId}-planned-${p.hour}`}
+            positioned={p as PositionedTask<BlockItem>}
+            isActual={isActual}
+          />
         ))}
       </div>
     </div>
@@ -142,17 +174,14 @@ interface DayColumnProps {
   label: string
   date: string
   actuals: TaskActualItem[]
+  plannedTasks: Task[]
 }
 
 // DayColumn — planned 제거, 헤더 단순화
-function DayColumn({ label, date, actuals }: DayColumnProps) {
+function DayColumn({ label, date, actuals, plannedTasks }: DayColumnProps) {
   const actual = groupActualsByHour(actuals, date)
+  const plannedByHour = groupPlannedByHour(plannedTasks, date)
   const router = useRouter()
-  console.log(utcIsoToKstDateStr('2026-04-24T00:00:00'))
-  // 뭐가 나와?
-
-  console.log(utcIsoToKstDateStr('2026-04-23T15:00:00'))
-  // 이건?
 
   return (
     <div
@@ -166,7 +195,7 @@ function DayColumn({ label, date, actuals }: DayColumnProps) {
       </div>
       {HOUR_LABELS.map((hour) => (
         <div key={hour} style={{ marginBottom: 2 }}>
-          <WeekHourSlot actualTasks={actual.get(hour) ?? []} />
+          <WeekHourSlot plannedTasks={plannedByHour.get(hour) ?? []} actualTasks={actual.get(hour) ?? []} />
         </div>
       ))}
     </div>
@@ -175,12 +204,13 @@ function DayColumn({ label, date, actuals }: DayColumnProps) {
 
 // ─── WeekTimeTable ───────────────────────────────────────────────────────────
 interface WeekTimeTableProps {
+  taskData: WeeklyTasksResponse
   actualData: WeeklyActualsResponse
   startDate: string
 }
 
 // WeekTimeTable — 시간 레이블 컬럼 추가
-export function WeekTimeTable({ actualData, startDate }: WeekTimeTableProps) {
+export function WeekTimeTable({ taskData, actualData, startDate }: WeekTimeTableProps) {
   return (
     <div style={{ display: 'flex', gap: 8 }}>
       {/* 시간 레이블 컬럼 */}
@@ -210,10 +240,12 @@ export function WeekTimeTable({ actualData, startDate }: WeekTimeTableProps) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, flex: 1 }}>
         {DAY_ORDER.map((day, i) => {
           const dateStr = getDayDate(startDate, i)
-          // ✅ 여기만 변경
           const actuals = resolveActualsForDay(actualData, i, startDate)
+          const plannedTasks = resolvePlannedForDay(taskData, i, startDate)
 
-          return <DayColumn key={day} label={DAY_LABELS[day]} date={dateStr} actuals={actuals} />
+          return (
+            <DayColumn key={day} label={DAY_LABELS[day]} date={dateStr} actuals={actuals} plannedTasks={plannedTasks} />
+          )
         })}
       </div>
     </div>

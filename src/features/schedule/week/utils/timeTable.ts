@@ -1,6 +1,6 @@
 //schedule/week/utils/timeTable.ts
 
-import { TaskActualItem } from '@/src/features/schedule/day/types'
+import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
 import { PositionedTask, splitByHourRaw, utcIsoToKstDateStr } from '@/src/features/schedule/day/utils/timeTable'
 
 export function groupActualsByHour(
@@ -17,6 +17,19 @@ export function groupActualsByHour(
     if (startDateStr !== date && endDateStr !== date) continue
 
     splitByHourRaw(actual, actual.actualStartAt, actual.actualEndAt, true, map, date)
+  }
+
+  return map
+}
+
+export function groupPlannedByHour(tasks: Task[], date: string): Map<number, PositionedTask<Task>[]> {
+  const map = new Map<number, PositionedTask<Task>[]>()
+
+  for (const task of tasks) {
+    // actual이 있으면 skip (actualData에서 렌더됨)
+    if (task.actual !== null) continue
+
+    splitByHourRaw(task, task.plannedStartAt, task.plannedEndAt, false, map, date)
   }
 
   return map

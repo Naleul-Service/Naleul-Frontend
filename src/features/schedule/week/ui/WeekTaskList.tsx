@@ -144,11 +144,13 @@ export function WeekTaskList({ date }: WeekTaskListProps) {
         )}
 
         {/* 주간 타임테이블 */}
-        {actualData && (
-          <div className="min-w-0 flex-1 overflow-x-auto">
-            <WeekTimeTable actualData={actualData} startDate={startDate} />
-          </div>
-        )}
+        <div className="min-w-0 flex-1 overflow-x-auto">
+          {isActualPending ? (
+            <p className="text-muted-foreground text-sm">불러오는 중...</p>
+          ) : actualData ? (
+            <WeekTimeTable taskData={taskData ?? { tasksByDay: {} }} actualData={actualData} startDate={startDate} />
+          ) : null}
+        </div>
       </div>
     </div>
   )

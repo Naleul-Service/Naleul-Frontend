@@ -1,7 +1,7 @@
 'use client'
 
 import { useCompletedGoalCategories } from '@/src/features/completed/hooks/useCompletedGoalCategories'
-import GoalStatsItem from '@/src/components/common/StatsSummary'
+import GoalStatsItem from '@/src/components/common/GoalStatsItem'
 import { formatMinutes } from '@/src/features/charts/constants'
 
 export default function GoalStatsSummary() {

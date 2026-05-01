@@ -20,7 +20,7 @@ export function AchievementDonutChart({ data }: Props) {
   const safeData = data.totalCount === 0 ? [{ name: '없음', value: 1, fill: UNACHIEVED_COLOR }] : chartData
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-between">
       {/* 도넛 */}
       <section className="relative h-[196px] w-[196px] shrink-0">
         <ResponsiveContainer width="100%" height="100%">
@@ -45,8 +45,8 @@ export function AchievementDonutChart({ data }: Props) {
         </ResponsiveContainer>
         {/* 중앙 달성률 */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1">
-          <span className="text-xs text-gray-400">달성률</span>
-          <span className="text-xl font-bold text-gray-800">{data.achievementRate}%</span>
+          <span className="label-sm text-[#8FA0A8]">달성률</span>
+          <span className="h3 text-gray-800">{data.achievementRate}%</span>
         </div>
       </section>
 
@@ -55,8 +55,8 @@ export function AchievementDonutChart({ data }: Props) {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: ACHIEVED_COLOR }} />
-            <span className="text-sm text-gray-500">달성</span>
-            <span className="ml-auto text-sm font-semibold text-gray-800">{data.achievedCount}개</span>
+            <span className="label-md text-gray-500">달성</span>
+            <span className="label-md text-primary-500 ml-auto">{data.achievedCount}개</span>
           </div>
           <div className="h-[8px] w-full overflow-hidden rounded-full bg-gray-100">
             <div
@@ -69,8 +69,8 @@ export function AchievementDonutChart({ data }: Props) {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-gray-200" />
-            <span className="text-sm text-gray-500">미달성</span>
-            <span className="ml-auto text-sm font-semibold text-gray-800">{data.unachievedCount}개</span>
+            <span className="label-md text-gray-500">미달성</span>
+            <span className="label-md text-primary-500 ml-auto">{data.unachievedCount}개</span>
           </div>
           <div className="h-[8px] w-full overflow-hidden rounded-full bg-gray-100">
             <div

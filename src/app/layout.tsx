@@ -6,8 +6,8 @@ import { cookies } from 'next/headers'
 import { UserStoreInitializer } from '@/src/components/providers/UserStoreInitializer'
 import { QueryProvider } from '@/src/components/providers/QueryProvider'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { MobileBlock } from '@/src/components/layout/MobileBlock'
-import { MobileNavBar } from '@/src/components/common/MobileNavBar'
+import { MobileNavBar } from '@/src/components/layout/MobileNavBar'
+import MobileHeader from '@/src/components/layout/MobileHeader'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,15 +42,16 @@ export default async function RootLayout({
           {userId && userRole && userName && userEmail && (
             <UserStoreInitializer userId={userId} userName={userName} userEmail={userEmail} userRole={userRole} />
           )}
-          <MobileBlock />
+          {/*<MobileBlock />*/}
 
-          <div className="tablet:flex hidden">
+          <div className="desktop:flex hidden">
             <Sidebar />
             <div className="flex-1 overflow-y-auto">{children}</div>
           </div>
 
-          <div className="desktop:hidden tablet:hidden flex flex-col">
-            <div className="flex-1 overflow-y-auto pb-16">{children}</div>
+          <div className="desktop:hidden flex flex-col">
+            <MobileHeader />
+            <div className="flex-1 overflow-y-auto pt-[48px] pb-16">{children}</div>
             <MobileNavBar />
           </div>
         </QueryProvider>

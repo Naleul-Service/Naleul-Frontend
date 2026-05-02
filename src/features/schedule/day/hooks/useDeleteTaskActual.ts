@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TASK_ACTUAL_QUERY_KEYS } from './useDailyActuals'
+import { invalidateScheduleAll } from '@/src/lib/queryInvalidations'
 
 async function deleteTaskActual(taskActualId: number) {
   const res = await fetch(`/api/task-actuals/${taskActualId}`, { method: 'DELETE' })
@@ -13,7 +13,7 @@ export function useDeleteTaskActual(date: string) {
   return useMutation({
     mutationFn: deleteTaskActual,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TASK_ACTUAL_QUERY_KEYS.daily({ date }) })
+      invalidateScheduleAll(queryClient)
     },
   })
 }

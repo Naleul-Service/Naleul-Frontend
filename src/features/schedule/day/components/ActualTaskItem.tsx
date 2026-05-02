@@ -26,7 +26,7 @@ export function ActualTaskItem({ actual, date }: ActualTaskItemProps) {
 
   return (
     <>
-      <li className="group flex flex-col gap-y-1 rounded-[10px] border border-gray-100 px-3 py-[10px]">
+      <li className="group flex flex-col gap-y-1 rounded-[10px] border border-gray-100 bg-white px-3 py-[10px]">
         {/* 상단 행 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-[10px]">

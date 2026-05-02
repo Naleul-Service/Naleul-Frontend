@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { DailyActualsParams, TaskActualItem } from '../types'
 
 export const TASK_ACTUAL_QUERY_KEYS = {
+  all: ['task-actuals'] as const,
   daily: (params: DailyActualsParams) => ['task-actuals', 'daily', params] as const,
 }
 

@@ -1,22 +1,19 @@
-'use client'
-
-import { useState } from 'react'
-import { Modal } from '@/src/components/common/Modal'
+import MobileHeader from '@/src/components/layout/MobileHeader'
 import { Input } from '@/src/components/common/Input'
-import { Button } from '@/src/components/common/Button'
+import { DatePicker } from '@/src/components/common/picker/DatePicker'
+import Label from '@/src/components/common/Label'
+import { ColorPicker } from '@/src/features/category/components/ColorPicker'
 import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGoalCategory } from '@/src/features/category/hooks/useGoalCategories'
-import { ColorPicker } from './ColorPicker'
-import Label from '@/src/components/common/Label'
-import { DatePicker } from '@/src/components/common/picker/DatePicker'
+import { useState } from 'react'
 import { getDefaultStartDate } from '@/src/features/category/utils/category'
 
-interface GoalCategoryModalProps {
+interface MobileGoalCategoryModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
+export default function MobileGoalCategoryModal({ isOpen, onClose }: MobileGoalCategoryModalProps) {
   const { data: colors = [], isLoading: isColorsLoading } = useColors()
   const { mutate, isPending } = useCreateGoalCategory()
 
@@ -63,23 +60,8 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title="목표 카테고리 추가"
-      description="목표를 담을 카테고리를 만들어요"
-      size="md"
-      footer={
-        <div className="flex justify-end gap-2">
-          <Button className="w-full" variant="secondary" size="lg" onClick={handleClose} disabled={isPending}>
-            취소
-          </Button>
-          <Button className="w-full" variant="primary" size="lg" onClick={handleSubmit} isLoading={isPending}>
-            만들기
-          </Button>
-        </div>
-      }
-    >
+    <div className="desktop:hidden tablet:hidden z-50 flex flex-col">
+      <MobileHeader onClick={onClose} headerType={'dynamic'} title={'목표 추가'} />
       <div className="flex flex-col gap-5">
         <Input
           label="카테고리명"
@@ -104,6 +86,6 @@ export function GoalCategoryModal({ isOpen, onClose }: GoalCategoryModalProps) {
 
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
-    </Modal>
+    </div>
   )
 }

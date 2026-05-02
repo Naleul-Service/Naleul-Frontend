@@ -326,7 +326,8 @@ function GoalCategoryItem({
             size={'sm'}
             leftIcon={<Plus size={12} className="text-primary-400" />}
           >
-            세부 목표 추가
+            <span className="tablet:block desktop:block hidden">세부 목표 추가</span>
+            <span className="tablet:hidden desktop:hidden block">세부 목표</span>
           </Button>
 
           {!isEtc && (

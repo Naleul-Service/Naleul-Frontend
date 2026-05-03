@@ -55,16 +55,18 @@ export function MobileTaskEditModal({ task, onClose }: Props) {
           generalCategories={generalCategories}
           isLoadingCategories={isLoadingCategories}
         />
-        <Button
-          variant="primary"
-          size="lg"
-          className="w-full"
-          onClick={handleSubmit}
-          isLoading={isPending}
-          disabled={!isValid}
-        >
-          저장
-        </Button>
+        <div className="fixed bottom-0 left-0 w-full bg-white px-4 py-3">
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full"
+            onClick={handleSubmit}
+            isLoading={isPending}
+            disabled={!isValid}
+          >
+            저장
+          </Button>
+        </div>
       </div>
     </div>
   )

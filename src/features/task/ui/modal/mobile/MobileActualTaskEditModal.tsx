@@ -39,9 +39,11 @@ export function MobileActualTaskEditModal({ actual, onClose }: Props) {
           onChange={handleChange}
           onGoalChange={handleGoalChange}
         />
-        <Button size="lg" className="w-full" onClick={handleSubmit} isLoading={isPending}>
-          저장
-        </Button>
+        <div className="fixed bottom-0 left-0 w-full bg-white px-4 py-3">
+          <Button size="lg" className="w-full" onClick={handleSubmit} isLoading={isPending}>
+            저장
+          </Button>
+        </div>
       </div>
     </div>
   )

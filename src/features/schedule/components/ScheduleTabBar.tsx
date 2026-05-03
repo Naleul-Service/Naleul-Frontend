@@ -6,7 +6,7 @@ export function ScheduleTabBar() {
   const pathname = usePathname() // 쿼리스트링 없는 순수 pathname
 
   return (
-    <nav className="label-md flex w-[193px] gap-1 rounded-[8px] bg-gray-50 px-[6px] py-[5px] text-gray-300">
+    <nav className="label-md desktop:w-[193px] tablet:w-[193px] flex w-full gap-1 rounded-[8px] bg-gray-50 px-[6px] py-[5px] text-gray-300">
       {SCHEDULE_TABS.map(({ label, href, pathname: tabPathname, ...rest }) => {
         const isActive = pathname === tabPathname // exact match
         const resolvedHref = 'getHref' in rest ? rest.getHref() : href

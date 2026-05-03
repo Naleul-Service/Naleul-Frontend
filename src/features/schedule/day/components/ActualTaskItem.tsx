@@ -132,7 +132,7 @@ export function ActualTaskItem({ actual, date }: ActualTaskItemProps) {
         </div>
       </li>
 
-      {isEditModalOpen && <ActualTaskEditModal actual={actual} date={date} onClose={() => setIsEditModalOpen(false)} />}
+      {isEditModalOpen && <ActualTaskEditModal actual={actual} onClose={() => setIsEditModalOpen(false)} />}
     </>
   )
 }

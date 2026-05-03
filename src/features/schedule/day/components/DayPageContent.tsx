@@ -1,51 +1,68 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
 import { DayTaskList } from '@/src/features/schedule/day/components/DayTaskList'
 import { DailyTimeTable } from '@/src/features/schedule/day/components/DailyTimeTable'
 import { parseDateParam, toDateString } from '@/src/features/schedule/day/utils/day'
-import { useTaskFilter } from '@/src/features/schedule/day/hooks/useTaskFilter'
-import { cn } from '@/src/lib/utils'
+import { useScheduleHeader } from '@/src/features/schedule/context/ScheduleHeaderContext'
+import {
+  SelectedScheduleIcon,
+  SelectedTaskIcon,
+  UnselectedScheduleIcon,
+  UnselectedTaskIcon,
+} from '@/src/assets/svgComponents'
+import { TabletTabBar } from '@/src/features/schedule/components/TabletTabBar'
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type MobileTab = 'schedule' | 'timeline'
 
-const MOBILE_TABS: { key: MobileTab; label: string }[] = [
+// ─── 탭 설정 ──────────────────────────────────────────────────────────────────
+
+const MOBILE_ICON_TABS: {
+  key: MobileTab
+  label: string
+  SelectedIcon: React.FC<React.SVGProps<SVGSVGElement>>
+  UnselectedIcon: React.FC<React.SVGProps<SVGSVGElement>>
+}[] = [
+  {
+    key: 'schedule',
+    label: '일정',
+    SelectedIcon: SelectedTaskIcon,
+    UnselectedIcon: UnselectedTaskIcon,
+  },
+  {
+    key: 'timeline',
+    label: '타임라인',
+    SelectedIcon: SelectedScheduleIcon,
+    UnselectedIcon: UnselectedScheduleIcon,
+  },
+]
+
+const TABLET_TEXT_TABS: { key: MobileTab; label: string }[] = [
   { key: 'schedule', label: '일정' },
   { key: 'timeline', label: '타임라인' },
 ]
+
+// ─── DayPageContent ───────────────────────────────────────────────────────────
 
 export function DayPageContent() {
   const searchParams = useSearchParams()
   const selectedDate = parseDateParam(searchParams.get('date'))
   const dateString = toDateString(selectedDate)
-  const { filter } = useTaskFilter()
-  const [mobileTab, setMobileTab] = useState<MobileTab>('schedule')
+
+  const { filter, mobileTab, setMobileTab } = useScheduleHeader() // mobileTab을 context에서
 
   const tableParams = { date: dateString }
 
   return (
     <main className="flex flex-col gap-4">
-      {/* 모바일 탭 */}
-      <div className="tablet:hidden desktop:hidden flex border-b border-gray-100">
-        {MOBILE_TABS.map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setMobileTab(key)}
-            className={cn(
-              'flex-1 pb-2 text-sm font-medium transition-colors',
-              mobileTab === key ? 'border-b-2 border-gray-700 text-gray-700' : 'text-gray-400 hover:text-gray-500'
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {/* 태블릿 텍스트 탭 — tablet에서만 노출 */}
+      <TabletTabBar activeTab={mobileTab} onChange={setMobileTab} />
 
       {/* 데스크탑 — 2컬럼 */}
       <div
-        className="tablet:grid desktop:grid hidden w-full gap-x-[32px] overflow-y-auto px-1"
+        className="tablet:hidden desktop:grid hidden w-full gap-x-[32px] overflow-y-auto px-1"
         style={{
           maxHeight: 'calc(100svh - 120px)',
           gridTemplateColumns: '2fr 3fr',
@@ -59,8 +76,8 @@ export function DayPageContent() {
         </div>
       </div>
 
-      {/* 모바일 — 탭별 단일 컬럼 */}
-      <div className="tablet:hidden desktop:hidden">
+      {/* 모바일/태블릿 — 탭별 단일 컬럼 */}
+      <div className="desktop:hidden">
         {mobileTab === 'schedule' && <DayTaskList filter={filter} date={selectedDate} />}
         {mobileTab === 'timeline' && <DailyTimeTable params={tableParams} />}
       </div>

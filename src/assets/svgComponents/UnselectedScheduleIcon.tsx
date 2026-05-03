@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgUnselectedScheduleIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 16 16" {...props}><path stroke="#8FA0A8" strokeLinecap="round" strokeLinejoin="round" d="M10.667 9.333V10.8l1.066.666M10.667 1.333V4M14 5V4a1.333 1.333 0 0 0-1.333-1.333H3.333A1.333 1.333 0 0 0 2 4v9.334a1.333 1.333 0 0 0 1.333 1.333h2.334M2 6.667h3.333M5.333 1.333V4" /><path stroke="#8FA0A8" strokeLinecap="round" strokeLinejoin="round" d="M10.667 14.667a4 4 0 1 0 0-8 4 4 0 0 0 0 8" /></svg>;
+export default SvgUnselectedScheduleIcon;

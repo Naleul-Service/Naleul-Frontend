@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
+import { Task, TaskActualItem } from '@/src/features/task/types'
 import { WeeklyActualsResponse, WeeklyTasksResponse } from '../types'
 import { HOUR_LABELS, PositionedTask, utcIsoToKstDateStr } from '@/src/features/schedule/day/utils/timeTable'
 import { formatLocalDate, utcIsoToKstMinutes } from '@/src/lib/datetime'

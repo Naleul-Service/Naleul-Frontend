@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const SvgSelectedTaskIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 16 16" {...props}><g stroke="#1E7A90" strokeLinecap="round" strokeLinejoin="round" clipPath="url(#selected-task-icon_svg__a)"><path d="m2.333 3.667 1 1L5 3M2.333 7.667l1 1L5 7M2.333 11.667l1 1L5 11M7.333 4h6M7.333 8h6M7.333 12h6" /></g><defs><clipPath id="selected-task-icon_svg__a"><path fill="#fff" d="M0 0h16v16H0z" /></clipPath></defs></svg>;
+export default SvgSelectedTaskIcon;

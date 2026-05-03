@@ -19,7 +19,7 @@ export function getChartHeight(count: number): number {
 
 export function GoalCategoryDetailChart({ data }: Props) {
   return (
-    <div className="flex flex-col divide-y divide-gray-100">
+    <div className="flex flex-col divide-y divide-gray-100 pt-[20px]">
       {data.map((goal) => {
         const chartData = toBarChartData(goal.generalCategories)
         const chartHeight = getChartHeight(chartData.length)
@@ -27,12 +27,12 @@ export function GoalCategoryDetailChart({ data }: Props) {
         return (
           <div key={goal.goalCategoryId} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
             {/* 목표 카테고리 헤더 */}
-            <div className="flex items-center gap-x-1">
+            <div className="flex items-center justify-between gap-x-1">
               <div className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full" style={{ backgroundColor: goal.colorHex || FALLBACK_COLOR }} />
-                <span className="text-sm font-semibold text-gray-800">{goal.goalCategoryName}</span>
+                <span className="label-lg font-semibold text-gray-800">{goal.goalCategoryName}</span>
               </div>
-              <span className="text-primary-400 label-md">{formatMinutes(goal.totalMinutes)}</span>
+              <span className="text-primary-400 label-lg">{formatMinutes(goal.totalMinutes)}</span>
             </div>
 
             {/* 막대 차트 */}
@@ -70,9 +70,9 @@ export function GoalCategoryDetailChart({ data }: Props) {
             {/* 범례 */}
             <div className="flex flex-wrap gap-x-4 gap-y-1.5">
               {goal.generalCategories.map((s) => (
-                <span key={s.id} className="flex items-center gap-1.5 text-xs text-gray-500">
+                <span key={s.id} className="label-sm flex items-center gap-1.5 text-gray-500">
                   <span
-                    className="h-2 w-2 shrink-0 rounded-full"
+                    className="label-sm h-2 w-2 shrink-0 rounded-full"
                     style={{ backgroundColor: s.colorHex || FALLBACK_COLOR }}
                   />
                   {s.name}

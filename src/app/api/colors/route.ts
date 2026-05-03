@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { ColorRequest, createColors, getColors } from '@/src/features/category/api/colors'
+import { createColors, getColors } from '@/src/features/color/api/colors'
+import { ColorRequest } from '@/src/features/color/types'
 
 export async function GET() {
   try {

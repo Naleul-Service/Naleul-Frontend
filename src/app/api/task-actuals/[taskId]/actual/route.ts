@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { patchActualTask } from '@/src/features/schedule/day/api/day'
+import { patchActualTask } from '@/src/features/task/api/task'
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ taskId: string }> }) {
   try {

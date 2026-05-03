@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { TaskActualItem } from '../types'
-import { useDeleteTaskActual } from '../hooks/useDeleteTaskActual'
 import { utcIsoToKstTimeLabel } from '@/src/lib/datetime'
 import Badge from '@/src/components/common/Badge'
 import { CheckIcon, OptionIcon, TimeIcon } from '@/src/assets/svgComponents'
-import { ActualTaskEditModal } from '@/src/features/schedule/day/components/ActualTaskEditModal'
+import { TaskActualItem } from '@/src/features/task/types'
+import { useDeleteTaskActual } from '@/src/features/task/hooks/useDeleteTaskActual'
+import { ActualTaskEditModal } from '@/src/features/task/ui/modal/ActualTaskEditModal'
 
 interface ActualTaskItemProps {
   actual: TaskActualItem
@@ -132,7 +132,7 @@ export function ActualTaskItem({ actual, date }: ActualTaskItemProps) {
         </div>
       </li>
 
-      {isEditModalOpen && <ActualTaskEditModal actual={actual} date={date} onClose={() => setIsEditModalOpen(false)} />}
+      {isEditModalOpen && <ActualTaskEditModal actual={actual} onClose={() => setIsEditModalOpen(false)} />}
     </>
   )
 }

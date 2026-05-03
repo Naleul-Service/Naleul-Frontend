@@ -12,3 +12,12 @@ export const STATUS_BADGE_STYLE: Record<GoalCategoryStatus, { bg: string; text: 
   COMPLETED: { bg: '#EBF6F1', text: '#1F5C3A' },
   STOPPED: { bg: '#FEF0F0', text: '#DC4E4E' },
 }
+
+export const STATUS_OPTIONS = [
+  { value: 'NOT_STARTED', label: '시작 전' },
+  { value: 'IN_PROGRESS', label: '진행 중' },
+  { value: 'COMPLETED', label: '완료' },
+  { value: 'STOPPED', label: '중단' },
+] as const
+
+export const toDroppableId = (goalCategoryId: number) => `droppable-${goalCategoryId}`

@@ -3,25 +3,26 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
-import { GoalCategoryModal } from '@/src/features/category/components/GoalCategoryModal'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import PageHeader from '@/src/components/layout/PageHeader'
 import PageLayout from '@/src/components/layout/PageLayout'
-import EmptyCategory from '@/src/features/category/components/EmptyCategory'
-import { GoalCategoryList } from '@/src/features/category/components/GoalCategoryList'
+import EmptyCategory from '@/src/features/category/ui/EmptyCategory'
+import { GoalCategoryList } from '@/src/features/category/ui/GoalCategoryList'
+import { GoalCategoryModal } from '@/src/features/category/ui/modal/GoalCategoryModal'
 
 export default function CategoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { data: categories = [] } = useGoalCategories()
 
   return (
-    <PageLayout customClassName={'gap-y-6'}>
+    <PageLayout customClassName={'gap-y-6 mb-[40px]'}>
       <PageHeader
         title={'목표 관리'}
         subtitle="목표와 세부 목표를 관리해요"
         rightElement={
           <Button leftIcon={<Plus size={15} />} onClick={() => setIsModalOpen(true)}>
-            목표 카테고리 추가
+            <span className="tablet:block desktop:block hidden">목표 카테고리 추가</span>
+            <span className="tablet:hidden desktop:hidden block">목표 추가</span>
           </Button>
         }
       />

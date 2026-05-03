@@ -92,7 +92,7 @@ export function CalendarPopover() {
   }
 
   return (
-    <div className="flex h-[40px] items-center gap-1 rounded-[8px] border border-gray-100">
+    <div className="desktop:border desktop:border-gray-100 tablet:border tablet:border-gray-100 flex h-[40px] items-center gap-1 rounded-[8px]">
       {/* 이전 */}
       <Button
         variant="ghost"

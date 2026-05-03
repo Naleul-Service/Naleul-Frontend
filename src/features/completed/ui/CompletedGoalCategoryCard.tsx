@@ -7,7 +7,7 @@ interface Props {
 
 export function CompletedGoalCategoryCard({ item }: Props) {
   return (
-    <div className="flex items-start gap-x-[20px] rounded-[12px] border border-gray-100 bg-white p-6">
+    <div className="desktop:p-6 flex items-start gap-x-[20px] rounded-[12px] border border-gray-100 bg-white p-4">
       <div className="mt-3 h-[12px] w-[12px] rounded-full" style={{ backgroundColor: item.colorCode }} />
       <section className="flex w-full flex-col gap-3">
         {/* 헤더 */}
@@ -41,7 +41,7 @@ export function CompletedGoalCategoryCard({ item }: Props) {
         {/* 통계 */}
         <div className="flex gap-3">
           <div className="flex flex-1 flex-col items-start gap-2 rounded-[8px] border border-gray-100 p-4">
-            <span className="label-sm text-gray-300">총 소요 시간</span>
+            <span className="label-sm text-gray-300">소요 시간</span>
             <span className="h3 text-primary-600">{formatMinutes(item.totalActualMinutes)}</span>
           </div>
           <div className="flex flex-1 flex-col items-start gap-2 rounded-[8px] border border-gray-100 p-4">

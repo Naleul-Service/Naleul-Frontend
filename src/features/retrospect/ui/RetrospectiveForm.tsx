@@ -13,6 +13,7 @@ import type {
 import { Dropdown } from '@/src/components/common/Dropdown'
 import { DatePicker } from '@/src/components/common/picker/DatePicker'
 import { Button } from '@/src/components/common/Button'
+import Label from '@/src/components/common/Label'
 
 const REVIEW_TYPES: { value: ReviewType; label: string }[] = [
   { value: 'DAILY', label: '일간' },
@@ -78,8 +79,8 @@ export function RetrospectiveForm(props: Props) {
     <div className="flex flex-col gap-5">
       {/* 타입 선택 (수정 시 숨김) */}
       {!isEdit && (
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">회고 유형</label>
+        <div className="flex flex-col gap-y-[6px]">
+          <Label isRequired={true}>회고 유형</Label>
           <div className="flex gap-2">
             {REVIEW_TYPES.map(({ value, label }) => (
               <Button
@@ -102,6 +103,7 @@ export function RetrospectiveForm(props: Props) {
           {/* 날짜 */}
           <DatePicker
             label="날짜"
+            isRequired={true}
             variant={reviewType === 'DAILY' ? 'day' : reviewType === 'WEEKLY' ? 'week' : 'month'}
             value={reviewDate}
             onChange={(date) => {
@@ -115,7 +117,8 @@ export function RetrospectiveForm(props: Props) {
 
       {/* 목표 카테고리 */}
       <Dropdown
-        label="목표 카테고리"
+        label="목표"
+        isRequired={true}
         placeholder="선택 안 함"
         value={goalCategoryId}
         onChange={(v) => handleGoalCategoryChange(Number(v))}
@@ -129,8 +132,9 @@ export function RetrospectiveForm(props: Props) {
 
       {/* 일반 카테고리 */}
       <Dropdown
-        label="일반 카테고리"
-        placeholder={!goalCategoryId ? '목표 카테고리를 먼저 선택하세요' : '선택 안 함'}
+        label="세부 목표"
+        isRequired={true}
+        placeholder={!goalCategoryId ? '목표를 먼저 선택하세요' : '선택 안 함'}
         value={generalCategoryId}
         onChange={(v) => setGeneralCategoryId(Number(v))}
         disabled={!goalCategoryId || generalCategories.length === 0}
@@ -141,8 +145,8 @@ export function RetrospectiveForm(props: Props) {
       />
 
       {/* 내용 */}
-      <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">내용</label>
+      <div className="flex flex-col gap-y-[6px]">
+        <Label isRequired={true}>내용</Label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -153,7 +157,8 @@ export function RetrospectiveForm(props: Props) {
       </div>
 
       {/* 버튼 */}
-      <div className="flex gap-2 pt-1">
+      {/* 버튼 — 모바일에서는 숨김 (MobileHeader의 < 버튼이 취소 역할) */}
+      <div className="tablet:flex desktop:flex flex hidden gap-2 pt-1">
         <button
           type="button"
           onClick={props.onCancel}
@@ -166,6 +171,18 @@ export function RetrospectiveForm(props: Props) {
           onClick={handleSubmit}
           disabled={!content.trim() || props.isLoading}
           className="flex-1 rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {props.isLoading ? '저장 중...' : isEdit ? '수정' : '저장'}
+        </button>
+      </div>
+
+      {/* 저장 버튼 — 모바일 전용 */}
+      <div className="fixed bottom-0 left-0 w-full bg-white px-4 py-3">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={!content.trim() || props.isLoading}
+          className="tablet:hidden desktop:hidden w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {props.isLoading ? '저장 중...' : isEdit ? '수정' : '저장'}
         </button>
@@ -198,49 +215,4 @@ function getDefaultDate(type: ReviewType): string {
     case 'MONTHLY':
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
   }
-}
-
-// "yyyy-MM-dd" → input[type=week] value인 "yyyy-Www"
-function dateToWeekValue(dateStr: string): string {
-  const date = new Date(dateStr)
-  const year = date.getFullYear()
-
-  // ISO 주차 계산
-  const startOfYear = new Date(year, 0, 1)
-  const diff = date.getTime() - startOfYear.getTime()
-  const weekNum = Math.ceil((diff / 86400000 + startOfYear.getDay() + 1) / 7)
-
-  return `${year}-W${String(weekNum).padStart(2, '0')}`
-}
-
-// input[type=week] value인 "yyyy-Www" → 해당 주 월요일 "yyyy-MM-dd"
-function weekValueToMonday(weekValue: string): string {
-  const [yearStr, weekStr] = weekValue.split('-W')
-  const year = Number(yearStr)
-  const week = Number(weekStr)
-
-  // 해당 연도 1월 4일 (항상 1주차에 포함)
-  const jan4 = new Date(year, 0, 4)
-  const jan4Day = jan4.getDay() || 7 // 일=0을 7로
-  const monday = new Date(jan4)
-  monday.setDate(jan4.getDate() - (jan4Day - 1) + (week - 1) * 7)
-
-  return monday.toISOString().slice(0, 10)
-}
-
-// 주간 범위 레이블: "2025년 18주 (04/28 ~ 05/04)"
-function getWeekRangeLabel(mondayStr: string): string {
-  const monday = new Date(mondayStr)
-  const sunday = new Date(monday)
-  sunday.setDate(monday.getDate() + 6)
-
-  const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`
-
-  return `${fmt(monday)} ~ ${fmt(sunday)}`
-}
-
-// 월간 레이블: "2025년 5월"
-function getMonthLabel(dateStr: string): string {
-  const d = new Date(dateStr)
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`
 }

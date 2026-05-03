@@ -1,7 +1,8 @@
 //schedule/week/utils/timeTable.ts
 
-import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
 import { PositionedTask, splitByHourRaw, utcIsoToKstDateStr } from '@/src/features/schedule/day/utils/timeTable'
+import { Task, TaskActualItem } from '@/src/features/task/types'
+import { utcIsoToKstMinutes } from '@/src/lib/datetime'
 
 export function groupActualsByHour(
   actuals: TaskActualItem[],
@@ -33,4 +34,8 @@ export function groupPlannedByHour(tasks: Task[], date: string): Map<number, Pos
   }
 
   return map
+}
+
+export function isOvernightIntoDate(endAt: string, targetDateStr: string): boolean {
+  return utcIsoToKstDateStr(endAt) === targetDateStr && utcIsoToKstMinutes(endAt) !== 0
 }

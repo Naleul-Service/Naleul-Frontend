@@ -1,4 +1,4 @@
-// src/components/common/DatePicker.tsx
+// src/ui/common/DatePicker.tsx
 import { DayPicker } from '@/src/components/common/picker/DayPicker'
 import { getWeekRange, WeekPicker } from '@/src/components/common/picker/WeekPicker'
 import { MonthPicker } from '@/src/components/common/picker/MonthPicker'

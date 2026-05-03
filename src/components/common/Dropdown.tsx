@@ -1,4 +1,4 @@
-// src/components/common/Dropdown.tsx
+// src/ui/common/Dropdown.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'

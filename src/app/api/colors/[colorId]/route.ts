@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { deleteColor } from '@/src/features/category/api/colors'
+import { deleteColor } from '@/src/features/color/api/colors'
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ colorId: string }> }) {
   try {

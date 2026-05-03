@@ -78,7 +78,7 @@ export function Modal({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="tablet:flex desktop:flex fixed inset-0 z-50 hidden items-center justify-center p-4">
           {/* 오버레이 */}
           <motion.div
             className="absolute inset-0 bg-black/40"

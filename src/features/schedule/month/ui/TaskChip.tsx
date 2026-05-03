@@ -1,12 +1,37 @@
-import { Task } from '@/src/features/schedule/day/types'
+import { Task } from '@/src/features/task/types'
 
 interface Props {
   task: Task
+  mobile?: boolean
 }
 
-export function TaskChip({ task }: Props) {
+export function TaskChip({ task, mobile = false }: Props) {
   const generalColor = task.generalCategoryColorCode ?? '#E5E7EB'
   const goalColor = task.goalCategoryColorCode ?? '#E5E7EB'
+
+  if (mobile) {
+    return (
+      <div
+        style={{
+          fontSize: 8,
+          fontWeight: 500,
+          lineHeight: '130%',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          color: '#1F2937',
+          backgroundColor: `${generalColor}33`,
+          // borderTop: `1px solid ${generalColor}`,
+          // borderBottom: `1px solid ${generalColor}`,
+          // borderRight: `1px solid ${generalColor}`,
+          borderLeft: `2px solid ${goalColor}`,
+        }}
+        title={task.taskName}
+      >
+        {task.taskName}
+      </div>
+    )
+  }
 
   return (
     <div

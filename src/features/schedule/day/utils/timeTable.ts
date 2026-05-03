@@ -1,5 +1,5 @@
 import { utcIsoToKstMinutes } from '@/src/lib/datetime'
-import { TaskActualItem } from '@/src/features/schedule/day/types'
+import { TaskActualItem } from '@/src/features/task/types'
 
 export const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => i)
 

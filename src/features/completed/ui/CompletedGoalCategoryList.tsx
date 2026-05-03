@@ -3,26 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useCompletedGoalCategories } from '../hooks/useCompletedGoalCategories'
 import { CompletedGoalCategoryCard } from './CompletedGoalCategoryCard'
-
-function CardSkeleton() {
-  return (
-    <div className="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-[0_2px_16px_0_rgba(0,0,0,0.06)]">
-      <div className="flex justify-between">
-        <div className="flex flex-col gap-1.5">
-          <div className="h-4 w-32 animate-pulse rounded-md bg-gray-100" />
-          <div className="h-3 w-20 animate-pulse rounded-md bg-gray-100" />
-        </div>
-        <div className="h-6 w-12 animate-pulse rounded-full bg-gray-100" />
-      </div>
-      <div className="h-16 animate-pulse rounded-xl bg-gray-100" />
-      <div className="flex gap-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-16 flex-1 animate-pulse rounded-xl bg-gray-100" />
-        ))}
-      </div>
-    </div>
-  )
-}
+import CardSkeleton from '@/src/features/category/ui/skeleton/CardSkeleton'
 
 export function CompletedGoalCategoryList() {
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useCompletedGoalCategories()
@@ -74,7 +55,7 @@ export function CompletedGoalCategoryList() {
   return (
     <div className="flex flex-col gap-y-2">
       <h1 className="h3">완료 목표</h1>
-      <div className="flex flex-col gap-y-2">
+      <div className="flex flex-col gap-4">
         {items.map((item) => (
           <CompletedGoalCategoryCard key={item.goalCategoryId} item={item} />
         ))}

@@ -14,7 +14,7 @@ export default function GoalStatsSummary() {
   if (isError) return <div className="flex gap-x-[20px]">에러 발생</div>
 
   return (
-    <div className="flex gap-x-[20px]" content="">
+    <div className="desktop:gap-x-[20px] tablet:gap-[16px] flex gap-[12px]" content="">
       <GoalStatsItem title="총 달성 목표" content={`${summary?.totalCompletedCount} 개`} />
       <GoalStatsItem title="누적 소요 시간" content={`${formatMinutes(summary?.totalActualMinutes)}`} />
       <GoalStatsItem title="평균 진행 기간" content={`${summary?.averageDurationDays} 일`} />

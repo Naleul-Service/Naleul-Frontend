@@ -1,6 +1,6 @@
 import { TaskChip } from './TaskChip'
-import { Task } from '@/src/features/schedule/day/types'
 import { useRouter } from 'next/navigation'
+import { Task } from '@/src/features/task/types'
 
 const MAX_VISIBLE = 3
 

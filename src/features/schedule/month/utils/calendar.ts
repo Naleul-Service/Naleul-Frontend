@@ -1,5 +1,6 @@
 // 해당 월의 캘린더 그리드에 필요한 날짜 배열 반환 (이전/다음 월 포함)
-import { Task } from '@/src/features/schedule/day/types'
+
+import { Task } from '@/src/features/task/types'
 
 export function buildCalendarDays(year: number, month: number): Date[] {
   // month: 1-indexed

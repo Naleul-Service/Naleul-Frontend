@@ -6,13 +6,13 @@ import { useSearchParams } from 'next/navigation'
 import { ScheduleTabBarContainer } from '@/src/features/schedule/components/ScheduleTabBarContainer'
 import { CalendarPopover } from '@/src/features/schedule/components/CalendarPopover'
 import { Button } from '@/src/components/common/Button'
-import { AddTaskModal } from '@/src/features/task/components/AddTaskModal'
-import { CreateTaskActualModal } from '@/src/features/schedule/day/components/CreateTaskActualModal'
 import { parseDateParam, toDateString } from '@/src/features/schedule/day/utils/day'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import PageHeader from '@/src/components/layout/PageHeader'
 import { TaskFilterPopover } from '@/src/features/schedule/day/components/TaskFilterPopover'
 import { useTaskFilter } from '@/src/features/schedule/day/hooks/useTaskFilter'
+import { CreateTaskActualModal } from '@/src/features/task/ui/modal/CreateTaskActualModal'
+import { AddTaskModal } from '@/src/features/task/ui/modal/AddTaskModal'
 
 export default function SchedulePageLayout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()

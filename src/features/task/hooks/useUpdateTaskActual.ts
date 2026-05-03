@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TaskActualUpdateBody } from '../types'
-import { TASK_ACTUAL_QUERY_KEYS } from './useDailyActuals'
 
 async function updateTaskActual(taskActualId: number, body: TaskActualUpdateBody) {
   const res = await fetch(`/api/task-actuals/${taskActualId}`, {
@@ -14,13 +13,13 @@ async function updateTaskActual(taskActualId: number, body: TaskActualUpdateBody
   return json.data
 }
 
-export function useUpdateTaskActual(date: string) {
+export function useUpdateTaskActual() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ taskActualId, body }: { taskActualId: number; body: TaskActualUpdateBody }) =>
       updateTaskActual(taskActualId, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TASK_ACTUAL_QUERY_KEYS.daily({ date }) })
-    },
+    // onSuccess: () => {
+    //   invalidateScheduleAll(queryClient)
+    // },
   })
 }

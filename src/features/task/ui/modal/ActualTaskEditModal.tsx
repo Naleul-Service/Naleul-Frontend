@@ -6,10 +6,10 @@ import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
 import { Dropdown, DropdownOption } from '@/src/components/common/Dropdown'
 import { DateTimePicker } from '@/src/components/common/DateTimePicker'
-import { useUpdateTaskActual } from '../hooks/useUpdateTaskActual'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
-import { TaskActualItem, TaskActualUpdateBody } from '../types'
 import { localInputToUtc, utcToLocalInput } from '@/src/lib/datetime'
+import { TaskActualItem, TaskActualUpdateBody } from '@/src/features/task/types'
+import { useUpdateTaskActual } from '@/src/features/task/hooks/useUpdateTaskActual'
 
 interface ActualTaskEditModalProps {
   actual: TaskActualItem
@@ -48,7 +48,7 @@ export function ActualTaskEditModal({ actual, date, onClose }: ActualTaskEditMod
   })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
 
-  const { mutate: updateActual, isPending } = useUpdateTaskActual(date)
+  const { mutate: updateActual, isPending } = useUpdateTaskActual()
   const { data: goalCategories = [], isLoading: isLoadingCategories } = useGoalCategories()
 
   const generalCategories =

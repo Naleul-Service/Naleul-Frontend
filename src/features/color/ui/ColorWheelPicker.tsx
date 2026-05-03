@@ -1,4 +1,4 @@
-// src/features/color/components/ColorWheelPicker.tsx
+// src/features/color/ui/ColorWheelPicker.tsx
 
 'use client'
 

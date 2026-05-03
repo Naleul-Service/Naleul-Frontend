@@ -5,10 +5,10 @@ import PageHeader from '@/src/components/layout/PageHeader'
 import { useState } from 'react'
 import { PlusIcon } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
-import { AddTaskModal } from '@/src/features/task/components/AddTaskModal'
 import { useChartData } from '@/src/features/charts/hooks/useChartData'
 import { StatsSummarySection } from '@/src/features/charts/ui/StatsSummarySection'
 import { ChartGridSection } from '@/src/features/charts/ui/ChartGridSection'
+import { AddTaskModal } from '@/src/features/task/ui/modal/AddTaskModal'
 
 export function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false)

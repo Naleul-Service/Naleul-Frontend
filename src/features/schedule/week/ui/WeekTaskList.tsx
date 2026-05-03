@@ -10,7 +10,7 @@ import { WeekTimeTable } from '@/src/features/schedule/week/ui/WeekTimeTable'
 import { useWeeklyActuals } from '@/src/features/schedule/week/hooks/useWeeklyActuals'
 import { formatLocalDate } from '@/src/lib/datetime'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { Task } from '@/src/features/schedule/day/types'
+import { Task } from '@/src/features/task/types'
 
 const DAY_LABELS: Record<string, string> = {
   MONDAY: '월',

@@ -1,4 +1,4 @@
-import { Task } from '@/src/features/schedule/day/types'
+import { Task } from '@/src/features/task/types'
 import { buildCalendarGrid, getDayStatus, toDateKey } from '../utils/calendar'
 
 interface Props {

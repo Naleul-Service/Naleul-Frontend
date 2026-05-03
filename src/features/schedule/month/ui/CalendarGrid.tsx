@@ -1,6 +1,6 @@
 import { buildCalendarDays, isSameMonth, isToday, toDateKey } from '../utils/calendar'
 import { CalendarCell } from './CalendarCell'
-import { Task } from '@/src/features/schedule/day/types'
+import { Task } from '@/src/features/task/types'
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 

@@ -1,7 +1,7 @@
 // src/features/task/hooks/useDeleteTask.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TASK_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyTasks'
 import { WEEKLY_TASK_QUERY_KEYS } from '@/src/features/schedule/week/hooks/useWeeklyTasks'
+import { TASK_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyTasks'
 
 async function deleteTask(taskId: number): Promise<void> {
   const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' })

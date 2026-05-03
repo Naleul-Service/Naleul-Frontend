@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TASK_ACTUAL_QUERY_KEYS } from './useDailyActuals'
+import { TASK_ACTUAL_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyActuals'
 
 async function deleteTaskActual(taskActualId: number) {
   const res = await fetch(`/api/task-actuals/${taskActualId}`, { method: 'DELETE' })

@@ -1,8 +1,8 @@
 // src/features/task/hooks/useUpdateTask.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { UpdateTaskBody } from '@/src/features/task/types'
-import { TASK_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyTasks'
 import { WEEKLY_TASK_QUERY_KEYS } from '@/src/features/schedule/week/hooks/useWeeklyTasks'
+import { TASK_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyTasks'
 
 async function updateTask(taskId: number, body: UpdateTaskBody): Promise<void> {
   const res = await fetch(`/api/tasks/${taskId}`, {

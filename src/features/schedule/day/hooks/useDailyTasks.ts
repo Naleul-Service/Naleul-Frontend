@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { DailyTasksParams, Task } from '../types'
+import { DailyTasksParams } from '../types'
+import { Task } from '@/src/features/task/types'
 
 export const TASK_QUERY_KEYS = {
   all: ['tasks'] as const,

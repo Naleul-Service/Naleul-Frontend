@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Task } from '../types'
-import { TaskActualModal } from './TaskActualModal'
 import { useDeleteTask } from '@/src/features/task/hooks/useDeleteTask'
-import { TaskEditModal } from '@/src/features/task/components/TaskEditModal'
 import { utcIsoToKstTimeLabel } from '@/src/lib/datetime'
 import Badge from '@/src/components/common/Badge'
 import { CheckIcon, OptionIcon, TimeIcon, UncheckIcon } from '@/src/assets/svgComponents'
 import PriorityBadge from '@/src/components/common/PriorityBadge'
+import { Task } from '@/src/features/task/types'
+import { TaskActualModal } from '@/src/features/task/ui/modal/TaskActualModal'
+import { TaskEditModal } from '@/src/features/task/ui/modal/TaskEditModal'
 
 export function TaskItem({ task, date }: { task: Task; date: string }) {
   const [isActualModalOpen, setIsActualModalOpen] = useState(false)

@@ -1,7 +1,7 @@
 //schedule/week/utils/timeTable.ts
 
-import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
 import { PositionedTask, splitByHourRaw, utcIsoToKstDateStr } from '@/src/features/schedule/day/utils/timeTable'
+import { Task, TaskActualItem } from '@/src/features/task/types'
 
 export function groupActualsByHour(
   actuals: TaskActualItem[],

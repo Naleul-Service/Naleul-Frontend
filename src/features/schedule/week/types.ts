@@ -1,5 +1,4 @@
-import { Task, TaskActualItem } from '@/src/features/schedule/day/types'
-import { TaskPriority } from '@/src/features/task/types'
+import { Task, TaskActualItem, TaskPriority } from '@/src/features/task/types'
 
 export interface WeeklyTasksParams {
   startDate: string

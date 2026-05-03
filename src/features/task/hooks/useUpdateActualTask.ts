@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TASK_QUERY_KEYS } from './useDailyTasks'
-import { TASK_ACTUAL_QUERY_KEYS } from './useDailyActuals'
-import { UpdateActualTaskBody } from '../api/day'
+import { UpdateActualTaskBody } from '@/src/features/task/api/task'
+import { TASK_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyTasks'
+import { TASK_ACTUAL_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyActuals'
 
 async function updateActualTask(taskId: number, body: UpdateActualTaskBody): Promise<void> {
   const res = await fetch(`/api/task-actuals/${taskId}/actual`, {

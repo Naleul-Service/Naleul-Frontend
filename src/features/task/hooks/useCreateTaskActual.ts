@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreateTaskActualBody, TaskActualItem } from '../types'
-import { TASK_ACTUAL_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyActuals'
+import { invalidateScheduleAll } from '@/src/lib/queryInvalidations'
 
 async function createTaskActual(body: CreateTaskActualBody): Promise<TaskActualItem> {
   const res = await fetch('/api/task-actuals', {
@@ -20,9 +20,7 @@ export function useCreateTaskActual(date: string) {
   return useMutation({
     mutationFn: createTaskActual,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: TASK_ACTUAL_QUERY_KEYS.daily({ date }),
-      })
+      invalidateScheduleAll(queryClient)
     },
   })
 }

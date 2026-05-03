@@ -36,6 +36,8 @@ function getDayDate(startDate: string, dayIndex: number): string {
  *  - 자신의 날짜에 속한 태스크
  *  - 전날 태스크 중 KST endDate가 자신의 날짜인 오버나이트 태스크 포함
  */
+// WeekTimeTable.tsx
+
 function resolveActualsForDay(
   actualData: WeeklyActualsResponse,
   dayIndex: number,
@@ -47,12 +49,17 @@ function resolveActualsForDay(
 
   const currentDateStr = getDayDate(startDate, dayIndex)
 
-  // 전날 하나만이 아니라 앞선 모든 날 체크
   const overflowFromPrev = DAY_ORDER.slice(0, dayIndex).flatMap((prevDay) => {
     const prevActuals = actualData.actualsByDay[prevDay] ?? []
     return prevActuals.filter((actual) => {
       const endDateStr = utcIsoToKstDateStr(actual.actualEndAt)
-      return endDateStr === currentDateStr
+      if (endDateStr !== currentDateStr) return false
+
+      // ✅ 핵심 수정: KST 기준 자정(00:00)에 끝나는 건 오버나이트가 아님
+      const kstEndMinutes = utcIsoToKstMinutes(actual.actualEndAt)
+      if (kstEndMinutes === 0) return false
+
+      return true
     })
   })
 

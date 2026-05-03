@@ -3,6 +3,7 @@ import { DailyActualsParams } from '../types'
 import { TaskActualItem } from '@/src/features/task/types'
 
 export const TASK_ACTUAL_QUERY_KEYS = {
+  all: ['task-actuals'] as const,
   daily: (params: DailyActualsParams) => ['task-actuals', 'daily', params] as const,
 }
 

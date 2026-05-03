@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TaskActualUpdateBody } from '../types'
+import { invalidateScheduleAll } from '@/src/lib/queryInvalidations'
 
 async function updateTaskActual(taskActualId: number, body: TaskActualUpdateBody) {
   const res = await fetch(`/api/task-actuals/${taskActualId}`, {
@@ -18,8 +19,8 @@ export function useUpdateTaskActual() {
   return useMutation({
     mutationFn: ({ taskActualId, body }: { taskActualId: number; body: TaskActualUpdateBody }) =>
       updateTaskActual(taskActualId, body),
-    // onSuccess: () => {
-    //   invalidateScheduleAll(queryClient)
-    // },
+    onSuccess: () => {
+      invalidateScheduleAll(queryClient)
+    },
   })
 }

@@ -1,7 +1,5 @@
-// src/features/task/hooks/useDeleteTask.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { WEEKLY_TASK_QUERY_KEYS } from '@/src/features/schedule/week/hooks/useWeeklyTasks'
-import { TASK_QUERY_KEYS } from '@/src/features/schedule/day/hooks/useDailyTasks'
+import { invalidateScheduleAll } from '@/src/lib/queryInvalidations'
 
 async function deleteTask(taskId: number): Promise<void> {
   const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' })
@@ -16,8 +14,7 @@ export function useDeleteTask() {
   return useMutation({
     mutationFn: (taskId: number) => deleteTask(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.all })
-      queryClient.invalidateQueries({ queryKey: WEEKLY_TASK_QUERY_KEYS.all })
+      invalidateScheduleAll(queryClient)
     },
   })
 }

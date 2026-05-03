@@ -1,10 +1,9 @@
 'use client'
 
-import { Logo } from '@/src/assets/svgComponents'
+import { HeaderChevronLeftIcon, Logo } from '@/src/assets/svgComponents'
 import SidebarMenu from '@/src/components/layout/sidebar/SidebarMenu'
 import { useUserStore } from '@/src/components/store/useUserStore'
 import { useState } from 'react'
-import { ChevronLeft } from 'lucide-react'
 
 interface MobileHeaderProps {
   headerType?: 'dynamic' | 'default'
@@ -21,8 +20,8 @@ export default function MobileHeader({ headerType = 'default', title, onClick }:
       case 'dynamic':
         return (
           <>
-            <header className="body-lg-medium">
-              <ChevronLeft onClick={onClick} width={24} height={24} />
+            <header className="body-lg-medium flex h-[48px] items-center justify-between">
+              <HeaderChevronLeftIcon onClick={onClick} width={24} height={24} />
               {title}
               <div className="h-[24px] w-[24px]" />
             </header>

@@ -3,13 +3,12 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
-import { GoalCategoryModal } from '@/src/features/category/ui/GoalCategoryModal'
 import { useGoalCategories } from '@/src/features/category/hooks/useGoalCategories'
 import PageHeader from '@/src/components/layout/PageHeader'
 import PageLayout from '@/src/components/layout/PageLayout'
 import EmptyCategory from '@/src/features/category/ui/EmptyCategory'
 import { GoalCategoryList } from '@/src/features/category/ui/GoalCategoryList'
-import MobileGoalCategoryModal from '@/src/features/category/ui/modal/MobileGoalCategoryModal'
+import { GoalCategoryModal } from '@/src/features/category/ui/modal/GoalCategoryModal'
 
 export default function CategoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -37,7 +36,6 @@ export default function CategoryPage() {
         <GoalCategoryList />
       )}
 
-      <MobileGoalCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <GoalCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </PageLayout>
   )

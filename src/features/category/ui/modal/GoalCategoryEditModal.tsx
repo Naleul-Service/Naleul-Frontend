@@ -4,18 +4,12 @@ import { useEffect, useState } from 'react'
 import { Modal } from '@/src/components/common/Modal'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
-import { ColorPicker } from './ColorPicker'
-import { useColors } from '../hooks/useColors'
-import { useUpdateGoalCategory } from '../hooks/useGoalCategoryMutations'
-import { GoalCategory, GoalCategoryStatus } from '../api/goalCategory'
 import Label from '@/src/components/common/Label'
-
-const STATUS_OPTIONS = [
-  { value: 'NOT_STARTED', label: '시작 전' },
-  { value: 'IN_PROGRESS', label: '진행 중' },
-  { value: 'COMPLETED', label: '완료' },
-  { value: 'STOPPED', label: '중단' },
-] as const
+import { GoalCategory, GoalCategoryStatus } from '@/src/features/category/api/goalCategory'
+import { useUpdateGoalCategory } from '@/src/features/category/hooks/useGoalCategoryMutations'
+import { STATUS_OPTIONS } from '@/src/features/category/constants'
+import { ColorPicker } from '@/src/features/color/ui/ColorPicker'
+import { useColors } from '@/src/features/color/hooks/useColors'
 
 interface GoalCategoryEditModalProps {
   isOpen: boolean

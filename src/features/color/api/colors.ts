@@ -1,14 +1,5 @@
 import { apiCallServer } from '@/src/lib/api.server'
-
-export interface Color {
-  userColorId: number
-  colorCode: string
-  default: boolean
-}
-
-export interface ColorRequest {
-  colorCode: string
-}
+import { Color, ColorRequest } from '../types'
 
 export async function getColors(): Promise<Color[]> {
   const result = await apiCallServer<Color[]>('/v1/user-colors')

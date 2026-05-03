@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import { Modal } from '@/src/components/common/Modal'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
-import { ColorPicker } from './ColorPicker'
-import { useColors } from '../hooks/useColors'
-import { useUpdateGeneralCategory } from '../hooks/useGeneralCategoryMutations'
-import { GeneralCategoryItemType, GoalCategory } from '../api/goalCategory'
 import Label from '@/src/components/common/Label'
+import { GeneralCategoryItemType, GoalCategory } from '@/src/features/category/api/goalCategory'
+import { useUpdateGeneralCategory } from '@/src/features/category/hooks/useGeneralCategoryMutations'
+import { ColorPicker } from '@/src/features/color/ui/ColorPicker'
+import { useColors } from '@/src/features/color/hooks/useColors'
 
 interface GeneralCategoryEditModalProps {
   isOpen: boolean

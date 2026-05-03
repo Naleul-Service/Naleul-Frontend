@@ -5,9 +5,9 @@ import { CheckCircle } from 'lucide-react'
 import { Modal } from '@/src/components/common/Modal'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
-import { useCompleteGoalCategory } from '../hooks/useGoalCategoryMutations'
-import { GoalCategory } from '../api/goalCategory'
 import Label from '@/src/components/common/Label'
+import { useCompleteGoalCategory } from '@/src/features/category/hooks/useGoalCategoryMutations'
+import { GoalCategory } from '@/src/features/category/api/goalCategory'
 
 interface GoalCategoryCompleteModalProps {
   isOpen: boolean

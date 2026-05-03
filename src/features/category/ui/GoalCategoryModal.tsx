@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { Modal } from '@/src/components/common/Modal'
 import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
-import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGoalCategory } from '@/src/features/category/hooks/useGoalCategories'
-import { ColorPicker } from './ColorPicker'
 import Label from '@/src/components/common/Label'
 import { DatePicker } from '@/src/components/common/picker/DatePicker'
 import { getDefaultStartDate } from '@/src/features/category/utils/category'
+import { useColors } from '@/src/features/color/hooks/useColors'
+import { ColorPicker } from '@/src/features/color/ui/ColorPicker'
 
 interface GoalCategoryModalProps {
   isOpen: boolean

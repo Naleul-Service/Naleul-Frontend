@@ -2,11 +2,11 @@ import MobileHeader from '@/src/components/layout/MobileHeader'
 import { Input } from '@/src/components/common/Input'
 import { DatePicker } from '@/src/components/common/picker/DatePicker'
 import Label from '@/src/components/common/Label'
-import { ColorPicker } from '@/src/features/category/components/ColorPicker'
-import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGoalCategory } from '@/src/features/category/hooks/useGoalCategories'
 import { useState } from 'react'
 import { getDefaultStartDate } from '@/src/features/category/utils/category'
+import { ColorPicker } from '@/src/features/color/ui/ColorPicker'
+import { useColors } from '@/src/features/color/hooks/useColors'
 
 interface MobileGoalCategoryModalProps {
   isOpen: boolean

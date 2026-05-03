@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Color } from '@/src/features/category/api/colors'
+import { Color } from '../types'
 
 async function fetchColors(): Promise<Color[]> {
   const res = await fetch('/api/colors')

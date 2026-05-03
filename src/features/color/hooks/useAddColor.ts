@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Color, ColorRequest } from '@/src/features/category/api/colors'
+import { Color, ColorRequest } from '@/src/features/color/types'
 
 async function postColor(body: ColorRequest): Promise<Color> {
   const res = await fetch('/api/colors', {

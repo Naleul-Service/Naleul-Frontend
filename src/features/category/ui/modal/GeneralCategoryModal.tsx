@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { Modal } from '@/src/components/common/Modal'
 import { Input } from '@/src/components/common/Input'
 import { Button } from '@/src/components/common/Button'
-import { useColors } from '@/src/features/category/hooks/useColors'
 import { useCreateGeneralCategory } from '@/src/features/category/hooks/useGeneralCategories'
 import { GoalCategory } from '@/src/features/category/api/goalCategory'
-import { ColorPicker } from './ColorPicker'
 import Label from '@/src/components/common/Label'
+import { ColorPicker } from '@/src/features/color/ui/ColorPicker'
+import { useColors } from '@/src/features/color/hooks/useColors'
 
 interface GeneralCategoryModalProps {
   isOpen: boolean

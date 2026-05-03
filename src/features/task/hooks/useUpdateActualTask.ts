@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { UpdateActualTaskBody } from '../api/day'
 import { invalidateScheduleAll } from '@/src/lib/queryInvalidations'
+import { UpdateActualTaskBody } from '@/src/features/task/api/task'
 
 async function updateActualTask(taskId: number, body: UpdateActualTaskBody): Promise<void> {
   const res = await fetch(`/api/task-actuals/${taskId}/actual`, {

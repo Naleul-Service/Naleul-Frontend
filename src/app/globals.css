@@ -376,3 +376,34 @@ body {
     flex-direction: column;
   }
 }
+/* globals.css 하단에 추가 */
+.show-tablet {
+  display: none;
+}
+.hide-tablet {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .show-tablet {
+    display: block;
+  }
+  .hide-tablet {
+    display: none;
+  }
+  .show-tablet-grid {
+    display: grid;
+  }
+  .hide-tablet-grid {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .show-tablet-grid {
+    display: none;
+  }
+  .hide-tablet-grid {
+    display: grid;
+  }
+}

@@ -20,7 +20,7 @@ export default function MobileHeader({ headerType = 'default', title, onClick }:
       case 'dynamic':
         return (
           <>
-            <header className="body-lg-medium flex h-[48px] items-center justify-between">
+            <header className="body-lg-medium flex h-[48px] items-center justify-between px-4">
               <HeaderChevronLeftIcon onClick={onClick} width={24} height={24} />
               {title}
               <div className="h-[24px] w-[24px]" />
